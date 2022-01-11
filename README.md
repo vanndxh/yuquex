@@ -1,24 +1,25 @@
 # yuquex
 
-## Project setup
-```
-npm install
-```
+### Introduction
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+毕业设计作品
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### Dev
 
-### Lints and fixes files
-```
-npm run lint
-```
+vue: ^3.0.0, vue-router: ^4.0.0-0, vuex: ^4.0.2"
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### About Author
+
+qq 1025196468
+
+email 1025196468@qq.com
+
+weibo https://weibo.com/u/6864286293
+
+yuque https://www.yuque.com/vannengdexiaohei
+
+### License
+
+MIT
+
+Copyright © 2021 vanndxh
