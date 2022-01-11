@@ -1,7 +1,6 @@
 <template>
-  <div>
-
-    <img alt="Vue logo" src="./assets/logo.png">
+  <div class="home">
+    <img alt="Vue logo" src="../assets/logo.png">
     <n-button>Default</n-button>
   </div>
 </template>
@@ -13,20 +12,6 @@ export default {
   name: 'Home',
   components: {
 
-  },
-  data() {
-    return {
-
-    }
-  },
-  methods: {
-
   }
 }
-
-
 </script>
-
-<style>
-
-</style>
