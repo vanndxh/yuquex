@@ -27,6 +27,16 @@ const routes = [
     name: 'RecycleBin',
     component: () => import('../views/RecycleBin')
   },
+  {
+    path: '/Create',
+    name: 'Create',
+    component: () => import('../views/Create')
+  },
+  {
+    path: '/Log',
+    name: 'Log',
+    component: () => import('../views/Log')
+  },
 ]
 
 const router = createRouter({

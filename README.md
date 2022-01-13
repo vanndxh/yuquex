@@ -1,14 +1,18 @@
 # yuquex
 
-### Introduction
+## Introduction
 
 毕业设计作品
 
-### Dev
+## Dev
 
-vue: ^3.0.0, vue-router: ^4.0.0-0, vuex: ^4.0.2"
+vue: ^3.0.0,
 
-### About Author
+vue-router: ^4.0.0-0,
+
+vuex: ^4.0.2"
+
+## About Author
 
 qq 1025196468
 
@@ -18,8 +22,8 @@ weibo https://weibo.com/u/6864286293
 
 yuque https://www.yuque.com/vannengdexiaohei
 
-### License
+## License
 
 MIT
 
-Copyright © 2021 vanndxh
+Copyright © 2022 vanndxh

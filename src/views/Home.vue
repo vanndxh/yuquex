@@ -8,6 +8,7 @@
         <!--侧边栏-->
         <n-layout-sider content-style="padding: 24px;">
           <tabBarS></tabBarS>
+          <catgif></catgif>
         </n-layout-sider>
         <!--主要内容-->
         <n-layout-content content-style="padding: 24px;">
@@ -26,15 +27,20 @@
 // @ is an alias to /src
 import bottom from "@/components/common/bottom";
 import tabBar from "@/components/common/tabBar";
-import tabBarS from "@/components/content/tabBarS";
+import tabBarS from "@/components/common/tabBarS";
+import catgif from "@/components/common/catgif"
 
 
 
 export default {
   name: 'Home',
   components: {
-    bottom, tabBar, tabBarS
+    bottom, tabBar, tabBarS, catgif
   },
 
 }
 </script>
+
+<style scoped>
+
+</style>
