@@ -5,16 +5,27 @@
       <n-gi span="14" offset="5">
         <h1 class="vanndxh">van能的小黑</h1>
         <n-data-table :columns="columns" :data="data" :striped="true"/>
-
       </n-gi>
     </n-grid>
+    <n-modal v-model:show="showModal">
+      <n-card
+          style="width: 600px;"
+          title="注意"
+          :bordered="false"
+          size="huge"
+          role="dialog"
+          aria-modal="true"
+      >
+        未安装跳转链接，请自行添加~
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script>
 import tabBar from "../components/common/tabBar";
-import { h } from 'vue'
-import { NButton, useNotification } from 'naive-ui'
+import { h, ref } from 'vue'
+import { NButton,  } from 'naive-ui'
 
 const createColumns = ({ jump }) => {
   return [
@@ -78,15 +89,13 @@ export default {
     tabBar
   },
   setup () {
-    const notification = useNotification()
+    const showModal = ref(false)
     const handleClick= ()=> {
-      notification.info({
-        title: '注意',
-        content: '没有设置链接，可以自己添加',
-        duration: 2500
-      })
+      showModal.value = true
     }
+
     return {
+      showModal,
 
       data: createData(),
       columns: createColumns({
@@ -99,6 +108,7 @@ export default {
           }
         }
       }),
+
     }
   }
 }
