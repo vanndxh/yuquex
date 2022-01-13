@@ -1,6 +1,6 @@
 <template>
   <div class="bottom">
-<!--    <n-divider />-->
+    <n-divider />
     <p>Copyright © 2022 vanndxh All Rights Reserved.</p>
     <p>联系作者：1025196468@qq.com</p>
   </div>
@@ -17,6 +17,7 @@ export default {
 
 <style scoped>
 .bottom {
+  align: center;
   font-size: x-small;
   color: cadetblue;
   font-family: "黑体";

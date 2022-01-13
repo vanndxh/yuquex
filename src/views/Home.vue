@@ -14,8 +14,6 @@
         <n-layout-content content-style="padding: 24px;">
           暂时没内容，先放个按钮玩玩吧
           <n-button>Default</n-button>
-          <bottom></bottom>
-
         </n-layout-content>
       </n-layout>
     </n-layout>
@@ -25,7 +23,6 @@
 
 <script>
 // @ is an alias to /src
-import bottom from "@/components/common/bottom";
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"
@@ -35,7 +32,7 @@ import catgif from "@/components/common/catgif"
 export default {
   name: 'Home',
   components: {
-    bottom, tabBar, tabBarS, catgif
+    tabBar, tabBarS, catgif
   },
 
 }

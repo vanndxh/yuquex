@@ -37,6 +37,16 @@ const routes = [
     name: 'Log',
     component: () => import('../views/Log')
   },
+  {
+    path: '/Update',
+    name: 'Update',
+    component: () => import('../views/Update')
+  },
+  {
+    path: '/Author',
+    name: 'Author',
+    component: () => import('../views/Author')
+  },
 ]
 
 const router = createRouter({

@@ -12,7 +12,7 @@
           </n-gi>
 
           <n-gi span="3">
-            <n-input v-model:value="searchValue" type="text" placeholder="搜索" clearable="true" maxlength="20" class="input"/>
+            <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"/>
           </n-gi>
 
           <n-gi offset="4">
@@ -91,12 +91,30 @@ export default {
         key: 'about',
         children: [
           {
-            label: '关于作者',
+            label: () =>
+                h(
+                    resolveComponent('router-link'),
+                    {
+                      to: {
+                        name: 'Author',
+                      }
+                    },
+                    { default: () => '关于作者' }
+                ),
             key: 'aboutAuthor',
           },
           {
-            label: '关于网站',
-            key: 'aboutPage',
+            label: () =>
+                h(
+                    resolveComponent('router-link'),
+                    {
+                      to: {
+                        name: 'Update',
+                      }
+                    },
+                    { default: () => '更新日志' }
+                ),
+            key: 'update',
           }
         ]
       },
