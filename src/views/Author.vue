@@ -7,7 +7,15 @@
         <n-data-table :columns="columns" :data="data" :striped="true"/>
       </n-gi>
     </n-grid>
-    <n-modal v-model:show="showModal">
+    <br>
+    <n-space justify="center">
+      <n-badge value="火">
+        <n-button type="success" @click=clickSupport() class="support" size="large">支持小黑</n-button>
+      </n-badge>
+    </n-space>
+
+
+    <n-modal v-model:show="showModel">
       <n-card
           style="width: 600px;"
           title="注意"
@@ -17,6 +25,24 @@
           aria-modal="true"
       >
         未安装跳转链接，请自行添加~
+      </n-card>
+    </n-modal>
+    <n-modal v-model:show="showQR">
+      <n-card
+          style="width: 600px;"
+          title="感谢支持"
+          :bordered="false"
+          size="huge"
+          role="dialog"
+          aria-modal="true"
+      >
+        <n-statistic tabular-nums>
+          你是第
+          <n-number-animation ref="numberAnimationInstRef" :from="0" :to=supportCount />
+          <template #suffix>
+            个发现这个小彩蛋的人~
+          </template>
+        </n-statistic>
       </n-card>
     </n-modal>
   </div>
@@ -89,13 +115,15 @@ export default {
     tabBar
   },
   setup () {
-    const showModal = ref(false)
+    let supportCount = 8888
+    const showModel = ref(false)
+    const showQR = ref(false)
     const handleClick= ()=> {
-      showModal.value = true
+      showModel.value = true
     }
 
     return {
-      showModal,
+      showModel, showQR, supportCount,
 
       data: createData(),
       columns: createColumns({
@@ -108,7 +136,10 @@ export default {
           }
         }
       }),
-
+      clickSupport () {
+        showQR.value = true
+        supportCount++
+      }
     }
   }
 }
@@ -116,9 +147,11 @@ export default {
 
 <style scoped>
 .vanndxh{
-  align-items: center;
   font-family: 华文行楷;
   font-size: 40px;
   text-align: center;
+}
+.support{
+  align: center;
 }
 </style>

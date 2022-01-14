@@ -5,6 +5,11 @@
     <n-grid :col="24">
       <n-gi span="12" offset="7">
         <n-timeline>
+          <n-timeline-item
+              title="v1.0.2"
+              content="修复前端bug，登录注册表单的创建，后端的创建"
+              time="2022/1/14"
+          />
 
           <n-timeline-item
               title="v1.0.1"

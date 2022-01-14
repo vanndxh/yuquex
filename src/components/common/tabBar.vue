@@ -13,6 +13,7 @@
 
           <n-gi span="3">
             <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"/>
+            <n-button type="primary" ghost>搜索</n-button>
           </n-gi>
 
           <n-gi offset="4">
