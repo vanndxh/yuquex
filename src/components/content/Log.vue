@@ -9,10 +9,10 @@
         <n-grid :col="24">
           <n-gi span="12" offset="6">
             <n-card>
-              <n-tabs default-value="signin" size="large" justify-content="space-evenly"  type="segment">
+              <n-tabs :default-value="choice" size="large" justify-content="space-evenly"  type="segment">
                 <!--登录表单-->
                 <n-tab-pane name="signin" tab="登录" >
-                  <n-form :model="modelSignin" ref="SigninRef"  :rules="rulesSignin" label-placement="left">
+                  <n-form :model="modelSignin" ref="SigninRef"  :rules="rulesSignin" label-placement="left" label-width="80px">
                     <n-form-item-row label="用户名" path="usernameSignin" :show-require-mark="false">
                       <n-input
                           v-model:value="modelSignin.usernameSignin"
@@ -30,7 +30,8 @@
                 </n-tab-pane>
                 <!--注册表单-->
                 <n-tab-pane name="signup" tab="注册">
-                  <n-form :model="modelSignup" ref="SignupRef"  :rules="rulesSignup" label-placement="left">
+                  <n-form :model="modelSignup" ref="SignupRef"  :rules="rulesSignup" label-placement="left"
+                          label-width="80px">
                     <n-form-item-row label="用户名" path="usernameSignup" :show-require-mark="true">
                       <n-input
                           v-model:value="modelSignup.usernameSignup"
@@ -50,7 +51,7 @@
                       />
                     </n-form-item-row>
                     <n-form-item-row path="isAgree">
-                      <n-checkbox v-model:checked="modelSignup.isAgree">勾选代表同意用户协议</n-checkbox>
+                      <n-checkbox v-model:checked="modelSignup.isAgree">我已阅读并同意用户协议</n-checkbox>
                     </n-form-item-row>
                   </n-form>
                   <n-button type="primary" block>注册</n-button>
@@ -67,8 +68,9 @@
 </template>
 
 <script>
-import tabBar from "../components/common/tabBar";
+import tabBar from "../common/tabBar";
 import { ref , } from 'vue'
+import { useStore } from "vuex";
 
 
 export default {
@@ -77,6 +79,7 @@ export default {
     tabBar
   },
   setup () {
+    const store = useStore()
     const SigninRef = ref(null)
     const modelRefSignin = ref({
       usernameSignin: null,
@@ -90,11 +93,13 @@ export default {
       isAgree: null,
     })
     const modelSignup = modelRefSignup
+    const isAgree = ref(false)
 
     return {
-      modelSignin: modelRefSignin,
-      SigninRef, SignupRef, modelSignup,
+      SigninRef, SignupRef, modelSignup, isAgree,
 
+      choice: store.state.choice,
+      modelSignin: modelRefSignin,
       rulesSignin: {
         usernameSignin:[{
           required: true,
@@ -151,10 +156,13 @@ export default {
           trigger: ['input', 'blur']
         }],
         isAgree:[{
-          type: 'array',
-          required: true,
-          trigger: ['change'],
-          message: '请勾选此项~'
+          validator (rule, value) {
+            if (!value) {
+              return new Error('请勾选此项~')
+            } else
+            return true
+          },
+          trigger: ['change','blur'],
         }],
       },
     }

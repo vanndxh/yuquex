@@ -35,17 +35,22 @@ const routes = [
   {
     path: '/Log',
     name: 'Log',
-    component: () => import('../views/Log')
+    component: () => import('../components/content/Log')
   },
   {
     path: '/Update',
     name: 'Update',
-    component: () => import('../views/Update')
+    component: () => import('../components/content/Update')
   },
   {
     path: '/Author',
     name: 'Author',
-    component: () => import('../views/Author')
+    component: () => import('../components/content/Author')
+  },
+  {
+    path: '/Profile',
+    name: 'Profile',
+    component: () => import('../components/content/Profile')
   },
 ]
 

@@ -51,7 +51,9 @@
 <script>
 import { ref , h , resolveComponent, } from 'vue'
 import { AddCircleOutline } from '@vicons/ionicons5'
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex"
+import { useDialog } from 'naive-ui'
 
 
 export default {
@@ -59,7 +61,9 @@ export default {
     AddCircleOutline,
   },
   setup () {
+    const dialog = useDialog()
     const router = useRouter()
+    const store = useStore()
     const menuOptions = [
       {
         label: () =>
@@ -126,11 +130,20 @@ export default {
 
       searchValue: ref(null),
       activeKey: ref(null),
-      isLogged: false,
+      isLogged: true,
       avatarOptions: [
         {
-          label: '个人信息',
-          key: 'personalInfo',
+          label:  () =>
+              h(
+                  resolveComponent('router-link'),
+                  {
+                    to: {
+                      name: 'Profile',
+                    }
+                  },
+                  { default: () => '个人信息' }
+              ),
+          key: 'Profile',
         },
         {
           label: '退出登录',
@@ -138,16 +151,31 @@ export default {
         },
       ],
       handleSelect (key) {
-        console.log(key);
+        if (key === "exit") {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要退出登录？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              console.log('确定');
+            },
+            onNegativeClick: () => {
+              console.log('取消');
+            }
+          })
+        }
       },
       clickCreate () {
         router.push('create')
       },
       clickLog () {
         router.push('Log')
+        store.state.choice = "signin"
       },
       clickRegister () {
         router.push('Log')
+        store.state.choice = "signup"
       }
     }
   },
@@ -156,7 +184,6 @@ export default {
 
 <style scoped>
 .create{
-  /*float: right;*/
   line-height: 45px;
 }
 .input{

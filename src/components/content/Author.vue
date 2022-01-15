@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import tabBar from "../components/common/tabBar";
+import tabBar from "../common/tabBar";
 import { h, ref } from 'vue'
 import { NButton,  } from 'naive-ui'
 
