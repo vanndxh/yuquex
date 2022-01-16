@@ -120,7 +120,20 @@ export default {
                     { default: () => '更新日志' }
                 ),
             key: 'update',
-          }
+          },
+          {
+            label: () =>
+                h(
+                    resolveComponent('router-link'),
+                    {
+                      to: {
+                        name: 'Article',
+                      }
+                    },
+                    { default: () => '文档详情测试页' }
+                ),
+            key: 'article',
+          },
         ]
       },
     ]

@@ -14,7 +14,6 @@
       </n-badge>
     </n-space>
 
-
     <n-modal v-model:show="showModel">
       <n-card
           style="width: 600px;"
@@ -45,6 +44,7 @@
         </n-statistic>
       </n-card>
     </n-modal>
+    <catgif></catgif>
   </div>
 </template>
 
@@ -52,6 +52,7 @@
 import tabBar from "../common/tabBar";
 import { h, ref } from 'vue'
 import { NButton,  } from 'naive-ui'
+import catgif from "../common/catgif";
 
 const createColumns = ({ jump }) => {
   return [
@@ -112,7 +113,7 @@ const createData = () => [
 
 export default {
   components:{
-    tabBar
+    tabBar, catgif
   },
   setup () {
     let supportCount = 8888

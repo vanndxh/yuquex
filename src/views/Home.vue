@@ -17,7 +17,6 @@
         </n-layout-content>
       </n-layout>
     </n-layout>
-
   </div>
 </template>
 

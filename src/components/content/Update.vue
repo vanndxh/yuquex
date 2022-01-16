@@ -6,6 +6,13 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              type="success"
+              title="v1.0.4"
+              content="完成新建文档页面设计，文档详情页设计，前端基本完成，等待后端联调"
+              time="2022/1/16"
+          />
+
+          <n-timeline-item
               title="v1.0.3"
               content="调整部分ui，创建个人信息界面，修复注册表单bug"
               time="2022/1/15"

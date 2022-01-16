@@ -52,6 +52,11 @@ const routes = [
     name: 'Profile',
     component: () => import('../components/content/Profile')
   },
+  {
+    path: '/Article',
+    name: 'Article',
+    component: () => import('../components/content/Article')
+  },
 ]
 
 const router = createRouter({

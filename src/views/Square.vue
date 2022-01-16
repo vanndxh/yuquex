@@ -1,7 +1,11 @@
 <template>
   <div>
     <tabBar></tabBar>
-    here is square
+    <n-grid :col="24">
+      <n-gi offset="6" span="12">
+        Square
+      </n-gi>
+    </n-grid>
   </div>
 </template>
 
