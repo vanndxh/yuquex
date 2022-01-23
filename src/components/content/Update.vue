@@ -7,8 +7,8 @@
         <n-timeline>
           <n-timeline-item
               title="v1.0.6"
-              content="连接数据库，连了tm一天"
-              time="2022/1/17"
+              content="连接数据库，连了tm一天，前端配置go环境，测试register指令前后端联调效果"
+              time="2022/1/23"
           />
 
           <n-timeline-item
