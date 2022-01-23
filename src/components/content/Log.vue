@@ -11,7 +11,7 @@
             <n-card>
               <n-tabs :default-value="choice" size="large" justify-content="space-evenly"  type="segment">
                 <!--登录表单-->
-                <n-tab-pane name="signin" tab="登录" >
+                <n-tab-pane name="signin" tab="登录">
                   <n-form :model="modelSignin" ref="SigninRef"  :rules="rulesSignin" label-placement="left" label-width="80px">
                     <n-form-item-row label="用户名" path="usernameSignin" :show-require-mark="false">
                       <n-input
@@ -54,7 +54,7 @@
                       <n-checkbox v-model:checked="modelSignup.isAgree">我已阅读并同意用户协议</n-checkbox>
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block>注册</n-button>
+                  <n-button type="primary" block @click="register">注册</n-button>
                 </n-tab-pane>
               </n-tabs>
             </n-card>
@@ -165,6 +165,20 @@ export default {
           trigger: ['change','blur'],
         }],
       },
+      register() {
+        this.$store.state.axios({
+          url: '/go/user/register',
+          method: 'post',
+          data: {
+            username: modelSignup.value.usernameSignup,
+            password: modelSignup.value.passwordSignup,
+            repassword: modelSignup.value.repasswordSignup,
+          },
+        }).then(r => {
+          console.log(r);
+          console.log(r.data);
+        })
+      }
     }
   }
 }

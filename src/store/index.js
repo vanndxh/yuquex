@@ -2,7 +2,9 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    choice: "signin"
+    uid: null,
+    choice: "signin",
+    axios: require('axios'),
   },
   mutations: {
   },

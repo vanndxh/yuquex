@@ -13,7 +13,7 @@
         <!--主要内容-->
         <n-layout-content content-style="padding: 24px;">
           暂时没内容，先放个按钮玩玩吧
-          <n-button>Default</n-button>
+          <n-button @click="test">Default</n-button>
         </n-layout-content>
       </n-layout>
     </n-layout>
@@ -27,12 +27,15 @@ import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"
 
 
-
 export default {
   name: 'Home',
   components: {
     tabBar, tabBarS, catgif
   },
+  setup() {
+    return {
+    }
+  }
 
 }
 </script>

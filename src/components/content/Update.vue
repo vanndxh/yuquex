@@ -6,9 +6,21 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.6"
+              content="连接数据库，连了tm一天"
+              time="2022/1/17"
+          />
+
+          <n-timeline-item
+              title="v1.0.5"
+              content="建立数据库，搭建后端框架"
+              time="2022/1/17"
+          />
+
+          <n-timeline-item
               type="success"
               title="v1.0.4"
-              content="完成新建文档页面设计，文档详情页设计，前端基本完成，等待后端联调"
+              content="完成新建文档页面设计，文档详情页设计，前端基本完成，并尝试部署到服务器上！"
               time="2022/1/16"
           />
 

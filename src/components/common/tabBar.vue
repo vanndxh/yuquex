@@ -143,7 +143,7 @@ export default {
 
       searchValue: ref(null),
       activeKey: ref(null),
-      isLogged: true,
+      isLogged: false,
       avatarOptions: [
         {
           label:  () =>
