@@ -6,6 +6,12 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.7"
+              content="基本完成后端，除知识小组功能外基本完成前端"
+              time="2022/1/26"
+          />
+
+          <n-timeline-item
               title="v1.0.6"
               content="连接数据库，连了tm一天，前端配置go环境，测试register指令前后端联调效果"
               time="2022/1/23"
