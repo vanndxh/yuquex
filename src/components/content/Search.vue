@@ -30,6 +30,7 @@
 <script>
 import tabBar from "../common/tabBar";
 import { useRouter } from "vue-router";
+import { ref } from "vue/dist/vue";
 
 export default {
   components: {
@@ -38,6 +39,7 @@ export default {
   setup() {
     const router = useRouter()
     return {
+      searchValue: ref(null),
       page: 1,
       pageTotal: 10,
       search(searchInfo) {
