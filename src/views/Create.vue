@@ -23,7 +23,7 @@
                   :autosize="{minRows: 20,maxRows: 30}"
                   maxlength="200" show-count
               />
-              <n-button type="success" class="save">保存</n-button>
+              <n-button type="success" class="save" @click="create">保存</n-button>
             </n-space>
           </n-gi>
           <n-gi span="6" offset="1">
@@ -86,6 +86,9 @@ export default {
           return false
         }
         return true
+      },
+      create() {
+
       }
     }
   }

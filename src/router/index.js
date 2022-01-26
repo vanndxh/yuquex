@@ -57,6 +57,11 @@ const routes = [
     name: 'Article',
     component: () => import('../components/content/Article')
   },
+  {
+    path: '/Search',
+    name: 'Search',
+    component: () => import('../components/content/Search')
+  },
 ]
 
 const router = createRouter({

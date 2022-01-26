@@ -13,7 +13,7 @@
 
           <n-gi span="3">
             <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"/>
-            <n-button type="primary" ghost>搜索</n-button>
+            <n-button type="primary" ghost @click="search(searchValue)">搜索</n-button>
           </n-gi>
 
           <n-gi offset="4">
@@ -189,6 +189,10 @@ export default {
       clickRegister () {
         router.push('Log')
         store.state.choice = "signup"
+      },
+      search(searchInfo) {
+        console.log(searchInfo);
+        router.push('search')
       }
     }
   },
