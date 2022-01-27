@@ -156,7 +156,7 @@ export default {
 
       searchValue: ref(null),
       activeKey: ref(null),
-      isLogged: false,
+      isLogged: true,
       avatarOptions: [
         {
           label:  () =>

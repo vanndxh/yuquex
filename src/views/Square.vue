@@ -5,8 +5,8 @@
 
       <n-list>
         <n-list-item>
-          <n-card title="{{ articleName }}" hoverable>
-            articleContent前15字
+          <n-card :title=articleData.articleName hoverable>
+            {{ articleData.articleInfo }}
             <div>
               <n-button style="float: right">详情</n-button>
             </div>
@@ -30,6 +30,10 @@ export default {
     return {
       page: 1,
       pageTotal: 10,
+      articleData: {
+        articleName: "articleName",
+        articleInfo: "articleInfo"
+      }
     }
   }
 }

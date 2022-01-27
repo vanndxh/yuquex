@@ -37,18 +37,15 @@ const createColumns = ({ lookDetail, deleteArticle }) => {
   return [
     {
       title: '文章标题',
-      titleColSpan: 1,
       key: 'articleName',
       align: 'center'
     },
     {
       title: '作者',
-      titleColSpan: 1,
       key: 'articleAuthor'
     },
     {
       title: '查看详情',
-      titleColSpan: 1,
       key: 'lookDetail',
       render (row) {
         return h(
@@ -64,7 +61,6 @@ const createColumns = ({ lookDetail, deleteArticle }) => {
     },
     {
       title: '删除文章',
-      titleColSpan: 1,
       key: 'delete',
       render (row) {
         return h(
