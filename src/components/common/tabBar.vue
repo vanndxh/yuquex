@@ -127,12 +127,25 @@ export default {
                     resolveComponent('router-link'),
                     {
                       to: {
-                        name: 'Article',
+                        name: 'ArticleInfo',
                       }
                     },
                     { default: () => '文档详情测试页' }
                 ),
-            key: 'article',
+            key: 'articleInfo',
+          },
+          {
+            label: () =>
+                h(
+                    resolveComponent('router-link'),
+                    {
+                      to: {
+                        name: 'TeamInfo',
+                      }
+                    },
+                    { default: () => '小组详情测试页' }
+                ),
+            key: 'teamInfo',
           },
         ]
       },

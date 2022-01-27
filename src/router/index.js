@@ -53,14 +53,19 @@ const routes = [
     component: () => import('../components/content/Profile')
   },
   {
-    path: '/Article',
-    name: 'Article',
-    component: () => import('../components/content/Article')
+    path: '/ArticleInfo',
+    name: 'ArticleInfo',
+    component: () => import('../components/content/ArticleInfo')
   },
   {
     path: '/Search',
     name: 'Search',
     component: () => import('../components/content/Search')
+  },
+  {
+    path: '/TeamInfo',
+    name: 'TeamInfo',
+    component: () => import('../components/content/TeamInfo')
   },
 ]
 

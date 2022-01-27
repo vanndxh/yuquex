@@ -88,7 +88,6 @@ const createData = () => [
 ]
 
 export default {
-  name: 'Home',
   components: {
     tabBar, tabBarS, catgif
   },

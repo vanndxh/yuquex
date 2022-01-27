@@ -30,7 +30,7 @@
 <script>
 import tabBar from "../common/tabBar";
 import { useRouter } from "vue-router";
-import { ref } from "vue/dist/vue";
+import { ref } from "vue";
 
 export default {
   components: {

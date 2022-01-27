@@ -11,9 +11,11 @@
         </n-layout-sider>
         <!--主要内容-->
         <n-layout-content content-style="padding: 24px;">
-          暂时没内容，先放个按钮玩玩吧
-          <n-button>Default</n-button>
-
+          <n-grid :col="24">
+            <n-gi :span="20" :offset="1">
+              <n-data-table :columns="columns" :data="data" :pagination="pagination" />
+            </n-gi>
+          </n-grid>
         </n-layout-content>
       </n-layout>
     </n-layout>
@@ -23,12 +25,63 @@
 <script>
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
+import {h} from "vue";
+import {NButton} from "naive-ui";
 
+const createColumns = ({ lookDetail }) => {
+  return [
+    {
+      title: '小组名称',
+      titleColSpan: 1,
+      key: 'teamName',
+      align: 'center'
+    },
+    {
+      title: '组长',
+      titleColSpan: 1,
+      key: 'teamLeader'
+    },
+    {
+      title: '查看详情',
+      titleColSpan: 1,
+      key: 'lookDetail',
+      render (row) {
+        return h(
+            NButton,
+            {
+              size: 'small',
+              type: 'info',
+              onClick: () => lookDetail(row)
+            },
+            { default: () => '查看' }
+        )
+      }
+    },
+  ]
+}
+const createData = () => [
+  {
+    teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    teamLeader: 'John Brown',
+  },
+]
 
 export default {
-  name: "Teams",
   components: {
     tabBar, tabBarS
+  },
+  setup() {
+    return {
+      data: createData(),
+      columns: createColumns({
+        lookDetail (rowData) {
+          console.log(rowData);
+        }
+      }),
+      pagination: {
+        pageSize: 10
+      }
+    }
   }
 }
 </script>

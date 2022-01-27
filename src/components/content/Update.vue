@@ -6,6 +6,12 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.8"
+              content="完成知识小组模块，网站备案成功~"
+              time="2022/1/27"
+          />
+
+          <n-timeline-item
               title="v1.0.7"
               content="基本完成后端，除知识小组功能外基本完成前端"
               time="2022/1/26"
