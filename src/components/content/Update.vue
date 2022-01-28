@@ -6,6 +6,12 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.9"
+              content="完成个人信息界面，完善部分小部件，添加用户须知等功能"
+              time="2022/1/28"
+          />
+
+          <n-timeline-item
               title="v1.0.8"
               content="完成知识小组模块，网站备案成功~"
               time="2022/1/27"
@@ -30,7 +36,7 @@
           />
 
           <n-timeline-item
-              type="success"
+              type="warning"
               title="v1.0.4"
               content="完成新建文档页面设计，文档详情页设计，前端基本完成，并尝试部署到服务器上！"
               time="2022/1/16"
@@ -55,7 +61,7 @@
           />
 
           <n-timeline-item
-              type="success"
+              type="warning"
               title="v1.0.0"
               content="新建文件夹，配置环境，搭建框架"
               time="2022/1/11"

@@ -5,7 +5,13 @@
     <n-gi offset="6" span="12">
       <n-grid :col="24">
         <n-gi :span="18" :offset="2">
-          <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input" size="large" round :autofocus="true"/>
+          <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true"
+                   maxlength="20" class="input" size="large" round :autofocus="true"
+          @keyup.enter="search(searchValue)">
+            <template #affix>
+              <n-icon><SearchOutline /></n-icon>
+            </template>
+          </n-input>
         </n-gi>
         <n-gi :span="3" :offset="1">
           <n-button type="primary" ghost @click="search(searchValue)" size="large">搜索</n-button>
@@ -31,10 +37,11 @@
 import tabBar from "../common/tabBar";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import {SearchOutline} from '@vicons/ionicons5'
 
 export default {
   components: {
-    tabBar
+    tabBar, SearchOutline
   },
   setup() {
     const router = useRouter()

@@ -94,6 +94,7 @@ const createColumns1 = ({ deleteUser }) => {
     {
       title: '操作',
       key: 'delete',
+      align: 'canter',
       render (row) {
         return h(
             NButton,
