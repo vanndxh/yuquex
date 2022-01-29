@@ -52,8 +52,8 @@
         aria-modal="true"
     >
       <n-space vertical>
-        <n-input v-model:value="newTeamName" type="text"/>
-        <n-input v-model:value="newTeamNotice" type="text"/>
+        小组名称<n-input v-model:value="newTeamName" type="text"/>
+        小组公告<n-input v-model:value="newTeamNotice" type="text"/>
         <n-button type="primary" ghost @click="saveInfo(newTeamName, newTeamNotice)" style="float: right">保存</n-button>
       </n-space>
     </n-card>
