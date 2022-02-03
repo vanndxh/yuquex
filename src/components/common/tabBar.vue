@@ -13,7 +13,6 @@
 
           <n-gi span="3">
             <n-space>
-
               <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"
                        @keyup.enter="search(searchValue)">
                 <template #affix>
@@ -54,6 +53,7 @@
       </n-card>
     </n-layout-header>
   </div>
+
 <!--用户须知-->
   <n-modal v-model:show="showUserInstruction">
     <n-card
@@ -103,6 +103,7 @@
         注意：如果您认为自己或他人的版权、著作权或其他合法权益在本网上受到他人侵害，请立即与小黑屋联系,并提供相关证据。</p>
     </n-card>
   </n-modal>
+
 <!--  提交反馈-->
   <n-modal v-model:show="showFeedback">
     <n-card
@@ -120,6 +121,7 @@
       </n-space>
     </n-card>
   </n-modal>
+
 </template>
 
 <script>

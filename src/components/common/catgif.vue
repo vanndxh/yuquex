@@ -13,9 +13,7 @@
 export default {
   name: "catgif",
   setup(){
-
     return {
-
     }
   }
 }

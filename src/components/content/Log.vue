@@ -64,7 +64,6 @@
           </n-gi>
         </n-grid>
 
-
       </n-layout-content>
     </n-layout>
   </div>
@@ -226,9 +225,6 @@ export default {
             password: modelSignup.value.passwordSignup,
             repassword: modelSignup.value.repasswordSignup,
           },
-        }).then(r => {
-          console.log(r);
-          console.log(r.data);
         })
       },
       showUI() {

@@ -17,7 +17,6 @@ export default {
 
 <style scoped>
 .bottom {
-  align: center;
   font-size: x-small;
   color: cadetblue;
   font-family: "黑体";

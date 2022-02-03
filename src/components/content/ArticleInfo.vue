@@ -14,8 +14,6 @@
           <n-grid :col="24" x-gap="12">
             <!--文章部分-->
             <n-gi span="14">
-              <h1>articleData.articleName</h1>
-              <p class="content">articleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleicleData.articleContentarticleData.articleContentarticleData.articleticleData.articleContentarticleData.articleContentarticleData.articleContent</p>
               <h1>{{ articleData.articleName }}</h1>
               <p class="content">{{ articleData.articleContent }}</p>
               <n-grid :col="24">
@@ -49,7 +47,7 @@
                     :autosize="{minRows: 5,maxRows: 10}"
                     maxlength="100" show-count
                 />
-                <n-button type="success" @click="clickComment">回复</n-button>
+                <n-button type="success" @click="clickComment()">回复</n-button>
               </n-space>
             </n-gi>
             <!--作者信息card-->
@@ -63,7 +61,7 @@
                       src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
                   />
                 </n-space>
-                <h1 class="user">{{ userData.username }}</h1>
+                <h1 class="user">{{ articleData.articleAuthor }}</h1>
               </n-card>
             </n-gi>
           </n-grid>
@@ -80,7 +78,6 @@ import { ref } from "vue";
 import { LikeOutlined, LikeFilled, StarOutlined, StarFilled } from "@vicons/antd";
 
 export default {
-  name: "Article",
   components: {
     tabBar, tabBarS, LikeOutlined, LikeFilled, StarOutlined, StarFilled
   },
@@ -88,32 +85,134 @@ export default {
     const isLiked = ref(false)
     const isStared = ref(false)
     const commentValue = ref(null)
+    const getUserData = () => {
+      this.$store.state.axios({
+        url: '/go/user/getUserInfo',
+        method: 'get',
+        data: {
+          userId: this.userData.userId,
+        },
+      }).then(r => {
+        this.userData = r.data.data
+      })
+    }
+    const getArticleData = () => {
+      this.$store.state.axios({
+        url: '/go/article/getArticleInfo',
+        method: 'get',
+        data: {
+          articleId: this.articleData.articleId,
+        },
+      }).then(r => {
+        this.articleData = r.data.data
+      })
+    }
+    const getIsLiked = () => {
+      this.$store.state.axios({
+        url: '/go/like/getIsLiked',
+        method: 'get',
+        data: {
+          userId: this.userData.userId,
+          articleId: this.articleData.articleId
+        },
+      }).then(r => {
+        this.isLiked = r.data.data
+      })
+    }
+    const getIsStared = () => {
+      this.$store.state.axios({
+        url: '/go/star/getIsStared',
+        method: 'get',
+        data: {
+          userId: this.userData.userId,
+          articleId: this.articleData.articleId
+        },
+      }).then(r => {
+        this.isStared = r.data.data
+      })
+    }
+
+    const clickLike = () => {
+      isLiked.value = !isLiked.value;
+      if (isLiked.value === false){
+        this.$store.state.axios({
+          url: '/go/like/addLike',
+          method: 'post',
+          data: {
+            userId: this.userData.userId,
+            articleId: this.articleData.articleId,
+          },
+        })
+      }else if (isLiked.value === true){
+        this.$store.state.axios({
+          url: '/go/like/cancelLike',
+          method: 'post',
+          data: {
+            userId: this.userData.userId,
+            articleId: this.articleData.articleId,
+          },
+        })
+      }
+    }
+    const clickStar = () => {
+      isStared.value = !isStared.value;
+      if (isStared.value === false){
+        this.$store.state.axios({
+          url: '/go/star/addStar',
+          method: 'post',
+          data: {
+            userId: this.userData.userId,
+            articleId: this.articleData.articleId,
+          },
+        })
+      }else if (isStared.value === true){
+        this.$store.state.axios({
+          url: '/go/star/cancelStar',
+          method: 'post',
+          data: {
+            userId: this.userData.userId,
+            articleId: this.articleData.articleId,
+          },
+        })
+      }
+    }
+    const clickComment = () => {
+      this.$store.state.axios({
+        url: '/go/comment/createComment',
+        method: 'post',
+        data: {
+          userId: this.userData.userId,
+          articleId: this.articleData.articleId,
+          commentContent: commentValue,
+        },
+      })
+    }
 
     return {
-      isLiked, isStared, commentValue,
+      isLiked, isStared, commentValue, getUserData, getArticleData, clickComment, clickStar, clickLike, getIsLiked, getIsStared,
 
-      articleData: ref({
+      articleData: {
+        articleId: null,
         articleName: null,
-        articleContent: null
-      }),
+        articleContent: null,
+        articleAuthor: null,
+        LikeAmount: null,
+        StarAmount: null,
+      },
       userData: {
+        userId: 1,
         username: "Vanndxh",
         userInfo: "暂无",
         articleAmount: 23,
         likeTotal: 24,
       },
-      clickLike() {
-        isLiked.value = !isLiked.value;
-        console.log(isLiked.value);
-      },
-      clickStar() {
-        isStared.value = !isStared.value;
-        console.log(isStared.value);
-      },
-      clickComment() {
-
-      }
     }
+  },
+  mounted() {
+    this.getArticleData()
+    this.getUserData()
+    this.getIsLiked()
+    this.getIsStared()
   }
 }
 </script>

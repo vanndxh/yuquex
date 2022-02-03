@@ -6,6 +6,12 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.10"
+              content="联调部分代码编写"
+              time="2022/2/3"
+          />
+
+          <n-timeline-item
               title="v1.0.9"
               content="完成个人信息界面，完善部分小部件，添加用户须知等功能"
               time="2022/1/28"

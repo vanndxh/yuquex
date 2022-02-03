@@ -83,7 +83,6 @@ const createColumns = ({ jump }) => {
     }
   ]
 }
-
 const createData = () => [
   {
     key: 0,
