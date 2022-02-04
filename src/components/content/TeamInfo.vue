@@ -24,10 +24,10 @@
 <!--      三个主要内容-->
       <n-tabs type="segment" size="large">
         <n-tab-pane name="members" tab="组内成员">
-          <n-data-table :columns="columns1" :data="data1" :pagination="pagination1" size="small"/>
+          <n-data-table :columns="columns1" :data="data1" :pagination="pagination" size="small"/>
         </n-tab-pane>
         <n-tab-pane name="articles" tab="组内文章">
-          <n-data-table :columns="columns2" :data="data2" :pagination="pagination2" size="small"/>
+          <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>
         </n-tab-pane>
         <n-tab-pane name="clockInfo" tab="打卡详情">
           <n-statistic tabular-nums>
@@ -41,7 +41,7 @@
       </n-tabs>
     </n-gi>
   </n-grid>
-  <!--  修改信息模块-->
+  <!--修改信息模块-->
   <n-modal v-model:show="showChangeInfo">
     <n-card
         style="width: 600px;"
@@ -58,7 +58,7 @@
       </n-space>
     </n-card>
   </n-modal>
-  <!--  新增用户模块  -->
+  <!--新增用户模块  -->
   <n-modal v-model:show="showAddUser">
     <n-card
         style="width: 600px;"
@@ -80,105 +80,108 @@ import { NotificationOutlined } from '@vicons/antd'
 import { EllipsisVerticalCircle } from '@vicons/ionicons5'
 import {NButton, useDialog} from 'naive-ui'
 import { h, ref } from "vue";
-
-const createColumns1 = ({ deleteUser }) => {
-  return [
-    {
-      title: '用户',
-      key: 'username'
-    },
-    {
-      title: '职位',
-      key: 'position'
-    },
-    {
-      title: '操作',
-      key: 'delete',
-      align: 'canter',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'warning',
-              onClick: () => deleteUser(row)
-            },
-            { default: () => '踢出' }
-        )
-      }
-    }
-  ]
-}
-const createData1 = () => [
-  {
-    username: 'John Brown',
-    position: '组长'
-  },
-]
-const createColumns2 = ({ lookDetail, deleteArticle }) => {
-  return [
-    {
-      key: 'articleName',
-      align: 'center'
-    },
-    {
-      key: 'articleAuthor'
-    },
-    {
-      key: 'lookDetail',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'info',
-              onClick: () => lookDetail(row)
-            },
-            { default: () => '查看' }
-        )
-      }
-    },
-    {
-      key: 'delete',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'warning',
-              onClick: () => deleteArticle(row)
-            },
-            { default: () => '删除' }
-        )
-      }
-    }
-  ]
-}
-const createData2 = () => [
-  {
-    articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    articleAuthor: 'John Brown',
-  },
-]
+import {useStore} from "vuex";
 
 export default {
   components: {
     tabBar, NotificationOutlined, EllipsisVerticalCircle
   },
   setup() {
+    const store = useStore()
     const dialog = useDialog()
+
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
-    const teamData= {
-          teamName: "teamName",
-          teamNotice: "testTeamNotice"
+    const teamData = ref({
+      teamName: "teamName",
+      teamNotice: "testTeamNotice"
+    })
+    const createColumns1 = ({ deleteUser }) => {
+      return [
+        {
+          title: '用户',
+          key: 'username'
+        },
+        {
+          title: '职位',
+          key: 'position'
+        },
+        {
+          title: '操作',
+          key: 'delete',
+          align: 'canter',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => deleteUser(row)
+                },
+                { default: () => '踢出' }
+            )
+          }
         }
+      ]
+    }
+    const createData1 = () => [
+      {
+        username: 'John Brown',
+        position: '组长'
+      },
+    ]
+    const createColumns2 = ({ lookDetail, deleteArticle }) => {
+      return [
+        {
+          key: 'articleName',
+          align: 'center'
+        },
+        {
+          key: 'articleAuthor'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },
+        {
+          key: 'delete',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => deleteArticle(row)
+                },
+                { default: () => '删除' }
+            )
+          }
+        }
+      ]
+    }
+    const createData2 = () => [
+      {
+        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        articleAuthor: 'John Brown',
+      },
+    ]
 
     return {
       showAddUser, showChangeInfo, teamData,
-      newTeamName: teamData.teamName,
-      newTeamNotice: teamData.teamNotice,
-      newUserId: ref(null),
+
+      newTeamName: teamData.value.teamName,
+      newTeamNotice: teamData.value.teamNotice,
+      newUserId: null,
 
       data1: createData1(),
       columns1: createColumns1({
@@ -186,9 +189,6 @@ export default {
           console.log(rowData);
         },
       }),
-      pagination1: {
-        pageSize: 10
-      },
       data2: createData2(),
       columns2: createColumns2({
         deleteArticle (rowData) {
@@ -198,7 +198,7 @@ export default {
           console.log(rowData);
         }
       }),
-      pagination2: {
+      pagination: {
         pageSize: 10
       },
       options: [
@@ -223,10 +223,9 @@ export default {
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              console.log('确定');
+              console.log('退出登录');
             },
             onNegativeClick: () => {
-              console.log('取消');
             }
           })
         }else if(key === "addUser") {
@@ -239,8 +238,14 @@ export default {
         console.log(newUserId);
       },
       saveInfo(newTeamName, newTeamNotice) {
-        console.log(newTeamName);
-        console.log(newTeamNotice);
+        store.state.axios({
+          url: '/go/team/getUserInfo',
+          method: 'put',
+          data: {
+            newTeamName: newTeamName,
+            newTeamNotice: newTeamNotice,
+          },
+        })
       }
     }
   }

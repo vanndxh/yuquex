@@ -132,6 +132,7 @@ export default {
   },
   setup () {
     const store = useStore()
+
     const SigninRef = ref(null)
     const modelRefSignin = ref({
       usernameSignin: null,
@@ -217,7 +218,7 @@ export default {
         }],
       },
       register() {
-        this.$store.state.axios({
+        store.state.axios({
           url: '/go/user/register',
           method: 'post',
           data: {

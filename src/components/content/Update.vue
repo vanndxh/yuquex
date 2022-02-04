@@ -87,11 +87,36 @@
 
 <script>
 import tabBar from "../common/tabBar";
+import { useStore } from "vuex";
+import { ref } from "vue";
 
 export default {
-  name: "Update",
   components:{
     tabBar
+  },
+  setup() {
+    const store = useStore()
+
+    const timelineData = ref([])
+
+    return {
+      timelineData,
+
+      getTimelineData() {
+        store.state.axios({
+          url: '/go/timeline/getTimeline',
+          method: 'get',
+          data: {
+            userId: store.state.uid,
+          },
+        }).then(r => {
+          timelineData.value = r.data.data
+        })
+      }
+    }
+  },
+  mounted() {
+    this.getTimelineData()
   }
 }
 </script>

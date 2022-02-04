@@ -53,13 +53,16 @@ import tabBar from "../common/tabBar";
 import { h, ref } from 'vue'
 import { NButton,  } from 'naive-ui'
 import catgif from "../common/catgif";
+import {useStore} from "vuex";
 
 export default {
   components:{
     tabBar, catgif
   },
   setup () {
-    let supportCount = 8888
+    const store = useStore()
+
+    const supportCount = ref(8888)
     const showModel = ref(false)
     const showQR = ref(false)
     const createColumns = ({ jump }) => {
@@ -117,17 +120,9 @@ export default {
         url:"https://github.com/vanndxh?tab=repositories"
       },
     ]
-    const getSupportCount = () => {
-      this.$store.state.axios({
-        url: '/go/supportCount/getSupportCount',
-        method: 'get',
-      }).then(r => {
-        this.supportCount = r.data.data
-      })
-    }
 
     return {
-      showModel, showQR, supportCount, getSupportCount,
+      showModel, showQR, supportCount,
 
       data: createData(),
       columns: createColumns({
@@ -140,6 +135,14 @@ export default {
           }
         }
       }),
+      getSupportCount() {
+        store.state.axios({
+          url: '/go/supportCount/getSupportCount',
+          method: 'get',
+        }).then(r => {
+          supportCount.value = r.data.data
+        })
+      }
     }
   },
   mounted() {

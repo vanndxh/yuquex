@@ -37,31 +37,32 @@
 import tabBar from "../common/tabBar";
 import { ref } from "vue";
 import {SearchOutline} from '@vicons/ionicons5'
+import {useStore} from "vuex";
 
 export default {
   components: {
     tabBar, SearchOutline
   },
   setup() {
-    const search = (searchInfo) => {
-      this.$store.state.axios({
-        url: '/go/article/searchArticle',
-        method: 'get',
-        data: {
-          searchValue: searchInfo
-        },
-      }).then(r => {
-        this.searchData = r.data.data
-      })
-    }
+    const store = useStore()
+
+    const searchData = ref([])
 
     return {
-      search,
-
       searchValue: ref(null),
-      searchData: [],
       page: 1,
       pageTotal: 10,
+      search(searchInfo) {
+        store.state.axios({
+          url: '/go/article/searchArticle',
+          method: 'get',
+          data: {
+            searchValue: searchInfo
+          },
+        }).then(r => {
+          searchData.value = r.data.data
+        })
+      }
     }
   }
 }

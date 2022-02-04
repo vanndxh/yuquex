@@ -66,14 +66,23 @@
 import tabBar from "../common/tabBar";
 import { BookOutline } from '@vicons/ionicons5'
 import { LikeOutlined } from '@vicons/antd'
-import {h} from "vue";
+import { h , ref } from "vue";
 import {NButton} from "naive-ui";
+import {useStore} from "vuex";
 
 export default {
   components: {
     tabBar, BookOutline, LikeOutlined
   },
   setup() {
+    const store = useStore()
+
+    const userData = ref({
+      username: "Vanndxh",
+      userInfo: "暂无",
+      articleAmount: 23,
+      likeTotal: 24,
+    })
     const createColumns = ({ lookDetail }) => {
       return [
         {
@@ -133,27 +142,8 @@ export default {
         articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       },
     ]
-    const getUserData = () => {
-      this.$store.state.axios({
-        url: '/go/user/getUserInfo',
-        method: 'get',
-        data: {
-          userId: this.$store.state.uid,
-        },
-      }).then(r => {
-        this.userData = r.data.data
-      })
-    }
 
     return {
-      getUserData,
-
-      userData: {
-        username: "Vanndxh",
-        userInfo: "暂无",
-        articleAmount: 23,
-        likeTotal: 24,
-      },
       data1: createData1(),
       data2: createData2(),
       data3: createData3(),
@@ -169,6 +159,17 @@ export default {
       }),
       pagination: {
         pageSize: 10
+      },
+      getUserData() {
+        store.state.axios({
+          url: '/go/user/getUserInfo',
+          method: 'get',
+          data: {
+            userId: store.state.uid,
+          },
+        }).then(r => {
+          userData.value = r.data.data
+        })
       }
     }
   },
