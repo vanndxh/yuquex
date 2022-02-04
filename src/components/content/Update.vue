@@ -6,6 +6,11 @@
       <n-gi span="12" offset="7">
         <n-timeline>
           <n-timeline-item
+              title="v1.0.11"
+              content="联调部分代码编写day2"
+              time="2022/2/4"
+          />
+          <n-timeline-item
               title="v1.0.10"
               content="联调部分代码编写"
               time="2022/2/3"

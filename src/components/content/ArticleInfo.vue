@@ -90,7 +90,7 @@ export default {
         url: '/go/user/getUserInfo',
         method: 'get',
         data: {
-          userId: this.userData.userId,
+          userId: this.$store.state.uid,
         },
       }).then(r => {
         this.userData = r.data.data

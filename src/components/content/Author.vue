@@ -10,7 +10,7 @@
     <br>
     <n-space justify="center">
       <n-badge value="火">
-        <n-button type="success" @click=clickSupport() class="support" size="large">支持小黑</n-button>
+        <n-button type="success" @click="showQR.value = true" size="large">支持小黑</n-button>
       </n-badge>
     </n-space>
 
@@ -54,62 +54,6 @@ import { h, ref } from 'vue'
 import { NButton,  } from 'naive-ui'
 import catgif from "../common/catgif";
 
-const createColumns = ({ jump }) => {
-  return [
-    {
-      title: '平台',
-      key: 'platform',
-      align: 'center'
-    },
-    {
-      title: '账号',
-      key: 'account',
-      align: "center"
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      align: "center",
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              onClick: () => jump(row)
-            },
-            { default: () => '跳转' }
-        )
-      }
-    }
-  ]
-}
-const createData = () => [
-  {
-    key: 0,
-    platform: 'QQ',
-    account: '1025196468',
-    url:"https://space.bilibili.com/363270906"
-  },
-  {
-    key: 1,
-    platform: 'Bilibili',
-    account: 'van能的小黑',
-    url:"https://space.bilibili.com/363270906"
-  },
-  {
-    key: 2,
-    platform: '微博',
-    account: 'van能的小黑',
-    url:"https://weibo.com/6864286293/profile?rightmod=1&wvr=6&mod=personinfo"
-  },
-  {
-    key: 3,
-    platform: 'Github',
-    account: 'vanndxh',
-    url:"https://github.com/vanndxh?tab=repositories"
-  },
-]
-
 export default {
   components:{
     tabBar, catgif
@@ -118,29 +62,88 @@ export default {
     let supportCount = 8888
     const showModel = ref(false)
     const showQR = ref(false)
-    const handleClick= ()=> {
-      showModel.value = true
+    const createColumns = ({ jump }) => {
+      return [
+        {
+          title: '平台',
+          key: 'platform',
+          align: 'center'
+        },
+        {
+          title: '账号',
+          key: 'account',
+          align: "center"
+        },
+        {
+          title: '操作',
+          key: 'actions',
+          align: "center",
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  onClick: () => jump(row)
+                },
+                { default: () => '跳转' }
+            )
+          }
+        }
+      ]
+    }
+    const createData = () => [
+      {
+        key: 0,
+        platform: 'QQ',
+        account: '1025196468',
+        url:"https://space.bilibili.com/363270906"
+      },
+      {
+        key: 1,
+        platform: 'Bilibili',
+        account: 'van能的小黑',
+        url:"https://space.bilibili.com/363270906"
+      },
+      {
+        key: 2,
+        platform: '微博',
+        account: 'van能的小黑',
+        url:"https://weibo.com/6864286293/profile?rightmod=1&wvr=6&mod=personinfo"
+      },
+      {
+        key: 3,
+        platform: 'Github',
+        account: 'vanndxh',
+        url:"https://github.com/vanndxh?tab=repositories"
+      },
+    ]
+    const getSupportCount = () => {
+      this.$store.state.axios({
+        url: '/go/supportCount/getSupportCount',
+        method: 'get',
+      }).then(r => {
+        this.supportCount = r.data.data
+      })
     }
 
     return {
-      showModel, showQR, supportCount,
+      showModel, showQR, supportCount, getSupportCount,
 
       data: createData(),
       columns: createColumns({
         jump (rowData) {
           if(rowData.key === 0){
-            handleClick()
+            showModel.value = true
           }else{
             let tempWindow = window.open('_blank');
             tempWindow.location = rowData.url;
           }
         }
       }),
-      clickSupport () {
-        showQR.value = true
-        supportCount++
-      }
     }
+  },
+  mounted() {
+    this.getSupportCount()
   }
 }
 </script>
@@ -150,8 +153,5 @@ export default {
   font-family: 华文行楷;
   font-size: 40px;
   text-align: center;
-}
-.support{
-  align: center;
 }
 </style>

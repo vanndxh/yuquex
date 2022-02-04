@@ -69,74 +69,85 @@ import { LikeOutlined } from '@vicons/antd'
 import {h} from "vue";
 import {NButton} from "naive-ui";
 
-const createColumns = ({ lookDetail }) => {
-  return [
-    {
-      key: 'articleName',
-      align: 'center'
-    },
-    {
-      key: 'lookDetail',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'info',
-              onClick: () => lookDetail(row)
-            },
-            { default: () => '查看' }
-        )
-      }
-    },
-  ]
-}
-const createColumns2 = ({ lookDetail }) => {
-  return [
-    {
-      key: 'teamName',
-      align: 'center'
-    },
-    {
-      key: 'lookDetail',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'info',
-              onClick: () => lookDetail(row)
-            },
-            { default: () => '查看' }
-        )
-      }
-    },
-  ]
-}
-const createData1 = () => [
-  {
-    articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  },
-]
-const createData2 = () => [
-  {
-    teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  },
-]
-const createData3 = () => [
-  {
-    articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  },
-]
-
 export default {
-  name: "Profile",
   components: {
     tabBar, BookOutline, LikeOutlined
   },
   setup() {
+    const createColumns = ({ lookDetail }) => {
+      return [
+        {
+          key: 'articleName',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },
+      ]
+    }
+    const createColumns2 = ({ lookDetail }) => {
+      return [
+        {
+          key: 'teamName',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },
+      ]
+    }
+    const createData1 = () => [
+      {
+        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      },
+    ]
+    const createData2 = () => [
+      {
+        teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      },
+    ]
+    const createData3 = () => [
+      {
+        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      },
+    ]
+    const getUserData = () => {
+      this.$store.state.axios({
+        url: '/go/user/getUserInfo',
+        method: 'get',
+        data: {
+          userId: this.$store.state.uid,
+        },
+      }).then(r => {
+        this.userData = r.data.data
+      })
+    }
 
     return {
+      getUserData,
+
       userData: {
         username: "Vanndxh",
         userInfo: "暂无",
@@ -160,6 +171,9 @@ export default {
         pageSize: 10
       }
     }
+  },
+  mounted() {
+    this.getUserData()
   }
 }
 </script>

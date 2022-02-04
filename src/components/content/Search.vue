@@ -35,7 +35,6 @@
 
 <script>
 import tabBar from "../common/tabBar";
-import { useRouter } from "vue-router";
 import { ref } from "vue";
 import {SearchOutline} from '@vicons/ionicons5'
 
@@ -44,15 +43,25 @@ export default {
     tabBar, SearchOutline
   },
   setup() {
-    const router = useRouter()
+    const search = (searchInfo) => {
+      this.$store.state.axios({
+        url: '/go/article/searchArticle',
+        method: 'get',
+        data: {
+          searchValue: searchInfo
+        },
+      }).then(r => {
+        this.searchData = r.data.data
+      })
+    }
+
     return {
+      search,
+
       searchValue: ref(null),
+      searchData: [],
       page: 1,
       pageTotal: 10,
-      search(searchInfo) {
-        console.log(searchInfo);
-        router.push('search')
-      }
     }
   }
 }
