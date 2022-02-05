@@ -93,6 +93,7 @@ export default {
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
     const teamData = ref({
+      teamId: 1,
       teamName: "teamName",
       teamNotice: "testTeamNotice"
     })
@@ -235,19 +236,40 @@ export default {
         }
       },
       addUser(newUserId) {
-        console.log(newUserId);
+        store.state.axios({
+          url: '/go/team/addTeamUser',
+          method: 'put',
+          data: {
+            teamId: teamData.value.teamId,
+            newUserId: newUserId,
+          },
+        })
       },
       saveInfo(newTeamName, newTeamNotice) {
         store.state.axios({
-          url: '/go/team/getUserInfo',
+          url: '/go/team/updateTeamInfo',
           method: 'put',
           data: {
             newTeamName: newTeamName,
             newTeamNotice: newTeamNotice,
           },
         })
+      },
+      getTeamInfo() {
+        store.state.axios({
+          url: '/go/team/getTeamInfo',
+          method: 'get',
+          data: {
+            teamId: store.state.tid
+          }
+        }).then(r => {
+          teamData.value = r.data.data
+        })
       }
     }
+  },
+  mounted() {
+    this.getTeamInfo()
   }
 }
 </script>

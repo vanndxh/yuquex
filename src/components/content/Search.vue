@@ -17,12 +17,12 @@
           <n-button type="primary" ghost @click="search(searchValue)" size="large">搜索</n-button>
         </n-gi>
       </n-grid>
-      <n-list>
+      <n-list v-for="item in searchData" :key="item">
         <n-list-item>
-          <n-card title="{{ articleName }}" hoverable>
-            articleContent前15字
+          <n-card :title=item.articleName hoverable>
+            articleContent前30字
             <div>
-              <n-button style="float: right">详情</n-button>
+              <n-button style="float: right" @click="lookDetail(item.articleId)">详情</n-button>
             </div>
           </n-card>
         </n-list-item>
@@ -38,6 +38,7 @@ import tabBar from "../common/tabBar";
 import { ref } from "vue";
 import {SearchOutline} from '@vicons/ionicons5'
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 export default {
   components: {
@@ -45,11 +46,14 @@ export default {
   },
   setup() {
     const store = useStore()
+    const router = useRouter()
 
     const searchData = ref([])
 
     return {
-      searchValue: ref(null),
+      searchData,
+
+      searchValue: store.state.searchData,
       page: 1,
       pageTotal: 10,
       search(searchInfo) {
@@ -62,6 +66,10 @@ export default {
         }).then(r => {
           searchData.value = r.data.data
         })
+      },
+      lookDetail(articleId) {
+        router.push('articleInfo')
+        store.state.aid = articleId
       }
     }
   }

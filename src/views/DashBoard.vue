@@ -1,34 +1,32 @@
 <template>
-  <div>
-    <n-layout>
-      <!--顶部栏-->
-      <tabBar></tabBar>
-      <!--侧边栏以及主要内容-->
-      <n-layout has-sider>
-        <!--侧边栏-->
-        <n-layout-sider content-style="padding: 24px;">
-          <tabBarS></tabBarS>
-          <catgif></catgif>
-        </n-layout-sider>
-        <!--主要内容-->
-        <n-layout-content content-style="padding: 24px;">
+  <n-layout>
+    <!--顶部栏-->
+    <tabBar></tabBar>
+    <!--侧边栏以及主要内容-->
+    <n-layout has-sider>
+      <!--侧边栏-->
+      <n-layout-sider content-style="padding: 24px;">
+        <tabBarS></tabBarS>
+        <catgif></catgif>
+      </n-layout-sider>
+      <!--主要内容-->
+      <n-layout-content content-style="padding: 24px;">
 
-          <n-grid :col="24">
-            <n-gi :span="20" :offset="1">
-              <n-data-table :columns="columns" :data="data" :pagination="pagination" />
-            </n-gi>
-          </n-grid>
+        <n-grid :col="24">
+          <n-gi :span="20" :offset="1">
+            <n-data-table :columns="columns" :data="data" :pagination="pagination" />
+          </n-gi>
+        </n-grid>
 
-        </n-layout-content>
-      </n-layout>
+      </n-layout-content>
     </n-layout>
-  </div>
+  </n-layout>
 </template>
 
 <script>
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
-import catgif from "../components/common/catgif";
+import catgif from "@/components/common/catgif"
 import { h, ref } from "vue";
 import {NButton} from "naive-ui";
 import {useStore} from "vuex";
@@ -40,8 +38,7 @@ export default {
   setup() {
     const store = useStore()
 
-    const data = ref([])
-    const createColumns = ({ lookDetail, removeStar }) => {
+    const createColumns = ({ lookDetail, deleteArticle }) => {
       return [
         {
           title: '文章标题',
@@ -68,7 +65,7 @@ export default {
           }
         },
         {
-          title: '移除收藏夹',
+          title: '删除文章',
           key: 'delete',
           render (row) {
             return h(
@@ -76,29 +73,22 @@ export default {
                 {
                   size: 'small',
                   type: 'warning',
-                  onClick: () => removeStar(row)
+                  onClick: () => deleteArticle(row)
                 },
-                { default: () => '移除' }
+                { default: () => '删除' }
             )
           }
         }
       ]
     }
+    const data = ref([])
 
     return {
       data,
 
       columns: createColumns({
-        removeStar (rowData) {
+        deleteArticle (rowData) {
           console.log(rowData);
-          store.state.axios({
-            url: '/go/star/cancelStar',
-            method: 'post',
-            data: {
-              userId: store.state.uid,
-              articleId: store.state.aid
-            },
-          })
         },
         lookDetail (rowData) {
           console.log(rowData);
@@ -107,9 +97,9 @@ export default {
       pagination: {
         pageSize: 10
       },
-      getFavorite() {
+      getArticles() {
         store.state.axios({
-          url: '/go/star/getFavorite',
+          url: '/go/article/getArticles',
           method: 'get',
           data: {
             userId: store.state.uid
@@ -121,7 +111,7 @@ export default {
     }
   },
   mounted() {
-    this.getFavorite()
+    this.getArticles()
   }
 }
 </script>

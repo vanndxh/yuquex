@@ -13,7 +13,6 @@ import {
 
 
 export default {
-  name: "tabBarS",
   setup () {
     const renderIcon =(icon) => {
       return () => h(NIcon, null, { default: () => h(icon) })
@@ -28,12 +27,12 @@ export default {
                   resolveComponent('router-link'),
                   {
                     to: {
-                      name: 'Home',
+                      name: 'DashBoard',
                     }
                   },
                   { default: () => '工作台' }
               ),
-          key: 'home',
+          key: 'dashBoard',
           icon: renderIcon(DesktopOutline)
         },
         {

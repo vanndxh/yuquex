@@ -67,6 +67,11 @@ const routes = [
     name: 'TeamInfo',
     component: () => import('../components/content/TeamInfo')
   },
+  {
+    path: '/DashBoard',
+    name: 'DashBoard',
+    component: () => import('../views/DashBoard')
+  },
 ]
 
 const router = createRouter({

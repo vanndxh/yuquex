@@ -13,17 +13,17 @@
         <n-grid :col="24" x-gap="12">
           <n-gi span="16">
             <n-space vertical>
-              <n-input v-model:value="articleData.articleName" type="text" placeholder="标题" size="large"
+              <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                        maxlength="20" show-count/>
               <n-input
-                  v-model:value="articleData.articleContent"
+                  v-model:value="newArticleContent"
                   type="textarea"
                   placeholder="正文"
                   size="small"
                   :autosize="{minRows: 20,maxRows: 30}"
                   maxlength="200" show-count
               />
-              <n-button type="success" class="save" @click="create">保存</n-button>
+              <n-button type="success" class="save" @click="createArticle(newArticleName, newArticleContent)">保存</n-button>
             </n-space>
           </n-gi>
           <n-gi span="6" offset="1">
@@ -66,20 +66,26 @@ import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { ref, } from 'vue'
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
+import {useStore} from "vuex";
 
 
 export default {
-  name: "Create",
   components: {
     tabBar, tabBarS, ArchiveIcon
   },
   setup() {
+    const store = useStore()
+
+    const newArticleName = ref(null)
+    const newArticleContent = ref(null)
+    const articleData = ref({
+      articleName: null,
+      articleContent: null
+    })
 
     return {
-      articleData: ref({
-        articleName: null,
-        articleContent: null
-      }),
+      articleData, newArticleName, newArticleContent,
+
       async beforeUpload ({ file }) {
         if (file.file.type !== 'docx') {
           console.log('error');
@@ -87,8 +93,17 @@ export default {
         }
         return true
       },
-      create() {
-
+      createArticle(newArticleName, newArticleContent) {
+        store.state.axios({
+          url: '/go/article/createArticle',
+          method: 'post',
+          data: {
+            newArticleName: newArticleName,
+            newArticleContent: newArticleContent,
+          },
+        }).then(r => {
+          articleData.value = r.data.data
+        })
       }
     }
   }

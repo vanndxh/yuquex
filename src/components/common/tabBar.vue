@@ -54,7 +54,7 @@
     </n-layout-header>
   </div>
 
-<!--用户须知-->
+  <!--用户须知-->
   <n-modal v-model:show="showUserInstruction">
     <n-card
         style="width: 800px;"
@@ -103,8 +103,7 @@
         注意：如果您认为自己或他人的版权、著作权或其他合法权益在本网上受到他人侵害，请立即与小黑屋联系,并提供相关证据。</p>
     </n-card>
   </n-modal>
-
-<!--  提交反馈-->
+  <!--  提交反馈-->
   <n-modal v-model:show="showFeedback">
     <n-card
         style="width: 600px;"
@@ -131,18 +130,18 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex"
 import { useDialog } from 'naive-ui'
 
-
 export default {
   components:{
     AddCircleOutline, SearchOutline
   },
   setup () {
-    const showFeedback = ref(false)
-    const showUserInstruction = ref(false)
-    const feedbackValue = ref(null)
     const dialog = useDialog()
     const router = useRouter()
     const store = useStore()
+
+    const showFeedback = ref(false)
+    const showUserInstruction = ref(false)
+    const feedbackValue = ref(null)
     const menuOptions = [
       {
         label: () =>
@@ -275,7 +274,6 @@ export default {
               console.log('确定');
             },
             onNegativeClick: () => {
-              console.log('取消');
             }
           })
         }else if(key === "feedback") {
@@ -296,11 +294,25 @@ export default {
         store.state.choice = "signup"
       },
       search(searchInfo) {
-        console.log(searchInfo);
+        store.state.axios({
+          url: '/go/article/searchArticle',
+          method: 'get',
+          data: {
+            searchValue: searchInfo
+          },
+        }).then(r => {
+          store.state.searchData = r.data.data
+        })
         router.push('search')
       },
       addFeedback(feedbackValue) {
-        console.log(feedbackValue);
+        store.state.axios({
+          url: '/go/feedback/submitFeedback',
+          method: 'post',
+          data: {
+            feedbackInfo: feedbackValue
+          },
+        })
       }
     }
   },

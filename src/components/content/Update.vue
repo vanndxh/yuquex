@@ -5,6 +5,20 @@
     <n-grid :col="24">
       <n-gi span="12" offset="7">
         <n-timeline>
+          <div v-for="item in timelineData" :key="item">
+            <n-timeline-item
+                :type = "item.type"
+                :title = "item.title"
+                :content = "item.content"
+                :time = "item.time"
+            />
+          </div>
+
+          <n-timeline-item
+              title="v1.0.12"
+              content="联调部分代码编写day3"
+              time="2022/2/5"
+          />
           <n-timeline-item
               title="v1.0.11"
               content="联调部分代码编写day2"
@@ -97,7 +111,9 @@ export default {
   setup() {
     const store = useStore()
 
-    const timelineData = ref([])
+    const timelineData = ref([
+
+    ])
 
     return {
       timelineData,
@@ -106,9 +122,6 @@ export default {
         store.state.axios({
           url: '/go/timeline/getTimeline',
           method: 'get',
-          data: {
-            userId: store.state.uid,
-          },
         }).then(r => {
           timelineData.value = r.data.data
         })

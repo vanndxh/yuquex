@@ -5,7 +5,10 @@ export default createStore({
     uid: null,
     pass: "",
     aid: null,
+    tid: null,
     choice: "signin",
+    searchData: [],
+
     axios: require('axios'),
   },
   mutations: {
