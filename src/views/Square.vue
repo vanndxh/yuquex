@@ -21,20 +21,37 @@
 
 <script>
 import tabBar from "@/components/common/tabBar";
+import {useStore} from "vuex";
 
 export default {
   components:{
     tabBar
   },
   setup() {
+    const store = useStore()
+
+    const articleData = [{
+      articleName: "articleName",
+      articleInfo: "articleInfo"
+    }]
+
     return {
+      articleData,
+
       page: 1,
       pageTotal: 10,
-      articleData: {
-        articleName: "articleName",
-        articleInfo: "articleInfo"
+      getHotArticle() {
+        store.state.axios({
+          url: '/go/article/getHotArticle',
+          method: 'get',
+        }).then(r => {
+          articleData.value = r.data.data
+        })
       }
     }
+  },
+  mounted() {
+    this.getHotArticle()
   }
 }
 </script>

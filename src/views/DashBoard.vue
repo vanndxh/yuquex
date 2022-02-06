@@ -30,12 +30,14 @@ import catgif from "@/components/common/catgif"
 import { h, ref } from "vue";
 import {NButton} from "naive-ui";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 export default {
   components: {
     tabBar, tabBarS, catgif
   },
   setup() {
+    const router = useRouter()
     const store = useStore()
 
     const createColumns = ({ lookDetail, deleteArticle }) => {
@@ -88,10 +90,18 @@ export default {
 
       columns: createColumns({
         deleteArticle (rowData) {
-          console.log(rowData);
+          store.state.axios({
+            url: '/go/article/transTrash',
+            method: 'put',
+            data: {
+              articleId: rowData.articleId,
+              handle: 1,
+            },
+          })
         },
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.aid = rowData.articleId
+          router.push("articleInfo")
         }
       }),
       pagination: {
@@ -102,7 +112,8 @@ export default {
           url: '/go/article/getArticles',
           method: 'get',
           data: {
-            userId: store.state.uid
+            userId: store.state.uid,
+            isInTrash: 0,
           },
         }).then(r => {
           data.value = r.data.data

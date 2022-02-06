@@ -16,7 +16,6 @@
               <n-data-table :columns="columns" :data="data" :pagination="pagination" />
             </n-gi>
           </n-grid>
-
         </n-layout-content>
       </n-layout>
     </n-layout>
@@ -26,83 +25,105 @@
 <script>
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
-import {h} from "vue";
+import { h , ref } from "vue";
 import {NButton} from "naive-ui";
-
-const createColumns = ({ recover, deleteArticle }) => {
-  return [
-    {
-      title: '文章标题',
-      titleColSpan: 1,
-      key: 'articleName',
-      align: 'center'
-    },
-    {
-      title: '作者',
-      titleColSpan: 1,
-      key: 'articleAuthor'
-    },
-    {
-      title: '恢复',
-      titleColSpan: 1,
-      key: 'lookDetail',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'info',
-              onClick: () => recover(row)
-            },
-            { default: () => '恢复' }
-        )
-      }
-    },
-    {
-      title: '彻底删除',
-      titleColSpan: 1,
-      key: 'delete',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'warning',
-              onClick: () => deleteArticle(row)
-            },
-            { default: () => '删除' }
-        )
-      }
-    }
-  ]
-}
-const createData = () => [
-  {
-    articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    articleAuthor: 'John Brown',
-  },
-]
+import {useStore} from "vuex";
 
 export default {
-  name: "RecycleBin",
   components: {
     tabBar, tabBarS
   },
   setup() {
+    const store = useStore()
+
+    const createColumns = ({ recover, deleteArticle }) => {
+      return [
+        {
+          title: '文章标题',
+          key: 'articleName',
+          align: 'center'
+        },
+        {
+          title: '作者',
+          key: 'articleAuthor'
+        },
+        {
+          title: '恢复',
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => recover(row)
+                },
+                { default: () => '恢复' }
+            )
+          }
+        },
+        {
+          title: '彻底删除',
+          key: 'delete',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => deleteArticle(row)
+                },
+                { default: () => '删除' }
+            )
+          }
+        }
+      ]
+    }
+    const data = ref([])
+
     return {
-      data: createData(),
+      data,
+
       columns: createColumns({
         recover (rowData) {
-          console.log(rowData);
+          store.state.axios({
+            url: '/go/article/transTrash',
+            method: 'put',
+            data: {
+              articleId: rowData.articleId,
+              handle: 0,
+            },
+          })
         },
-        lookDetail (rowData) {
-          console.log(rowData);
+        deleteArticle (rowData) {
+          store.state.axios({
+            url: '/go/article/deleteArticle',
+            method: 'delete',
+            data: {
+              articleId: rowData.articleId,
+            },
+          })
         }
       }),
       pagination: {
         pageSize: 10
+      },
+      getArticles() {
+        store.state.axios({
+          url: '/go/article/getArticles',
+          method: 'get',
+          data: {
+            userId: store.state.uid,
+            isInTrash: 1,
+          },
+        }).then(r => {
+          data.value = r.data.data
+        })
       }
     }
+  },
+  mounted() {
+    this.getArticles()
   }
 }
 </script>

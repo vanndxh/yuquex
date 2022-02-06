@@ -14,6 +14,12 @@
             />
           </div>
 
+
+          <n-timeline-item
+              title="v1.0.13"
+              content="联调部分代码编写day4"
+              time="2022/2/6"
+          />
           <n-timeline-item
               title="v1.0.12"
               content="联调部分代码编写day3"
@@ -29,69 +35,58 @@
               content="联调部分代码编写"
               time="2022/2/3"
           />
-
           <n-timeline-item
               title="v1.0.9"
               content="完成个人信息界面，完善部分小部件，添加用户须知等功能"
               time="2022/1/28"
           />
-
           <n-timeline-item
               title="v1.0.8"
               content="完成知识小组模块，网站备案成功~"
               time="2022/1/27"
           />
-
           <n-timeline-item
               title="v1.0.7"
               content="基本完成后端，除知识小组功能外基本完成前端"
               time="2022/1/26"
           />
-
           <n-timeline-item
               title="v1.0.6"
               content="连接数据库，连了tm一天，前端配置go环境，测试register指令前后端联调效果"
               time="2022/1/23"
           />
-
           <n-timeline-item
               title="v1.0.5"
               content="建立数据库，搭建后端框架"
               time="2022/1/17"
           />
-
           <n-timeline-item
               type="warning"
               title="v1.0.4"
               content="完成新建文档页面设计，文档详情页设计，前端基本完成，并尝试部署到服务器上！"
               time="2022/1/16"
           />
-
           <n-timeline-item
               title="v1.0.3"
               content="调整部分ui，创建个人信息界面，修复注册表单bug"
               time="2022/1/15"
           />
-
           <n-timeline-item
               title="v1.0.2"
               content="修复前端bug，创建登录注册表单，创建后端"
               time="2022/1/14"
           />
-
           <n-timeline-item
               title="v1.0.1"
               content="新增注册登录，ui优化，新增动画小猫，新增日志功能，个人信息界面，完善前端功能"
               time="2022/1/13"
           />
-
           <n-timeline-item
               type="warning"
               title="v1.0.0"
               content="新建文件夹，配置环境，搭建框架"
               time="2022/1/11"
           />
-
         </n-timeline>
       </n-gi>
     </n-grid>

@@ -32,12 +32,14 @@ import catgif from "../components/common/catgif";
 import { h, ref } from "vue";
 import {NButton} from "naive-ui";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 export default {
   components: {
     tabBar, tabBarS, catgif
   },
   setup() {
+    const router = useRouter()
     const store = useStore()
 
     const data = ref([])
@@ -90,18 +92,18 @@ export default {
 
       columns: createColumns({
         removeStar (rowData) {
-          console.log(rowData);
           store.state.axios({
             url: '/go/star/cancelStar',
             method: 'post',
             data: {
               userId: store.state.uid,
-              articleId: store.state.aid
+              articleId: rowData.articleId
             },
           })
         },
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.aid = rowData.articleId
+          router.push("articleInfo")
         }
       }),
       pagination: {

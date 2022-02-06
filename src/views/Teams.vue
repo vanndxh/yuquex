@@ -48,6 +48,8 @@ import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { h, ref } from "vue";
 import { NButton } from "naive-ui";
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 const createColumns = ({ lookDetail }) => {
   return [
@@ -80,7 +82,7 @@ const createColumns = ({ lookDetail }) => {
     },
   ]
 }
-const createData = () => [
+const data =  [
   {
     teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     teamLeader: 'John Brown',
@@ -92,31 +94,48 @@ export default {
     tabBar, tabBarS
   },
   setup() {
+    const router = useRouter()
+    const store = useStore()
+
     return {
+      data,
+
       showCreateTeam: ref(false),
       newTeamName: ref(null),
-      data: createData(),
       columns: createColumns({
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.aid = rowData.articleId
+          router.push("articleInfo")
         }
       }),
       pagination: {
         pageSize: 10
       },
       createTeam(newTeamName) {
-        this.$store.state.axios({
-          url: '/go/user/register',
+        store.state.axios({
+          url: '/go/team/createTeam',
           method: 'post',
           data: {
             teamName: newTeamName,
-            teamLeader: 1
+            teamLeader: store.state.uid
+          },
+        })
+      },
+      getTeams() {
+        store.state.axios({
+          url: '/go/team/getTeams',
+          method: 'get',
+          data: {
+            userId: store.state.uid
           },
         }).then(r => {
-          console.log(r.data);
+          data.value = r.data.data
         })
       }
     }
+  },
+  mounted() {
+    this.getTeams()
   }
 }
 </script>
