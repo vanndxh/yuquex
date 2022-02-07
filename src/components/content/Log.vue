@@ -13,20 +13,21 @@
                 <!--登录表单-->
                 <n-tab-pane name="signin" tab="登录">
                   <n-form :model="modelSignin" ref="SigninRef"  :rules="rulesSignin" label-placement="left" label-width="80px">
-                    <n-form-item-row label="用户名" path="usernameSignin" :show-require-mark="false">
+                    <n-form-item-row label="账号" path="useridSignin" :show-require-mark="false">
                       <n-input
-                          v-model:value="modelSignin.usernameSignin"
+                          v-model:value="modelSignin.useridSignin"
                           @keydown.enter.prevent
                       />
                     </n-form-item-row>
                     <n-form-item-row label="密码" path="passwordSignin" :show-require-mark="false">
                       <n-input
+                          type="password"
                           v-model:value="modelSignin.passwordSignin"
                           @keydown.enter.prevent
                       />
                     </n-form-item-row>
                   </n-form>
-                  <n-button type="primary" block>登录</n-button>
+                  <n-button type="primary" block @click="signIn()">登录</n-button>
                 </n-tab-pane>
                 <!--注册表单-->
                 <n-tab-pane name="signup" tab="注册">
@@ -40,12 +41,14 @@
                     </n-form-item-row>
                     <n-form-item-row label="密码" path="passwordSignup" :show-require-mark="true">
                       <n-input
+                          type="password"
                           v-model:value="modelSignup.passwordSignup"
                           @keydown.enter.prevent
                       />
                     </n-form-item-row>
                     <n-form-item-row label="重复密码" path="repasswordSignup" :show-require-mark="true">
                       <n-input
+                          type="password"
                           v-model:value="modelSignup.repasswordSignup"
                           @keydown.enter.prevent
                       />
@@ -53,7 +56,7 @@
                     <n-form-item-row path="isAgree">
                       <n-checkbox v-model:checked="modelSignup.isAgree">
                         我已阅读并同意
-                        <a @click="showUI()" class="userInstruction">用户须知</a>
+                        <a @click="showUserInstruction = !showUserInstruction" class="userInstruction">用户须知</a>
                       </n-checkbox>
                     </n-form-item-row>
                   </n-form>
@@ -123,6 +126,7 @@
 import tabBar from "../common/tabBar";
 import {ref,} from 'vue'
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 
 export default {
@@ -131,11 +135,12 @@ export default {
     tabBar
   },
   setup () {
+    const router = useRouter()
     const store = useStore()
 
     const SigninRef = ref(null)
-    const modelRefSignin = ref({
-      usernameSignin: null,
+    const modelSignin = ref({
+      useridSignin: null,
       passwordSignin: null,
     })
     const SignupRef = ref(null)
@@ -146,14 +151,14 @@ export default {
       isAgree: null,
     })
     const showUserInstruction = ref(false)
+    let test = modelSignin.value.useridSignin
 
     return {
-      SigninRef, SignupRef, modelSignup, showUserInstruction,
+      SigninRef, SignupRef, modelSignin, modelSignup, showUserInstruction, test,
 
       choice: store.state.choice,
-      modelSignin: modelRefSignin,
       rulesSignin: {
-        usernameSignin:[{
+        useridSignin:[{
           required: true,
           validator (rule, value) {
             if (!value) {
@@ -226,11 +231,34 @@ export default {
             password: modelSignup.value.passwordSignup,
             repassword: modelSignup.value.repasswordSignup,
           },
+        }).then(r => {
+          console.log(r);
+        })
+
+        store.state.choice = "signin"
+
+      },
+      signIn() {
+        store.state.axios({
+          url: '/go/user/signIn',
+          method: 'put',
+          data: {
+            userId: test,
+            password: modelSignin.value.passwordSignin,
+          },
+        }).then(r => {
+          if (r.status === 200) {
+            // store.state.isLogged = true
+            // store.state.uid = modelSignin.value.useridSignin
+            router.push("/")
+            console.log(r);
+            console.log(modelSignin.value.useridSignin);
+          } else {
+            // err
+
+          }
         })
       },
-      showUI() {
-        showUserInstruction.value = !showUserInstruction.value
-      }
     }
   }
 }

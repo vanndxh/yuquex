@@ -23,7 +23,7 @@
                   :autosize="{minRows: 20,maxRows: 30}"
                   maxlength="200" show-count
               />
-              <n-button type="success" class="save" @click="createArticle(newArticleName, newArticleContent)">保存</n-button>
+              <n-button type="success" class="save" @click="createArticle()">保存</n-button>
             </n-space>
           </n-gi>
           <n-gi span="6" offset="1">
@@ -93,13 +93,14 @@ export default {
         }
         return true
       },
-      createArticle(newArticleName, newArticleContent) {
+      createArticle() {
         store.state.axios({
           url: '/go/article/createArticle',
           method: 'post',
           data: {
-            newArticleName: newArticleName,
-            newArticleContent: newArticleContent,
+            articleName: newArticleName,
+            articleContent: newArticleContent,
+            articleAuthor: store.state.uid
           },
         }).then(r => {
           articleData.value = r.data.data

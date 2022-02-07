@@ -36,12 +36,12 @@
 
           <n-gi span="2">
             <n-space>
-              <n-button v-show="!isLogged === true" @click="clickLog">登录</n-button>
-              <n-button v-show="!isLogged === true" @click="clickRegister">注册</n-button>
+              <n-button v-show="!log === true" @click="clickLog">登录</n-button>
+              <n-button v-show="!log === true" @click="clickRegister">注册</n-button>
             </n-space>
             <n-dropdown trigger="hover" @select="handleSelect" :options="avatarOptions">
               <n-avatar
-                  v-show="isLogged === true"
+                  v-show="log === true"
                   round
                   size="medium"
                   src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
@@ -232,9 +232,9 @@ export default {
     return {
       menuOptions, showFeedback, feedbackValue, showUserInstruction,
 
+      log: store.state.isLogged,
       searchValue: ref(null),
       activeKey: ref(null),
-      isLogged: false,
       avatarOptions: [
         {
           label:  () =>
@@ -271,7 +271,9 @@ export default {
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              console.log('确定');
+              store.state.uid = 0
+              store.state.isLogged = false
+              location.reload()
             },
             onNegativeClick: () => {
             }

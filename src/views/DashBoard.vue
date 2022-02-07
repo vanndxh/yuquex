@@ -112,7 +112,7 @@ export default {
           url: '/go/article/getArticles',
           method: 'get',
           data: {
-            userId: store.state.uid,
+            articleAuthor: store.state.uid,
             isInTrash: 0,
           },
         }).then(r => {

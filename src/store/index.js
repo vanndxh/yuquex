@@ -3,9 +3,11 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     uid: null,
-    pass: "",
     aid: null,
     tid: null,
+    pass: "",
+
+    isLogged: false,
     choice: "signin",
     searchData: [],
 
