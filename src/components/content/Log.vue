@@ -9,7 +9,7 @@
         <n-grid :col="24">
           <n-gi span="12" offset="6">
             <n-card>
-              <n-tabs :default-value="choice" size="large" justify-content="space-evenly"  type="segment">
+              <n-tabs :default-value="tabDef" size="large" type="segment" :value="tabValue">
                 <!--登录表单-->
                 <n-tab-pane name="signin" tab="登录">
                   <n-form :model="modelSignin" ref="SigninRef"  :rules="rulesSignin" label-placement="left" label-width="80px">
@@ -127,14 +127,15 @@ import tabBar from "../common/tabBar";
 import {ref,} from 'vue'
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
-
+import { useMessage, useNotification } from 'naive-ui'
 
 export default {
-  name: "Log",
-  components:{
+  components: {
     tabBar
   },
-  setup () {
+  setup() {
+    const notification = useNotification()
+    const message = useMessage()
     const router = useRouter()
     const store = useStore()
 
@@ -151,38 +152,41 @@ export default {
       isAgree: null,
     })
     const showUserInstruction = ref(false)
-    let test = modelSignin.value.useridSignin
+    const tabDef = ref(store.state.choice)
+    let tabValue = ref()
 
     return {
-      SigninRef, SignupRef, modelSignin, modelSignup, showUserInstruction, test,
+      SigninRef, SignupRef, modelSignin, modelSignup, showUserInstruction, tabValue, tabDef,
 
-      choice: store.state.choice,
       rulesSignin: {
-        useridSignin:[{
+        useridSignin: [{
           required: true,
-          validator (rule, value) {
-            if (!value) {
-              return new Error('不能为空')
-            } else
-            return true
-          },
-          trigger: ['input', 'blur']
-        }],
-        passwordSignin:[{
-          required: true,
-          validator (rule, value) {
+          validator(rule, value) {
             if (!value) {
               return new Error('不能为空')
             } else
               return true
+          },
+          trigger: ['input', 'blur']
+        }],
+        passwordSignin: [{
+          required: true,
+          validator(rule, value) {
+            if (!value) {
+              return new Error('不能为空')
+            } else if (value.length < 6){
+              return new Error('密码不能小于6位')
+            } else {
+              return true
+            }
           },
           trigger: ['input', 'blur']
         }],
       },
-      rulesSignup:{
-        usernameSignup:[{
+      rulesSignup: {
+        usernameSignup: [{
           required: true,
-          validator (rule, value) {
+          validator(rule, value) {
             if (!value) {
               return new Error('不能为空')
             } else
@@ -190,77 +194,90 @@ export default {
           },
           trigger: ['input', 'blur']
         }],
-        passwordSignup:[{
+        passwordSignup: [{
           required: true,
-          validator (rule, value) {
+          validator(rule, value) {
             if (!value) {
               return new Error('不能为空')
+            } else if (value.length < 6) {
+              return new Error('密码不能小于6位')
             } else
               return true
           },
           trigger: ['input', 'blur']
         }],
-        repasswordSignup:[{
+        repasswordSignup: [{
           required: true,
-          validator (rule, value) {
+          validator(rule, value) {
             if (!value) {
               return new Error('不能为空')
             } else if (modelSignup.value.passwordSignup !== modelSignup.value.repasswordSignup) {
               return new Error('两次密码不一致')
             }
-              return true
+            return true
           },
           trigger: ['input', 'blur']
         }],
-        isAgree:[{
-          validator (rule, value) {
+        isAgree: [{
+          validator(rule, value) {
             if (!value) {
               return new Error('请勾选此项~')
             } else
-            return true
+              return true
           },
-          trigger: ['change','blur'],
+          trigger: ['change', 'blur'],
         }],
       },
       register() {
+        let formData = new FormData()
+        formData.set('username', modelSignup.value.usernameSignup)
+        formData.set('password', modelSignup.value.passwordSignup)
+        formData.set('rePassword', modelSignup.value.repasswordSignup)
+
         store.state.axios({
           url: '/go/user/register',
           method: 'post',
-          data: {
-            username: modelSignup.value.usernameSignup,
-            password: modelSignup.value.passwordSignup,
-            repassword: modelSignup.value.repasswordSignup,
-          },
-        }).then(r => {
-          console.log(r);
-        })
-
-        store.state.choice = "signin"
-
-      },
-      signIn() {
-        store.state.axios({
-          url: '/go/user/signIn',
-          method: 'put',
-          data: {
-            userId: test,
-            password: modelSignin.value.passwordSignin,
-          },
+          data: formData
         }).then(r => {
           if (r.status === 200) {
-            // store.state.isLogged = true
-            // store.state.uid = modelSignin.value.useridSignin
-            router.push("/")
-            console.log(r);
-            console.log(modelSignin.value.useridSignin);
-          } else {
-            // err
-
+            store.state.choice = "signin"
+            modelSignin.value.useridSignin = r.data.userId
+            modelSignin.value.passwordSignin = r.data.password
+            message.success("注册成功！")
+            notification.warning({
+              title: "请牢记你的信息!",
+              content: "账号: " + r.data.userId + "\n" + "密码:" + r.data.password
+            })
+            tabValue.value = "signin"
           }
+        }).catch(() => {
+          message.error("注册信息错误，请按提示修改！")
+        })
+      },
+      signIn() {
+        let formData = new FormData()
+        formData.set('userId', modelSignin.value.useridSignin)
+        formData.set('password', modelSignin.value.passwordSignin)
+
+        store.state.axios({
+          url: '/go/user/login',
+          method: 'post',
+          data: formData
+        }).then(r => {
+            if (r.status === 200) {
+              message.success("登录成功，将自动跳转！")
+              store.state.isLogged = true
+              store.state.uid = modelSignin.value.useridSignin
+              router.push("/")
+            } else if (r.status === 404) {
+              message.error("账号或密码错误！")
+            }
+          }).catch(() => {
+          message.error("账号或密码错误！")
         })
       },
     }
-  }
+  },
 }
 </script>
 

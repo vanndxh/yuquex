@@ -48,12 +48,12 @@ export default {
     const store = useStore()
     const router = useRouter()
 
+    const searchValue = ref(store.state.searchData)
     const searchData = ref([])
 
     return {
-      searchData,
+      searchData, searchValue,
 
-      searchValue: store.state.searchData,
       page: 1,
       pageTotal: 10,
       search(searchInfo) {

@@ -116,7 +116,7 @@
       <n-space vertical>
         <n-input v-model:value="feedbackValue" type="textarea" placeholder="Please input~" :clearable="true" maxlength="200" show-count
                  :autosize="{minRows: 3,maxRows: 15}"/>
-        <n-button type="primary" ghost @click="addFeedback(feedbackValue)" style="float: right">提交</n-button>
+        <n-button type="primary" ghost @click="addFeedback()" style="float: right">提交</n-button>
       </n-space>
     </n-card>
   </n-modal>
@@ -128,13 +128,14 @@ import { ref , h , resolveComponent, } from 'vue'
 import { AddCircleOutline, SearchOutline } from '@vicons/ionicons5'
 import { useRouter } from "vue-router";
 import { useStore } from "vuex"
-import { useDialog } from 'naive-ui'
+import {useDialog, useMessage} from 'naive-ui'
 
 export default {
   components:{
     AddCircleOutline, SearchOutline
   },
   setup () {
+    const message = useMessage()
     const dialog = useDialog()
     const router = useRouter()
     const store = useStore()
@@ -271,8 +272,9 @@ export default {
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              store.state.uid = 0
+              store.state.uid = null
               store.state.isLogged = false
+              message.info('退出登录~')
               location.reload()
             },
             onNegativeClick: () => {
@@ -304,16 +306,25 @@ export default {
           },
         }).then(r => {
           store.state.searchData = r.data.data
+          router.push('search')
         })
-        router.push('search')
+
       },
-      addFeedback(feedbackValue) {
+      addFeedback() {
+        let formData = new FormData()
+        formData.set('feedbackInfo', feedbackValue.value)
+
         store.state.axios({
           url: '/go/feedback/submitFeedback',
           method: 'post',
-          data: {
-            feedbackInfo: feedbackValue
-          },
+          data: formData
+        }).then(r => {
+          if (r.status === 200) {
+            feedbackValue.value = ""
+            message.success("提交反馈成功，感谢您的反馈！")
+          } else {
+            message.error("提交失败！")
+          }
         })
       }
     }
