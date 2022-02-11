@@ -19,7 +19,7 @@
                   <n-icon><SearchOutline /></n-icon>
                 </template>
               </n-input>
-              <n-button type="primary" ghost @click="search(searchValue)" style="vertical-align: center">搜索</n-button>
+              <n-button type="primary" ghost @click="search()" style="vertical-align: center">搜索</n-button>
             </n-space>
           </n-gi>
 
@@ -229,12 +229,12 @@ export default {
         ]
       },
     ]
+    const searchValue = ref(null)
 
     return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction,
+      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue,
 
       log: store.state.isLogged,
-      searchValue: ref(null),
       activeKey: ref(null),
       avatarOptions: [
         {
@@ -297,16 +297,21 @@ export default {
         router.push('Log')
         store.state.choice = "signup"
       },
-      search(searchInfo) {
+      search() {
+        let formData = new FormData()
+        formData.set('searchValue', searchValue.value)
         store.state.axios({
           url: '/go/article/searchArticle',
-          method: 'get',
-          data: {
-            searchValue: searchInfo
-          },
+          method: 'post',
+          data: formData,
         }).then(r => {
-          store.state.searchData = r.data.data
           router.push('search')
+          if (r.data.data === "none"){
+            store.state.searchData = []
+            message.error("没有找到文章！")
+          } else {
+            store.state.searchData = r.data.data
+          }
         })
 
       },

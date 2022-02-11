@@ -26,7 +26,7 @@
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { h , ref } from "vue";
-import {NButton, useMessage} from "naive-ui";
+import {NButton, useDialog, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 
 export default {
@@ -34,6 +34,7 @@ export default {
     tabBar, tabBarS
   },
   setup() {
+    const dialog = useDialog()
     const message = useMessage()
     const store = useStore()
 
@@ -41,12 +42,12 @@ export default {
       return [
         {
           title: '文章标题',
-          key: 'articleName',
+          key: 'ArticleName',
           align: 'center'
         },
         {
           title: '作者',
-          key: 'articleAuthor'
+          key: 'ArticleAuthor'
         },
         {
           title: '恢复',
@@ -81,50 +82,78 @@ export default {
       ]
     }
     const data = ref([])
+    const getArticles = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set('articleAuthor', store.state.uid)
+        formData.set('isInTrash', "1")
+        store.state.axios({
+          url: '/go/article/getArticles',
+          method: 'post',
+          data: formData,
+        }).then(r => {
+          data.value = r.data.data
+        })
+      }
+    }
 
     return {
-      data,
+      data, getArticles,
 
-      columns: createColumns({
-        recover (rowData) {
-          store.state.axios({
-            url: '/go/article/transTrash',
-            method: 'put',
-            data: {
-              articleId: rowData.articleId,
-              handle: 0,
-            },
-          })
-        },
-        deleteArticle (rowData) {
-          store.state.axios({
-            url: '/go/article/deleteArticle',
-            method: 'delete',
-            data: {
-              articleId: rowData.articleId,
-            },
-          })
-        }
-      }),
       pagination: {
         pageSize: 10
       },
-      getArticles() {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        } else {
-          let formData = new FormData()
-          formData.set('userId', store.state.uid)
-          formData.set('isInTrash', "1")
-          store.state.axios({
-            url: '/go/article/getArticles',
-            method: 'post',
-            data: formData,
-          }).then(r => {
-            data.value = r.data.data
+      columns: createColumns({
+        recover (rowData) {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要将文章移出回收站？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              let formData = new FormData()
+              formData.set('articleId', rowData.ArticleId)
+              formData.set('handle', "0")
+              store.state.axios({
+                url: '/go/article/transTrash',
+                method: 'post',
+                data: formData,
+              }).then(() => {
+                message.success("文章已移出回收站!")
+                getArticles()
+              })
+            },
+            onNegativeClick: () => {
+            }
+          })
+        },
+        deleteArticle (rowData) {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要将文章彻底删除？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              let formData = new FormData()
+              formData.set('articleId', rowData.ArticleId)
+              formData.set('userId', store.state.uid)
+              store.state.axios({
+                url: '/go/article/deleteArticle',
+                method: 'post',
+                data: formData,
+              }).then(() => {
+                message.success("文章彻底删除!")
+                getArticles()
+              })
+            },
+            onNegativeClick: () => {
+            }
           })
         }
-      }
+      }),
+
     }
   },
   mounted() {

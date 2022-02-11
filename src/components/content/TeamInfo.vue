@@ -3,7 +3,7 @@
   <n-grid :col="24">
     <n-gi :span="16" :offset="4">
 
-      <h1 class="teamName">{{ teamData.teamName }}</h1>
+      <h1 class="teamName">{{ teamData.TeamName }}</h1>
       <n-dropdown trigger="hover" @select="handleSelect" :options="options">
         <n-icon size="30" style="float: right;width: 200px">
           <EllipsisVerticalCircle/>
@@ -17,7 +17,7 @@
           </n-icon>
         </n-gi>
         <n-gi :span="18">
-          {{ teamData.teamNotice }}
+          {{ teamData.TeamNotice }}
         </n-gi>
       </n-grid>
       <br>
@@ -92,11 +92,7 @@ export default {
 
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
-    const teamData = ref({
-      teamId: 1,
-      teamName: "teamName",
-      teamNotice: "testTeamNotice"
-    })
+    const teamData = ref(null)
     const createColumns1 = ({ deleteUser }) => {
       return [
         {
@@ -125,12 +121,7 @@ export default {
         }
       ]
     }
-    const createData1 = () => [
-      {
-        username: 'John Brown',
-        position: '组长'
-      },
-    ]
+    const createData1 = () => []
     const createColumns2 = ({ lookDetail, deleteArticle }) => {
       return [
         {
@@ -170,18 +161,15 @@ export default {
         }
       ]
     }
-    const createData2 = () => [
-      {
-        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        articleAuthor: 'John Brown',
-      },
-    ]
+    const createData2 = () => []
+    const newTeamName = ref(null)
+    const newTeamNotice = ref(null)
 
     return {
-      showAddUser, showChangeInfo, teamData,
+      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice,
 
-      newTeamName: teamData.value.teamName,
-      newTeamNotice: teamData.value.teamNotice,
+      // newTeamName: teamData.value.teamName,
+      // newTeamNotice: teamData.value.teamNotice,
       newUserId: null,
 
       data1: createData1(),
@@ -256,12 +244,12 @@ export default {
         })
       },
       getTeamInfo() {
+        let formData = new FormData()
+        formData.set('teamId', store.state.tid)
         store.state.axios({
           url: '/go/team/getTeamInfo',
-          method: 'get',
-          data: {
-            teamId: store.state.tid
-          }
+          method: 'post',
+          data: formData
         }).then(r => {
           teamData.value = r.data.data
         })

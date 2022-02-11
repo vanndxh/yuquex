@@ -91,14 +91,32 @@ export default {
     const data = ref([])
     const newTeamName = ref(null)
     const showCreateTeam = ref(false)
+    const getTeams = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set('userId', store.state.uid)
+
+        store.state.axios({
+          url: '/go/team/getTeams',
+          method: 'post',
+          data: formData,
+        }).then(r => {
+          data.value = r.data.data
+        }).catch(() => {
+          message.error("获取小组信息出错！")
+        })
+      }
+    }
 
     return {
-      data, newTeamName, showCreateTeam,
+      data, newTeamName, showCreateTeam, getTeams,
 
       columns: createColumns({
         lookDetail (rowData) {
-          store.state.aid = rowData.articleId
-          router.push("articleInfo")
+          store.state.tid = rowData.TeamId
+          router.push("/TeamInfo")
         }
       }),
       pagination: {
@@ -119,29 +137,13 @@ export default {
             message.success("创建小组成功")
             newTeamName.value = null
             showCreateTeam.value = false
+            getTeams()
           }).catch(() => {
             message.error("创建小组出错！")
           })
         }
       },
-      getTeams() {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        } else {
-          let formData = new FormData()
-          formData.set('userId', store.state.uid)
 
-          store.state.axios({
-            url: '/go/team/getTeams',
-            method: 'post',
-            data: formData,
-          }).then(r => {
-            data.value = r.data.data
-          }).catch(() => {
-            message.error("获取小组信息出错！")
-          })
-        }
-      }
     }
   },
   mounted() {

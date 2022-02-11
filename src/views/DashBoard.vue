@@ -119,7 +119,7 @@ export default {
                 method: 'post',
                 data: formData,
               }).then(() => {
-                message.error("文章已移入回收站!")
+                message.success("文章已移入回收站!")
                 getArticles()
               })
             },

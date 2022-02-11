@@ -7,22 +7,22 @@
         <n-gi :span="18" :offset="2">
           <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true"
                    maxlength="20" class="input" size="large" round :autofocus="true"
-          @keyup.enter="search(searchValue)">
+          @keyup.enter="search()">
             <template #affix>
               <n-icon><SearchOutline /></n-icon>
             </template>
           </n-input>
         </n-gi>
         <n-gi :span="3" :offset="1">
-          <n-button type="primary" ghost @click="search(searchValue)" size="large">搜索</n-button>
+          <n-button type="primary" ghost @click="search()" size="large">搜索</n-button>
         </n-gi>
       </n-grid>
-      <n-list v-for="item in searchData" :key="item">
-        <n-list-item>
-          <n-card :title=item.articleName hoverable>
+      <n-list>
+        <n-list-item v-for="item in searchData" :key="item">
+          <n-card :title=item.ArticleName hoverable>
             articleContent前30字
             <div>
-              <n-button style="float: right" @click="lookDetail(item.articleId)">详情</n-button>
+              <n-button style="float: right" @click="lookDetail(item.ArticleId)">详情</n-button>
             </div>
           </n-card>
         </n-list-item>
@@ -39,39 +39,53 @@ import { ref } from "vue";
 import {SearchOutline} from '@vicons/ionicons5'
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
+import {useMessage} from "naive-ui";
 
 export default {
   components: {
     tabBar, SearchOutline
   },
   setup() {
+    const message = useMessage()
     const store = useStore()
     const router = useRouter()
 
-    const searchValue = ref(store.state.searchData)
+    const searchValue = ref(null)
     const searchData = ref([])
+
 
     return {
       searchData, searchValue,
 
       page: 1,
       pageTotal: 10,
-      search(searchInfo) {
+      search() {
+        let formData = new FormData()
+        formData.set('searchValue', searchValue.value)
         store.state.axios({
           url: '/go/article/searchArticle',
-          method: 'get',
-          data: {
-            searchValue: searchInfo
-          },
+          method: 'post',
+          data: formData,
         }).then(r => {
-          searchData.value = r.data.data
+          if (r.data.data === "none"){
+            searchData.value = []
+            message.error("没有找到文章！")
+          } else {
+            searchData.value = r.data.data
+          }
         })
       },
       lookDetail(articleId) {
-        router.push('articleInfo')
         store.state.aid = articleId
+        router.push('articleInfo')
+      },
+      searchInit () {
+        searchData.value = store.state.searchData
       }
     }
+  },
+  mounted() {
+    this.searchInit()
   }
 }
 </script>
