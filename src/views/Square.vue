@@ -4,11 +4,11 @@
     <n-gi offset="6" span="12">
 
       <n-list>
-        <n-list-item>
-          <n-card :title=articleData.articleName hoverable>
-            {{ articleData.articleInfo }}
+        <n-list-item v-for="item in articleData" :key="item">
+          <n-card :title=item.ArticleName hoverable>
+            {{ item.ArticleContent }}
             <div>
-              <n-button style="float: right">详情</n-button>
+              <n-button style="float: right" @click="lookdetail()">详情</n-button>
             </div>
           </n-card>
         </n-list-item>
@@ -22,6 +22,7 @@
 <script>
 import tabBar from "@/components/common/tabBar";
 import {useStore} from "vuex";
+import { ref } from "vue";
 
 export default {
   components:{
@@ -30,10 +31,7 @@ export default {
   setup() {
     const store = useStore()
 
-    const articleData = [{
-      articleName: "articleName",
-      articleInfo: "articleInfo"
-    }]
+    const articleData = ref([])
 
     return {
       articleData,

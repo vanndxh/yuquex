@@ -10,7 +10,7 @@
     <br>
     <n-space justify="center">
       <n-badge value="火">
-        <n-button type="success" @click="showQR.value = true" size="large">支持小黑</n-button>
+        <n-button type="success" @click="clickShowQR" size="large">支持小黑</n-button>
       </n-badge>
     </n-space>
 
@@ -62,7 +62,7 @@ export default {
   setup () {
     const store = useStore()
 
-    const supportCount = ref(8888)
+    const supportCount = ref(0)
     const showModel = ref(false)
     const showQR = ref(false)
     const createColumns = ({ jump }) => {
@@ -120,6 +120,14 @@ export default {
         url:"https://github.com/vanndxh?tab=repositories"
       },
     ]
+    const getSupportCount = () => {
+      store.state.axios({
+        url: '/go/supportCount/getSupportCount',
+        method: 'get',
+      }).then(r => {
+        supportCount.value = r.data.data
+      })
+    }
 
     return {
       showModel, showQR, supportCount,
@@ -135,19 +143,13 @@ export default {
           }
         }
       }),
-      getSupportCount() {
-        store.state.axios({
-          url: '/go/supportCount/getSupportCount',
-          method: 'get',
-        }).then(r => {
-          supportCount.value = r.data.data
-        })
-      }
+      clickShowQR() {
+        getSupportCount()
+        showQR.value = true
+      },
+
     }
   },
-  mounted() {
-    this.getSupportCount()
-  }
 }
 </script>
 

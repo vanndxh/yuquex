@@ -37,7 +37,7 @@
     >
       <n-space vertical>
         小组名称<n-input v-model:value="newTeamName" type="text"/>
-        <n-button type="primary" ghost @click="createTeam(newTeamName)" style="float: right">保存</n-button>
+        <n-button type="primary" ghost @click="createTeam()" style="float: right">保存</n-button>
       </n-space>
     </n-card>
   </n-modal>
@@ -47,61 +47,54 @@
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { h, ref } from "vue";
-import { NButton } from "naive-ui";
+import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
-
-const createColumns = ({ lookDetail }) => {
-  return [
-    {
-      title: '小组名称',
-      titleColSpan: 1,
-      key: 'teamName',
-      align: 'center'
-    },
-    {
-      title: '组长',
-      titleColSpan: 1,
-      key: 'teamLeader'
-    },
-    {
-      title: '查看详情',
-      titleColSpan: 1,
-      key: 'lookDetail',
-      render (row) {
-        return h(
-            NButton,
-            {
-              size: 'small',
-              type: 'info',
-              onClick: () => lookDetail(row)
-            },
-            { default: () => '查看' }
-        )
-      }
-    },
-  ]
-}
-const data =  [
-  {
-    teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    teamLeader: 'John Brown',
-  },
-]
 
 export default {
   components: {
     tabBar, tabBarS
   },
   setup() {
+    const message = useMessage()
     const router = useRouter()
     const store = useStore()
 
-    return {
-      data,
+    const createColumns = ({ lookDetail }) => {
+      return [
+        {
+          title: '小组名称',
+          key: 'TeamName',
+          align: 'center'
+        },
+        {
+          title: '组长',
+          key: 'TeamLeader'
+        },
+        {
+          title: '查看详情',
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },
+      ]
+    }
+    const data = ref([])
+    const newTeamName = ref(null)
+    const showCreateTeam = ref(false)
 
-      showCreateTeam: ref(false),
-      newTeamName: ref(null),
+    return {
+      data, newTeamName, showCreateTeam,
+
       columns: createColumns({
         lookDetail (rowData) {
           store.state.aid = rowData.articleId
@@ -111,26 +104,43 @@ export default {
       pagination: {
         pageSize: 10
       },
-      createTeam(newTeamName) {
-        store.state.axios({
-          url: '/go/team/createTeam',
-          method: 'post',
-          data: {
-            teamName: newTeamName,
-            teamLeader: store.state.uid
-          },
-        })
+      createTeam() {
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          let formData = new FormData()
+          formData.set('teamName', newTeamName.value)
+          formData.set('teamLeader', store.state.uid)
+          store.state.axios({
+            url: '/go/team/createTeam',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("创建小组成功")
+            newTeamName.value = null
+            showCreateTeam.value = false
+          }).catch(() => {
+            message.error("创建小组出错！")
+          })
+        }
       },
       getTeams() {
-        store.state.axios({
-          url: '/go/team/getTeams',
-          method: 'get',
-          data: {
-            userId: store.state.uid
-          },
-        }).then(r => {
-          data.value = r.data.data
-        })
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+
+          store.state.axios({
+            url: '/go/team/getTeams',
+            method: 'post',
+            data: formData,
+          }).then(r => {
+            data.value = r.data.data
+          }).catch(() => {
+            message.error("获取小组信息出错！")
+          })
+        }
       }
     }
   },

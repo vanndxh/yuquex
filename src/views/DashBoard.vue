@@ -28,7 +28,7 @@ import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"
 import { h, ref } from "vue";
-import {NButton} from "naive-ui";
+import {NButton, useDialog, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
@@ -37,6 +37,8 @@ export default {
     tabBar, tabBarS, catgif
   },
   setup() {
+    const dialog = useDialog()
+    const message = useMessage()
     const router = useRouter()
     const store = useStore()
 
@@ -44,12 +46,8 @@ export default {
       return [
         {
           title: '文章标题',
-          key: 'articleName',
+          key: 'ArticleName',
           align: 'center'
-        },
-        {
-          title: '作者',
-          key: 'articleAuthor'
         },
         {
           title: '查看详情',
@@ -84,41 +82,60 @@ export default {
       ]
     }
     const data = ref([])
+    const getArticles = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set("articleAuthor", store.state.uid)
+        formData.set('isInTrash', "0")
+
+        store.state.axios({
+          url: '/go/article/getArticles',
+          method: 'post',
+          data: formData
+        }).then(r => {
+          data.value = r.data.data
+        })
+      }
+    }
 
     return {
-      data,
+      data, getArticles,
 
       columns: createColumns({
         deleteArticle (rowData) {
-          store.state.axios({
-            url: '/go/article/transTrash',
-            method: 'put',
-            data: {
-              articleId: rowData.articleId,
-              handle: 1,
+          dialog.warning({
+            title: '警告',
+            content: '你确定要将文章移入回收站？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              let formData = new FormData()
+              formData.set('articleId', rowData.ArticleId)
+              formData.set('handle', "1")
+              store.state.axios({
+                url: '/go/article/transTrash',
+                method: 'post',
+                data: formData,
+              }).then(() => {
+                message.error("文章已移入回收站!")
+                getArticles()
+              })
             },
+            onNegativeClick: () => {
+            }
           })
         },
         lookDetail (rowData) {
-          store.state.aid = rowData.articleId
-          router.push("articleInfo")
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
         }
       }),
       pagination: {
         pageSize: 10
       },
-      getArticles() {
-        store.state.axios({
-          url: '/go/article/getArticles',
-          method: 'get',
-          data: {
-            articleAuthor: store.state.uid,
-            isInTrash: 0,
-          },
-        }).then(r => {
-          data.value = r.data.data
-        })
-      }
+
     }
   },
   mounted() {

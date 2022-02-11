@@ -67,6 +67,8 @@ import tabBarS from "@/components/common/tabBarS";
 import { ref, } from 'vue'
 import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
 import {useStore} from "vuex";
+import {useMessage} from "naive-ui";
+import {useRouter} from "vue-router";
 
 
 export default {
@@ -74,6 +76,8 @@ export default {
     tabBar, tabBarS, ArchiveIcon
   },
   setup() {
+    const router = useRouter()
+    const message = useMessage()
     const store = useStore()
 
     const newArticleName = ref(null)
@@ -94,17 +98,33 @@ export default {
         return true
       },
       createArticle() {
-        store.state.axios({
-          url: '/go/article/createArticle',
-          method: 'post',
-          data: {
-            articleName: newArticleName,
-            articleContent: newArticleContent,
-            articleAuthor: store.state.uid
-          },
-        }).then(r => {
-          articleData.value = r.data.data
-        })
+        if (store.state.uid === 0){
+          message.error("您尚未登录！")
+        } else if (newArticleName.value === null){
+          message.error("文章名不能为空！")
+        } else {
+          let formData = new FormData()
+          formData.set('articleName', newArticleName.value)
+          console.log(newArticleName.value);
+          formData.set('articleContent', newArticleContent.value)
+          formData.set('articleAuthor', store.state.uid)
+
+          store.state.axios({
+            url: '/go/article/createArticle',
+            method: 'post',
+            data: formData,
+          }).then(r => {
+            newArticleName.value = ""
+            newArticleContent.value = ""
+            message.success("创建文章成功！")
+            store.state.aid = r.data.articleId
+            console.log(r.data.articleId);
+            router.push("/ArticleInfo")
+          }).catch(() => {
+            message.error("新建文章出错！")
+          })
+        }
+
       }
     }
   }

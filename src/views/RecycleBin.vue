@@ -26,7 +26,7 @@
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { h , ref } from "vue";
-import {NButton} from "naive-ui";
+import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 
 export default {
@@ -34,6 +34,7 @@ export default {
     tabBar, tabBarS
   },
   setup() {
+    const message = useMessage()
     const store = useStore()
 
     const createColumns = ({ recover, deleteArticle }) => {
@@ -109,16 +110,20 @@ export default {
         pageSize: 10
       },
       getArticles() {
-        store.state.axios({
-          url: '/go/article/getArticles',
-          method: 'get',
-          data: {
-            userId: store.state.uid,
-            isInTrash: 1,
-          },
-        }).then(r => {
-          data.value = r.data.data
-        })
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+          formData.set('isInTrash', "1")
+          store.state.axios({
+            url: '/go/article/getArticles',
+            method: 'post',
+            data: formData,
+          }).then(r => {
+            data.value = r.data.data
+          })
+        }
       }
     }
   },

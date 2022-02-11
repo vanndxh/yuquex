@@ -2,8 +2,8 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    uid: null,
-    aid: null,
+    uid: 0,
+    aid: 0,
     tid: null,
     pass: "",
 

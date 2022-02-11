@@ -30,7 +30,7 @@ import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "../components/common/catgif";
 import { h, ref } from "vue";
-import {NButton} from "naive-ui";
+import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
@@ -39,6 +39,7 @@ export default {
     tabBar, tabBarS, catgif
   },
   setup() {
+    const message = useMessage()
     const router = useRouter()
     const store = useStore()
 
@@ -47,12 +48,12 @@ export default {
       return [
         {
           title: '文章标题',
-          key: 'articleName',
+          key: 'ArticleName',
           align: 'center'
         },
         {
           title: '作者',
-          key: 'articleAuthor'
+          key: 'ArticleAuthor'
         },
         {
           title: '查看详情',
@@ -110,15 +111,22 @@ export default {
         pageSize: 10
       },
       getFavorite() {
-        store.state.axios({
-          url: '/go/star/getFavorite',
-          method: 'get',
-          data: {
-            userId: store.state.uid
-          },
-        }).then(r => {
-          data.value = r.data.data
-        })
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+
+          store.state.axios({
+            url: '/go/star/getFavorite',
+            method: 'post',
+            data: formData,
+          }).then(r => {
+            data.value = r.data.data
+          }).catch(() => {
+            message.error("获取收藏夹出错！")
+          })
+        }
       }
     }
   },
