@@ -26,14 +26,14 @@
             <n-card hoverable>
               <n-statistic tabular-nums>
                 <n-icon size="20"><BookOutline/></n-icon>共有
-                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.articleAmount />
+                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.ArticleAmount />
                 <template #suffix>
                   篇文章
                 </template>
               </n-statistic>
               <n-statistic tabular-nums>
                 <n-icon size="20"><LikeOutlined/></n-icon>共收获
-                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.likeTotal />
+                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.LikeTotal />
                 <template #suffix>
                   个赞
                 </template>
@@ -67,7 +67,7 @@ import tabBar from "../common/tabBar";
 import { BookOutline } from '@vicons/ionicons5'
 import { LikeOutlined } from '@vicons/antd'
 import { h , ref } from "vue";
-import {NButton} from "naive-ui";
+import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 
 export default {
@@ -75,14 +75,13 @@ export default {
     tabBar, BookOutline, LikeOutlined
   },
   setup() {
+    const message = useMessage()
     const store = useStore()
 
-    const userData = ref({
-      username: "Vanndxh",
-      userInfo: "暂无",
-      articleAmount: 23,
-      likeTotal: 24,
-    })
+    const userData = ref(null)
+    const data1 = ref(null)
+    const data2 = ref(null)
+    const data3 = ref(null)
     const createColumns = ({ lookDetail }) => {
       return [
         {
@@ -127,26 +126,65 @@ export default {
         },
       ]
     }
-    const createData1 = () => [
-      {
-        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      },
-    ]
-    const createData2 = () => [
-      {
-        teamName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      },
-    ]
-    const createData3 = () => [
-      {
-        articleName: 'John Brownaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      },
-    ]
+
+    const getArticles = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set("articleAuthor", store.state.uid)
+        formData.set('isInTrash', "0")
+
+        store.state.axios({
+          url: '/go/article/getArticles',
+          method: 'post',
+          data: formData
+        }).then(r => {
+          data1.value = r.data.data
+        })
+      }
+    }
+    const getTeams = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set('userId', store.state.uid)
+
+        store.state.axios({
+          url: '/go/team/getTeams',
+          method: 'post',
+          data: formData,
+        }).then(r => {
+          data2.value = r.data.data
+        }).catch(() => {
+          message.error("获取小组信息出错！")
+        })
+      }
+    }
+    const getFavorite = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set('userId', store.state.uid)
+
+        store.state.axios({
+          url: '/go/star/getFavorite',
+          method: 'post',
+          data: formData,
+        }).then(r => {
+          data3.value = r.data.data
+        }).catch(() => {
+          message.error("获取收藏夹出错！")
+        })
+      }
+    }
 
     return {
-      data1: createData1(),
-      data2: createData2(),
-      data3: createData3(),
+      data1, data2, data3, userData,
+      getTeams, getArticles, getFavorite,
+
       columns: createColumns({
         lookDetail (rowData) {
           console.log(rowData);
@@ -161,12 +199,12 @@ export default {
         pageSize: 10
       },
       getUserData() {
+        let formData = new FormData()
+        formData.set("userId", store.state.uid)
         store.state.axios({
           url: '/go/user/getUserInfo',
-          method: 'get',
-          data: {
-            userId: store.state.uid,
-          },
+          method: 'post',
+          data: formData,
         }).then(r => {
           userData.value = r.data.data
         })
@@ -175,6 +213,9 @@ export default {
   },
   mounted() {
     this.getUserData()
+    this.getArticles()
+    this.getFavorite()
+    this.getTeams()
   }
 }
 </script>

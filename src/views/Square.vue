@@ -8,7 +8,7 @@
           <n-card :title=item.ArticleName hoverable>
             {{ item.ArticleContent }}
             <div>
-              <n-button style="float: right" @click="lookdetail()">详情</n-button>
+              <n-button style="float: right" @click="lookDetail(item.ArticleId)">详情</n-button>
             </div>
           </n-card>
         </n-list-item>
@@ -23,12 +23,14 @@
 import tabBar from "@/components/common/tabBar";
 import {useStore} from "vuex";
 import { ref } from "vue";
+import {useRouter} from "vue-router";
 
 export default {
   components:{
     tabBar
   },
   setup() {
+    const router = useRouter()
     const store = useStore()
 
     const articleData = ref([])
@@ -38,6 +40,10 @@ export default {
 
       page: 1,
       pageTotal: 10,
+      lookDetail(id) {
+        store.state.aid = id
+        router.push('ArticleInfo')
+      },
       getHotArticle() {
         store.state.axios({
           url: '/go/article/getHotArticle',

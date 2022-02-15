@@ -31,8 +31,8 @@
         </n-tab-pane>
         <n-tab-pane name="clockInfo" tab="打卡详情">
           <n-statistic tabular-nums>
-            共在本小组打卡
-            <n-number-animation ref="numberAnimationInstRef" :from="0" :to="666" />
+            您共在本小组打卡
+            <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
             <template #suffix>
               次
             </template>
@@ -54,7 +54,7 @@
       <n-space vertical>
         小组名称<n-input v-model:value="newTeamName" type="text"/>
         小组公告<n-input v-model:value="newTeamNotice" type="text"/>
-        <n-button type="primary" ghost @click="saveInfo(newTeamName, newTeamNotice)" style="float: right">保存</n-button>
+        <n-button type="primary" ghost @click="saveInfo()" style="float: right">保存</n-button>
       </n-space>
     </n-card>
   </n-modal>
@@ -78,21 +78,30 @@
 import tabBar from "../common/tabBar";
 import { NotificationOutlined } from '@vicons/antd'
 import { EllipsisVerticalCircle } from '@vicons/ionicons5'
-import {NButton, useDialog} from 'naive-ui'
+import {NButton, useDialog, useMessage} from 'naive-ui'
 import { h, ref } from "vue";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 export default {
   components: {
     tabBar, NotificationOutlined, EllipsisVerticalCircle
   },
   setup() {
+    const router = useRouter()
+    const message = useMessage()
     const store = useStore()
     const dialog = useDialog()
 
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
+    const data1 = ref(null)
+    const data2 = ref(null)
     const teamData = ref(null)
+    const count = ref(null)
+    const newTeamName = ref(null)
+    const newTeamNotice = ref(null)
+    const newUserId = ref(null)
     const createColumns1 = ({ deleteUser }) => {
       return [
         {
@@ -121,7 +130,6 @@ export default {
         }
       ]
     }
-    const createData1 = () => []
     const createColumns2 = ({ lookDetail, deleteArticle }) => {
       return [
         {
@@ -161,30 +169,67 @@ export default {
         }
       ]
     }
-    const createData2 = () => []
-    const newTeamName = ref(null)
-    const newTeamNotice = ref(null)
+    const getTeamInfo = () => {
+      let formData = new FormData()
+      formData.set('teamId', store.state.tid)
+      store.state.axios({
+        url: '/go/team/getTeamInfo',
+        method: 'post',
+        data: formData
+      }).then(r => {
+        teamData.value = r.data.data
+        if(store.state.uid === teamData.value.TeamLeader) {
+          count.value = r.data.data.LeaderCount
+        } else if (store.state.uid === teamData.value.TeamMember1) {
+          count.value = r.data.data.Member1Count
+        } else if (store.state.uid === teamData.value.TeamMember2) {
+          count.value = r.data.data.Member2Count
+        } else if (store.state.uid === teamData.value.TeamMember3) {
+          count.value = r.data.data.Member3Count
+        } else if (store.state.uid === teamData.value.TeamMember4) {
+          count.value = r.data.data.Member4Count
+        }
+      })
+    }
+    const getTeamArticles = () => {
+      let formData = new FormData()
+      formData.set('teamId', store.state.tid)
+      store.state.axios({
+        url: '/go/team/getTeamArticles',
+        method: 'post',
+        data: formData,
+      }).then(r => {
+        data2.value = r.data.data
+      })
+    }
+    const getTeamMembers = () => {
+      let formData = new FormData()
+      formData.set('teamId', store.state.tid)
+      store.state.axios({
+        url: '/go/team/getTeamMembers',
+        method: 'post',
+        data: formData,
+      }).then(r => {
+        data1.value = r.data.data
+      })
+    }
 
     return {
-      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice,
+      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2,
+      getTeamInfo, getTeamArticles, getTeamMembers,
 
-      // newTeamName: teamData.value.teamName,
-      // newTeamNotice: teamData.value.teamNotice,
-      newUserId: null,
-
-      data1: createData1(),
       columns1: createColumns1({
         deleteUser (rowData) {
           console.log(rowData);
         },
       }),
-      data2: createData2(),
       columns2: createColumns2({
         deleteArticle (rowData) {
           console.log(rowData);
         },
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
         }
       }),
       pagination: {
@@ -208,11 +253,34 @@ export default {
         if (key === "exitTeam") {
           dialog.warning({
             title: '警告',
-            content: '你确定要退出登录？',
+            content: '你确定要退出小组么？如果你是组长，小组将被解散',
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              console.log('退出登录');
+              if(teamData.value.TeamLeader === store.state.uid) {
+                let formData = new FormData()
+                formData.set("teamId", teamData.value.TeamId)
+                store.state.axios({
+                  url: '/go/team/deleteTeam',
+                  method: 'post',
+                  data: formData
+                }).then(() => {
+                  message.success("退出小组成功!")
+                  router.push("Teams")
+                })
+              } else {
+                let formData = new FormData()
+                formData.set("userId", store.state.uid)
+                formData.set("teamId", store.state.tid)
+                store.state.axios({
+                  url: '/go/team/quitTeam',
+                  method: 'post',
+                  data: formData
+                }).then(() => {
+                  message.success("退出小组成功!")
+                  router.push("Teams")
+                })
+              }
             },
             onNegativeClick: () => {
             }
@@ -220,44 +288,50 @@ export default {
         }else if(key === "addUser") {
           showAddUser.value = !showAddUser.value
         } else if(key === "changeTeamInfo") {
+          newTeamName.value = teamData.value.TeamName
+          newTeamNotice.value = teamData.value.TeamNotice
           showChangeInfo.value = !showChangeInfo.value
         }
       },
-      addUser(newUserId) {
-        store.state.axios({
-          url: '/go/team/addTeamUser',
-          method: 'put',
-          data: {
-            teamId: teamData.value.teamId,
-            newUserId: newUserId,
-          },
-        })
-      },
-      saveInfo(newTeamName, newTeamNotice) {
-        store.state.axios({
-          url: '/go/team/updateTeamInfo',
-          method: 'put',
-          data: {
-            newTeamName: newTeamName,
-            newTeamNotice: newTeamNotice,
-          },
-        })
-      },
-      getTeamInfo() {
+      addUser() {
         let formData = new FormData()
         formData.set('teamId', store.state.tid)
+        formData.set('newUserId', newUserId)
         store.state.axios({
-          url: '/go/team/getTeamInfo',
+          url: '/go/team/addTeamUser',
           method: 'post',
-          data: formData
-        }).then(r => {
-          teamData.value = r.data.data
+          data: formData,
+        }).then(() => {
+          message.success("成功添加新成员！")
+        }).catch(() => {
+          message.error("添加失败!请检查输入id后再试~")
         })
-      }
+      },
+      saveInfo() {
+        if (newTeamName.value === "") {
+          message.error("小组名称不能为空！请重新填写！")
+        } else {
+          let formData = new FormData()
+          formData.set('teamId', store.state.tid)
+          formData.set('teamName', newTeamName.value)
+          formData.set('teamNotice', newTeamNotice.value)
+          store.state.axios({
+            url: '/go/team/updateTeamInfo',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("修改小组信息成功！")
+            showChangeInfo.value = !showChangeInfo.value
+            getTeamInfo()
+          })
+        }
+      },
     }
   },
   mounted() {
     this.getTeamInfo()
+    this.getTeamArticles()
+    this.getTeamMembers()
   }
 }
 </script>

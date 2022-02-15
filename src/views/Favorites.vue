@@ -87,47 +87,51 @@ export default {
         }
       ]
     }
+    const getFavorite = () => {
+      if (store.state.uid === 0) {
+        message.error("您尚未登录！")
+      } else {
+        let formData = new FormData()
+        formData.set('userId', store.state.uid)
+
+        store.state.axios({
+          url: '/go/star/getFavorite',
+          method: 'post',
+          data: formData,
+        }).then(r => {
+          data.value = r.data.data
+        }).catch(() => {
+          message.error("获取收藏夹出错！")
+        })
+      }
+    }
 
     return {
-      data,
+      data, getFavorite,
 
       columns: createColumns({
         removeStar (rowData) {
+          console.log(rowData.ArticleId);
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+          formData.set('articleId', rowData.ArticleId)
           store.state.axios({
             url: '/go/star/cancelStar',
             method: 'post',
-            data: {
-              userId: store.state.uid,
-              articleId: rowData.articleId
-            },
+            data: formData,
+          }).then(() => {
+            message.success("成功取消收藏！")
+            getFavorite()
           })
         },
         lookDetail (rowData) {
-          store.state.aid = rowData.articleId
-          router.push("articleInfo")
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
         }
       }),
       pagination: {
         pageSize: 10
       },
-      getFavorite() {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        } else {
-          let formData = new FormData()
-          formData.set('userId', store.state.uid)
-
-          store.state.axios({
-            url: '/go/star/getFavorite',
-            method: 'post',
-            data: formData,
-          }).then(r => {
-            data.value = r.data.data
-          }).catch(() => {
-            message.error("获取收藏夹出错！")
-          })
-        }
-      }
     }
   },
   mounted() {
