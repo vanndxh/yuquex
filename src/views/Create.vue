@@ -125,8 +125,16 @@ export default {
           })
         }
 
+      },
+      judgeIsLogged() {
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        }
       }
     }
+  },
+  mounted() {
+    this.judgeIsLogged()
   }
 }
 </script>
