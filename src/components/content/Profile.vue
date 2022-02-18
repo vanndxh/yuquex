@@ -6,7 +6,7 @@
     <n-layout-content style="background-color: rgb(250,250,250)">
       <br>
       <n-grid :col="24" x-gap="12">
-        <n-gi offset="5" span="5">
+        <n-gi offset="4" span="4">
           <n-space vertical>
             <n-card hoverable>
               <n-space justify="center">
@@ -19,7 +19,7 @@
               </n-space>
 <!--              <h1 class="user">{{ userData.username }}</h1>-->
               <n-space justify="center">
-                <n-button style="">编辑资料</n-button>
+                <n-button v-if="uid === uidt">编辑资料</n-button>
               </n-space>
 <!--              <p>{{ userData.userInfo }}</p>-->
             </n-card>
@@ -43,19 +43,22 @@
             </n-card>
           </n-space>
         </n-gi>
-        <n-gi span="9">
+        <n-gi span="11">
           <n-card hoverable>
-            <n-tabs type="line">
-              <n-tab-pane name="articles" tab="文档">
-                <n-data-table :columns="columns" :data="data1" :pagination="pagination" size="small"/>
-              </n-tab-pane>
-              <n-tab-pane name="teams" tab="知识小组">
-                <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>
-              </n-tab-pane>
-              <n-tab-pane name="favorites" tab="收藏夹">
-                <n-data-table :columns="columns3" :data="data3" :pagination="pagination" size="small"/>
-              </n-tab-pane>
-            </n-tabs>
+<!--            <n-tabs type="line">-->
+<!--              <n-tab-pane name="articles" tab="文档">-->
+<!--                <n-data-table :columns="columns" :data="data1" :pagination="pagination" size="small"/>-->
+<!--              </n-tab-pane>-->
+<!--              <n-tab-pane name="teams" tab="知识小组">-->
+<!--                <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>-->
+<!--              </n-tab-pane>-->
+<!--              <n-tab-pane name="favorites" tab="收藏夹">-->
+<!--                <n-data-table :columns="columns3" :data="data3" :pagination="pagination" size="small"/>-->
+<!--              </n-tab-pane>-->
+<!--              <n-tab-pane name="comments" tab="历史评论">-->
+<!--                <n-data-table :columns="columns4" :data="data4" :pagination="pagination" size="small"/>-->
+<!--              </n-tab-pane>-->
+<!--            </n-tabs>-->
           </n-card>
         </n-gi>
       </n-grid>
@@ -86,6 +89,7 @@ export default {
     const data1 = ref(null)
     const data2 = ref(null)
     const data3 = ref(null)
+    const data4 = ref(null)
     const createColumns = ({ lookDetail }) => {
       return [
         {
@@ -152,6 +156,41 @@ export default {
         },
       ]
     }
+    const createColumns4 = ({ lookDetail, deleteComment }) => {
+      return [
+        {
+          key: 'CommentContent',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },{
+          key: 'deleteComment',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => deleteComment(row)
+                },
+                { default: () => '删除' }
+            )
+          }
+        },
+      ]
+    }
 
     const getArticles = () => {
       if (store.state.uid === 0) {
@@ -203,11 +242,26 @@ export default {
         })
       }
     }
+    const getUserComment = () => {
+      store.state.axios({
+        url: '/go/comment/getUserComment',
+        method: 'get',
+        params: {
+          userId: store.state.uid
+        }
+      }).then(r => {
+        data4.value = r.data.data
+      }).catch(() => {
+        message.error("获取收藏夹出错！")
+      })
+    }
 
     return {
-      data1, data2, data3, userData,
-      getTeams, getArticles, getFavorite,
+      data1, data2, data3, data4, userData,
+      getTeams, getArticles, getFavorite, getUserComment,
 
+      uid: store.state.uid,
+      uidt: store.state.uidTemp,
       pagination: {
         pageSize: 10
       },
@@ -229,6 +283,26 @@ export default {
           router.push("ArticleInfo")
         }
       }),
+      columns4: createColumns4({
+        lookDetail (rowData) {
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
+        },
+        deleteComment (rowData) {
+          let formData = new FormData()
+          formData.set('commentId', rowData.CommentId)
+          store.state.axios({
+            url: '/go/comment/deleteComment',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("删除成功！")
+            getUserComment()
+          }).catch(() => {
+            message.error("error!")
+          })
+        }
+      }),
       getUserData() {
         store.state.axios({
           url: '/go/user/getUserInfo',
@@ -247,6 +321,7 @@ export default {
     this.getArticles()
     this.getFavorite()
     this.getTeams()
+    this.getUserComment()
   }
 }
 </script>

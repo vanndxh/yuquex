@@ -238,17 +238,8 @@ export default {
       activeKey: ref(null),
       avatarOptions: [
         {
-          label:  () =>
-              h(
-                  resolveComponent('router-link'),
-                  {
-                    to: {
-                      name: 'Profile',
-                    }
-                  },
-                  { default: () => '个人信息' }
-              ),
-          key: 'Profile',
+          label: '个人信息',
+          key: 'profile',
         },
         {
           label: '提交反馈',
@@ -282,6 +273,9 @@ export default {
           showFeedback.value = !showFeedback.value
         }else if(key === "userInstruction") {
           showUserInstruction.value = !showUserInstruction.value
+        } else if (key === "profile") {
+          store.state.uidTemp = store.state.uid
+          router.push("Profile")
         }
       },
       clickCreate () {

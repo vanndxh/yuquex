@@ -4,7 +4,8 @@ export default createStore({
   state: {
     uid: 0,
     aid: 0,
-    tid: null,
+    tid: 0,
+    uidTemp: 0,
     pass: "",
 
     isLogged: false,

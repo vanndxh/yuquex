@@ -35,6 +35,23 @@
               <n-divider />
               <!--评论区板块-->
               <n-space vertical>
+                <n-list>
+                  <n-list-item v-for="item in commentData" :key="item">
+                    <n-card hoverable>
+                      <n-avatar
+                          size="small"
+                          style="horiz-align: center"
+                          round
+                          src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
+                      /> {{ item.UserName }}
+                      {{ item.CommentContent }}
+                      <div>
+                        <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)">删除</n-button>
+                      </div>
+                    </n-card>
+                  </n-list-item>
+                </n-list>
+
                 <n-avatar
                     size="medium"
                     style="horiz-align: center"
@@ -44,8 +61,8 @@
                 <n-input
                     v-model:value="commentValue"
                     type="textarea"
-                    :autosize="{minRows: 5,maxRows: 10}"
-                    maxlength="100" show-count
+                    :autosize="{minRows: 3,maxRows: 5}"
+                    maxlength="50" show-count
                 />
                 <n-button type="success" @click="clickComment()">回复</n-button>
               </n-space>
@@ -77,13 +94,14 @@ import tabBarS from "../common/tabBarS";
 import { ref } from "vue";
 import { LikeOutlined, LikeFilled, StarOutlined, StarFilled } from "@vicons/antd";
 import {useStore} from "vuex";
-import {useMessage} from "naive-ui";
+import {useDialog, useMessage} from "naive-ui";
 
 export default {
   components: {
     tabBar, tabBarS, LikeOutlined, LikeFilled, StarOutlined, StarFilled
   },
   setup() {
+    const dialog = useDialog()
     const message = useMessage()
     const store = useStore()
 
@@ -92,9 +110,21 @@ export default {
     const commentValue = ref(null)
     const articleData = ref(null)
     const userData = ref(null)
+    const commentData = ref(null)
+    const getCommentData = () => {
+      store.state.axios({
+        url: '/go/comment/getArticleComment',
+        method: 'get',
+        params: {
+          articleId: store.state.aid
+        }
+      }).then(r => {
+        commentData.value = r.data.data
+      })
+    }
 
     return {
-      isLiked, isStared, commentValue, articleData, userData,
+      isLiked, isStared, commentValue, articleData, userData, commentData, getCommentData,
 
       getUserData() {
         store.state.axios({
@@ -147,7 +177,6 @@ export default {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else {
-          isLiked.value = !isLiked.value;
           if (isLiked.value === false){
             let formData = new FormData()
             formData.set('userId', store.state.uid)
@@ -167,6 +196,7 @@ export default {
               data: formData,
             })
           }
+          isLiked.value = !isLiked.value;
         }
 
       },
@@ -174,7 +204,6 @@ export default {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else {
-          isStared.value = !isStared.value;
           if (isStared.value === false){
             let formData = new FormData()
             formData.set('userId', store.state.uid)
@@ -194,36 +223,62 @@ export default {
               data: formData,
             })
           }
+          isStared.value = !isStared.value;
         }
 
       },
       clickComment() {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
+        } else if (commentValue.value === null) {
+          message.error("不能评论空！")
         } else {
-          if (commentValue.value === null){
-            message.error("不能评论空！")
-          } else {
-            let formData = new FormData()
-            formData.set('userId', store.state.uid)
-            formData.set('articleId', store.state.aid)
-            formData.set('commentContent', commentValue)
-            store.state.axios({
-              url: '/go/comment/createComment',
-              method: 'post',
-              data: formData,
-            }).then(() => {
-              message.success("评论成功！")
-              commentValue.value = null
-            })
-          }
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+          formData.set('articleId', store.state.aid)
+          formData.set('commentContent', commentValue)
+          store.state.axios({
+            url: '/go/comment/createComment',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("评论成功！")
+            commentValue.value = null
+          })
         }
       },
+      deleteComment(u, c) {
+        if (store.state.uid !== 1 || store.state.uid !== u) {
+          message.error("您没有权限删除这条评论！")
+        } else {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要删除这条评论？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              let formData = new FormData()
+              formData.set('commentId', c)
+              store.state.axios({
+                url: '/go/comment/deleteComment',
+                method: 'post',
+                data: formData,
+              }).then(() => {
+                message.success("删除成功！")
+                getCommentData()
+              }).catch(() => {
+                message.error("error!")
+              })
+            }
+          })
+        }
+      }
     }
   },
   mounted() {
     this.getArticleData()
     this.getUserData()
+    this.getCommentData()
     this.getIsLiked()
     this.getIsStared()
   }
