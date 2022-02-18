@@ -69,10 +69,12 @@ export default {
         },
         {
           title: '组长',
-          key: 'TeamLeader'
+          key: 'TeamLeader',
+          align: 'right'
         },
         {
           title: '查看详情',
+          align: 'center',
           key: 'lookDetail',
           render (row) {
             return h(
@@ -104,7 +106,7 @@ export default {
         }).then(r => {
           data.value = r.data.data
         }).catch(() => {
-          message.error("获取小组信息出错！")
+          message.error("没有获取到小组！")
         })
       }
     }

@@ -95,13 +95,13 @@ export default {
 
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
-    const data1 = ref(null)
-    const data2 = ref(null)
-    const teamData = ref(null)
+    const data1 = ref([])
+    const data2 = ref([])
+    const teamData = ref({})
     const count = ref(null)
-    const newTeamName = ref(null)
-    const newTeamNotice = ref(null)
-    const newUserId = ref(null)
+    const newTeamName = ref("")
+    const newTeamNotice = ref("")
+    const newUserId = ref("")
     const createColumns1 = ({ deleteUser }) => {
       return [
         {
@@ -133,14 +133,15 @@ export default {
     const createColumns2 = ({ lookDetail, deleteArticle }) => {
       return [
         {
-          key: 'articleName',
-          align: 'center'
+          key: 'ArticleName',
+          align: 'left'
         },
         {
-          key: 'articleAuthor'
+          key: 'ArticleAuthor'
         },
         {
           key: 'lookDetail',
+          align: 'right',
           render (row) {
             return h(
                 NButton,
@@ -155,6 +156,7 @@ export default {
         },
         {
           key: 'delete',
+          align: 'right',
           render (row) {
             return h(
                 NButton,
@@ -170,12 +172,12 @@ export default {
       ]
     }
     const getTeamInfo = () => {
-      let formData = new FormData()
-      formData.set('teamId', store.state.tid)
       store.state.axios({
         url: '/go/team/getTeamInfo',
-        method: 'post',
-        data: formData
+        method: 'get',
+        params: {
+          teamId: store.state.tid
+        }
       }).then(r => {
         teamData.value = r.data.data
         if(store.state.uid === teamData.value.TeamLeader) {
@@ -192,30 +194,30 @@ export default {
       })
     }
     const getTeamArticles = () => {
-      let formData = new FormData()
-      formData.set('teamId', store.state.tid)
       store.state.axios({
         url: '/go/team/getTeamArticles',
-        method: 'post',
-        data: formData,
+        method: 'get',
+        params: {
+          teamId: store.state.tid
+        }
       }).then(r => {
         data2.value = r.data.data
       })
     }
     const getTeamMembers = () => {
-      let formData = new FormData()
-      formData.set('teamId', store.state.tid)
       store.state.axios({
         url: '/go/team/getTeamMembers',
-        method: 'post',
-        data: formData,
+        method: 'get',
+        params: {
+          teamId: store.state.tid
+        },
       }).then(r => {
         data1.value = r.data.data
       })
     }
 
     return {
-      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2,
+      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2, newUserId,
       getTeamInfo, getTeamArticles, getTeamMembers,
 
       columns1: createColumns1({
@@ -296,13 +298,16 @@ export default {
       addUser() {
         let formData = new FormData()
         formData.set('teamId', store.state.tid)
-        formData.set('newUserId', newUserId)
+        formData.set('newUserId', newUserId.value)
         store.state.axios({
           url: '/go/team/addTeamUser',
           method: 'post',
           data: formData,
         }).then(() => {
           message.success("成功添加新成员！")
+          newUserId.value = ""
+          showAddUser.value = false
+          // getTeamMembers()
         }).catch(() => {
           message.error("添加失败!请检查输入id后再试~")
         })

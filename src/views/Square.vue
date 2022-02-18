@@ -2,7 +2,6 @@
   <tabBar></tabBar>
   <n-grid :col="24">
     <n-gi offset="6" span="12">
-
       <n-list>
         <n-list-item v-for="item in articleData" :key="item">
           <n-card :title=item.ArticleName hoverable>
@@ -14,9 +13,9 @@
         </n-list-item>
       </n-list>
       <n-pagination v-model:page="page" :page-count=pageTotal />
-
     </n-gi>
   </n-grid>
+  <n-back-top :right="100" :visibility-height="300"/>
 </template>
 
 <script>

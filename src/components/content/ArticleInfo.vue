@@ -20,51 +20,41 @@
                 <n-gi span="1" offset="6">
                   <n-space justify="center" vertical>
                     <h4 style="text-align: center">{{ articleData.LikeAmount }}</h4>
-                    <n-icon size="40" v-if="!isLiked" @click="clickLike()"><LikeOutlined /></n-icon>
-                    <n-icon size="40" v-else @click="clickLike()"><LikeFilled /></n-icon>
+                    <n-icon size="40" v-if="isLiked" @click="clickLike()"><LikeOutlined /></n-icon>
+                    <n-icon size="40" v-if="!isLiked" @click="clickLike()"><LikeFilled /></n-icon>
                   </n-space>
                 </n-gi>
-                <n-gi span="1" offset="8">
-                  <n-space justify="center">
+                <n-gi span="1" offset="8" >
+                  <n-space justify="center" vertical>
                     <h4 style="text-align: center">{{ articleData.StarAmount }}</h4>
-                    <n-icon size="40" v-if="!isStared" @click="clickStar()"><StarOutlined /></n-icon>
+                    <n-icon size="40" v-if="isStared" @click="clickStar()"><StarOutlined /></n-icon>
                     <n-icon size="40" v-else @click="clickStar()"><StarFilled /></n-icon>
                   </n-space>
                 </n-gi>
               </n-grid>
               <n-divider />
               <!--评论区板块-->
+              <n-list>
+                <n-list-item v-for="item in commentData" :key="item">
+                  <n-card hoverable>
+                    <h3>{{ item.UserName }}</h3>
+                    {{ item.CommentContent }}
+                    <div>
+                      <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)">删除</n-button>
+                    </div>
+                  </n-card>
+                </n-list-item>
+              </n-list>
               <n-space vertical>
-                <n-list>
-                  <n-list-item v-for="item in commentData" :key="item">
-                    <n-card hoverable>
-                      <n-avatar
-                          size="small"
-                          style="horiz-align: center"
-                          round
-                          src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
-                      /> {{ item.UserName }}
-                      {{ item.CommentContent }}
-                      <div>
-                        <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)">删除</n-button>
-                      </div>
-                    </n-card>
-                  </n-list-item>
-                </n-list>
-
-                <n-avatar
-                    size="medium"
-                    style="horiz-align: center"
-                    round
-                    src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
-                />
                 <n-input
                     v-model:value="commentValue"
                     type="textarea"
                     :autosize="{minRows: 3,maxRows: 5}"
                     maxlength="50" show-count
                 />
-                <n-button type="success" @click="clickComment()">回复</n-button>
+                <n-button type="success" @click="clickComment()"
+                          :disabled="uid === 0"
+                >回复</n-button>
               </n-space>
             </n-gi>
             <!--作者信息card-->
@@ -78,7 +68,7 @@
                       src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
                   />
                 </n-space>
-                <h1 class="user">{{ articleData.ArticleAuthor }}</h1>
+                <h1 class="user">{{ authorName }}</h1>
               </n-card>
             </n-gi>
           </n-grid>
@@ -86,6 +76,7 @@
       </n-layout>
     </n-layout>
   </div>
+  <n-back-top :right="100" :visibility-height="300"/>
 </template>
 
 <script>
@@ -105,12 +96,13 @@ export default {
     const message = useMessage()
     const store = useStore()
 
-    const isLiked = ref(false)
+    const isLiked =  ref(false)
     const isStared = ref(false)
     const commentValue = ref(null)
-    const articleData = ref(null)
-    const userData = ref(null)
-    const commentData = ref(null)
+    const articleData = ref({})
+    const authorName = ref(null)
+    const userData = ref({})
+    const commentData = ref([])
     const getCommentData = () => {
       store.state.axios({
         url: '/go/comment/getArticleComment',
@@ -122,10 +114,57 @@ export default {
         commentData.value = r.data.data
       })
     }
+    const getIsLiked = () => {
+      if (store.state.uid === 0) {
+        isLiked.value = false
+      } else {
+        store.state.axios({
+          url: '/go/like/getIsLiked',
+          method: 'get',
+          params: {
+            articleId: store.state.aid,
+            userId: store.state.uid
+          },
+        }).then(r => {
+          isLiked.value = r.data.data
+        })
+      }
+    }
+    const getIsStared = () => {
+      if (store.state.uid === 0) {
+        isStared.value = false
+      } else {
+        store.state.axios({
+          url: '/go/star/getIsStared',
+          method: 'get',
+          params: {
+            articleId: store.state.aid,
+            userId: store.state.uid
+          },
+        }).then(r => {
+          isStared.value = r.data.data
+          message.success("star:" + isStared.value)
+        })
+      }
+    }
+    const getArticleData = () => {
+      store.state.axios({
+        url: '/go/article/getArticleInfo',
+        method: 'get',
+        params: {
+          articleId: store.state.aid
+        }
+      }).then(r => {
+        articleData.value = r.data.data
+        authorName.value = r.data.authorName
+      })
+    }
 
     return {
-      isLiked, isStared, commentValue, articleData, userData, commentData, getCommentData,
+      isLiked, isStared, commentValue, articleData, userData, commentData, authorName,
+      getCommentData, getIsLiked, getIsStared, getArticleData,
 
+      uid: store.state.uid,
       getUserData() {
         store.state.axios({
           url: '/go/user/getUserInfo',
@@ -137,47 +176,11 @@ export default {
           userData.value = r.data.data
         })
       },
-      getArticleData() {
-        store.state.axios({
-          url: '/go/article/getArticleInfo',
-          method: 'get',
-          params: {
-            articleId: store.state.aid
-          }
-        }).then(r => {
-          articleData.value = r.data.data
-        })
-      },
-      getIsLiked() {
-        store.state.axios({
-          url: '/go/like/getIsLiked',
-          method: 'get',
-          params: {
-            articleId: store.state.aid,
-            userId: store.state.uid
-          },
-        }).then(r => {
-          isLiked.value = r.data.data
-        })
-      },
-      getIsStared() {
-        store.state.axios({
-          url: '/go/star/getIsStared',
-          method: 'get',
-          params: {
-            articleId: store.state.aid,
-            userId: store.state.uid
-          },
-        }).then(r => {
-          isStared.value = r.data.data
-        })
-      },
 
       clickLike() {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
-        } else {
-          if (isLiked.value === false){
+        } else if (isLiked.value === false) {
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
@@ -185,26 +188,31 @@ export default {
               url: '/go/like/addLike',
               method: 'post',
               data: formData,
+            }).then(() => {
+              message.success("点赞成功")
             })
-          }else if (isLiked.value === true){
-            let formData = new FormData()
-            formData.set('userId', store.state.uid)
-            formData.set('articleId', store.state.aid)
-            store.state.axios({
-              url: '/go/like/cancelLike',
-              method: 'post',
-              data: formData,
-            })
-          }
-          isLiked.value = !isLiked.value;
+        } else if (isLiked.value === true) {
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+          formData.set('articleId', store.state.aid)
+          store.state.axios({
+            url: '/go/like/cancelLike',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("取消点赞成功")
+          })
         }
-
+        getIsLiked()
+        getArticleData()
       },
       clickStar() {
+        console.log(isStared.value);
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else {
-          if (isStared.value === false){
+          if (isStared.value === false) {
+            console.log(isStared.value);
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
@@ -212,8 +220,11 @@ export default {
               url: '/go/star/addStar',
               method: 'post',
               data: formData,
+            }).then(() => {
+              message.success("收藏成功", isStared.value)
             })
-          }else if (isStared.value === true){
+          } else if (isStared.value === true) {
+            console.log(isStared.value);
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
@@ -221,11 +232,13 @@ export default {
               url: '/go/star/cancelStar',
               method: 'post',
               data: formData,
+            }).then(() => {
+              message.success("取消收藏成功")
             })
           }
-          isStared.value = !isStared.value;
         }
-
+        getIsStared()
+        getArticleData()
       },
       clickComment() {
         if (store.state.uid === 0){
@@ -236,7 +249,7 @@ export default {
           let formData = new FormData()
           formData.set('userId', store.state.uid)
           formData.set('articleId', store.state.aid)
-          formData.set('commentContent', commentValue)
+          formData.set('commentContent', commentValue.value)
           store.state.axios({
             url: '/go/comment/createComment',
             method: 'post',
@@ -244,11 +257,12 @@ export default {
           }).then(() => {
             message.success("评论成功！")
             commentValue.value = null
+            getCommentData()
           })
         }
       },
       deleteComment(u, c) {
-        if (store.state.uid !== 1 || store.state.uid !== u) {
+        if (store.state.uid != 1 && store.state.uid != u && store.state.uid != articleData.value.ArticleAuthor) {
           message.error("您没有权限删除这条评论！")
         } else {
           dialog.warning({
@@ -261,7 +275,7 @@ export default {
               formData.set('commentId', c)
               store.state.axios({
                 url: '/go/comment/deleteComment',
-                method: 'post',
+                method: 'delete',
                 data: formData,
               }).then(() => {
                 message.success("删除成功！")
