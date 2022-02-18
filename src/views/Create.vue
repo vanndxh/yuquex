@@ -105,7 +105,6 @@ export default {
         } else {
           let formData = new FormData()
           formData.set('articleName', newArticleName.value)
-          console.log(newArticleName.value);
           formData.set('articleContent', newArticleContent.value)
           formData.set('articleAuthor', store.state.uid)
 
@@ -124,7 +123,6 @@ export default {
             message.error("新建文章出错！")
           })
         }
-
       },
       judgeIsLogged() {
         if (store.state.uid === 0) {

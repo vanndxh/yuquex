@@ -17,23 +17,25 @@
                     src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
                 />
               </n-space>
-              <h1 class="user">{{ userData.username }}</h1>
+<!--              <h1 class="user">{{ userData.username }}</h1>-->
               <n-space justify="center">
                 <n-button style="">编辑资料</n-button>
               </n-space>
-              <p>{{ userData.userInfo }}</p>
+<!--              <p>{{ userData.userInfo }}</p>-->
             </n-card>
             <n-card hoverable>
               <n-statistic tabular-nums>
                 <n-icon size="20"><BookOutline/></n-icon>共有
-                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.ArticleAmount />
+                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=6 />
+<!--                userData.articleAmount-->
                 <template #suffix>
                   篇文章
                 </template>
               </n-statistic>
               <n-statistic tabular-nums>
                 <n-icon size="20"><LikeOutlined/></n-icon>共收获
-                <n-number-animation ref="numberAnimationInstRef" :from="0" :to=userData.LikeTotal />
+                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=6 />
+<!--                userData.likeTotal-->
                 <template #suffix>
                   个赞
                 </template>
@@ -50,8 +52,8 @@
               <n-tab-pane name="teams" tab="知识小组">
                 <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>
               </n-tab-pane>
-              <n-tab-pane name="Favorites" tab="收藏夹">
-                <n-data-table :columns="columns" :data="data3" :pagination="pagination" size="small"/>
+              <n-tab-pane name="favorites" tab="收藏夹">
+                <n-data-table :columns="columns3" :data="data3" :pagination="pagination" size="small"/>
               </n-tab-pane>
             </n-tabs>
           </n-card>
@@ -69,12 +71,14 @@ import { LikeOutlined } from '@vicons/antd'
 import { h , ref } from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 export default {
   components: {
     tabBar, BookOutline, LikeOutlined
   },
   setup() {
+    const router = useRouter()
     const message = useMessage()
     const store = useStore()
 
@@ -85,7 +89,7 @@ export default {
     const createColumns = ({ lookDetail }) => {
       return [
         {
-          key: 'articleName',
+          key: 'ArticleName',
           align: 'center'
         },
         {
@@ -107,7 +111,29 @@ export default {
     const createColumns2 = ({ lookDetail }) => {
       return [
         {
-          key: 'teamName',
+          key: 'TeamName',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },
+      ]
+    }
+    const createColumns3 = ({ lookDetail }) => {
+      return [
+        {
+          key: 'ArticleName',
           align: 'center'
         },
         {
@@ -131,14 +157,13 @@ export default {
       if (store.state.uid === 0) {
         message.error("您尚未登录！")
       } else {
-        let formData = new FormData()
-        formData.set("articleAuthor", store.state.uid)
-        formData.set('isInTrash', "0")
-
         store.state.axios({
           url: '/go/article/getArticles',
-          method: 'post',
-          data: formData
+          method: 'get',
+          params: {
+            articleAuthor: store.state.uid,
+            isInTrash: 0
+          }
         }).then(r => {
           data1.value = r.data.data
         })
@@ -148,13 +173,12 @@ export default {
       if (store.state.uid === 0) {
         message.error("您尚未登录！")
       } else {
-        let formData = new FormData()
-        formData.set('userId', store.state.uid)
-
         store.state.axios({
           url: '/go/team/getTeams',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          }
         }).then(r => {
           data2.value = r.data.data
         }).catch(() => {
@@ -166,13 +190,12 @@ export default {
       if (store.state.uid === 0) {
         message.error("您尚未登录！")
       } else {
-        let formData = new FormData()
-        formData.set('userId', store.state.uid)
-
         store.state.axios({
           url: '/go/star/getFavorite',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          }
         }).then(r => {
           data3.value = r.data.data
         }).catch(() => {
@@ -185,26 +208,34 @@ export default {
       data1, data2, data3, userData,
       getTeams, getArticles, getFavorite,
 
+      pagination: {
+        pageSize: 10
+      },
       columns: createColumns({
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
         }
       }),
       columns2: createColumns2({
         lookDetail (rowData) {
-          console.log(rowData);
+          store.state.tid = rowData.TeamId
+          router.push("TeamInfo")
         }
       }),
-      pagination: {
-        pageSize: 10
-      },
+      columns3: createColumns3({
+        lookDetail (rowData) {
+          store.state.aid = rowData.ArticleId
+          router.push("ArticleInfo")
+        }
+      }),
       getUserData() {
-        let formData = new FormData()
-        formData.set("userId", store.state.uid)
         store.state.axios({
           url: '/go/user/getUserInfo',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          }
         }).then(r => {
           userData.value = r.data.data
         })

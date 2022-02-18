@@ -14,7 +14,7 @@ import {
 
 export default {
   setup () {
-    const renderIcon =(icon) => {
+    const renderIcon = (icon) => {
       return () => h(NIcon, null, { default: () => h(icon) })
     }
 

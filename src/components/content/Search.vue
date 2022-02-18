@@ -60,12 +60,12 @@ export default {
       page: 1,
       pageTotal: 10,
       search() {
-        let formData = new FormData()
-        formData.set('searchValue', searchValue.value)
         store.state.axios({
           url: '/go/article/searchArticle',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            searchValue: searchValue.value
+          },
         }).then(r => {
           if (r.data.data === "none"){
             searchData.value = []
@@ -77,7 +77,7 @@ export default {
       },
       lookDetail(articleId) {
         store.state.aid = articleId
-        router.push('articleInfo')
+        router.push('ArticleInfo')
       },
       searchInit () {
         searchData.value = store.state.searchData

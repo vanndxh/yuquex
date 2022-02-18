@@ -86,14 +86,13 @@ export default {
       if (store.state.uid === 0) {
         message.error("您尚未登录！")
       } else {
-        let formData = new FormData()
-        formData.set("articleAuthor", store.state.uid)
-        formData.set('isInTrash', "0")
-
         store.state.axios({
           url: '/go/article/getArticles',
-          method: 'post',
-          data: formData
+          method: 'get',
+          params: {
+            articleAuthor: store.state.uid,
+            isInTrash: 0
+          }
         }).then(r => {
           data.value = r.data.data
         })

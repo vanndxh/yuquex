@@ -97,49 +97,47 @@ export default {
       isLiked, isStared, commentValue, articleData, userData,
 
       getUserData() {
-        let formData = new FormData()
-        formData.set('userId', store.state.uid)
         store.state.axios({
           url: '/go/user/getUserInfo',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          },
         }).then(r => {
           userData.value = r.data.data
         })
       },
       getArticleData() {
-        let formData = new FormData()
-        formData.set('articleId', store.state.aid)
         store.state.axios({
           url: '/go/article/getArticleInfo',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            articleId: store.state.aid
+          }
         }).then(r => {
-          console.log(r.data.data);
-
           articleData.value = r.data.data
         })
       },
       getIsLiked() {
-        let formData = new FormData()
-        formData.set('articleId', store.state.aid)
-        formData.set('userId', store.state.uid)
         store.state.axios({
-          url: '/go/like/judgeIsLiked',
-          method: 'post',
-          data: formData,
+          url: '/go/like/getIsLiked',
+          method: 'get',
+          params: {
+            articleId: store.state.aid,
+            userId: store.state.uid
+          },
         }).then(r => {
           isLiked.value = r.data.data
         })
       },
       getIsStared() {
-        let formData = new FormData()
-        formData.set('articleId', store.state.aid)
-        formData.set('userId', store.state.uid)
         store.state.axios({
-          url: '/go/star/judgeIsStared',
-          method: 'post',
-          data: formData,
+          url: '/go/star/getIsStared',
+          method: 'get',
+          params: {
+            articleId: store.state.aid,
+            userId: store.state.uid
+          },
         }).then(r => {
           isStared.value = r.data.data
         })

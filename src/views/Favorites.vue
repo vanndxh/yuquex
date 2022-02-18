@@ -91,13 +91,12 @@ export default {
       if (store.state.uid === 0) {
         message.error("您尚未登录！")
       } else {
-        let formData = new FormData()
-        formData.set('userId', store.state.uid)
-
         store.state.axios({
           url: '/go/star/getFavorite',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          },
         }).then(r => {
           data.value = r.data.data
         }).catch(() => {
@@ -111,7 +110,6 @@ export default {
 
       columns: createColumns({
         removeStar (rowData) {
-          console.log(rowData.ArticleId);
           let formData = new FormData()
           formData.set('userId', store.state.uid)
           formData.set('articleId', rowData.ArticleId)

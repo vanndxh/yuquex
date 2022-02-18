@@ -103,7 +103,7 @@
         注意：如果您认为自己或他人的版权、著作权或其他合法权益在本网上受到他人侵害，请立即与小黑屋联系,并提供相关证据。</p>
     </n-card>
   </n-modal>
-  <!--  提交反馈-->
+  <!--提交反馈-->
   <n-modal v-model:show="showFeedback">
     <n-card
         style="width: 600px;"
@@ -275,9 +275,7 @@ export default {
               store.state.uid = null
               store.state.isLogged = false
               message.info('退出登录~')
-              location.reload()
-            },
-            onNegativeClick: () => {
+              router.push("/")
             }
           })
         }else if(key === "feedback") {
@@ -287,7 +285,7 @@ export default {
         }
       },
       clickCreate () {
-        router.push('create')
+        router.push('Create')
       },
       clickLog () {
         router.push('Log')
@@ -298,12 +296,12 @@ export default {
         store.state.choice = "signup"
       },
       search() {
-        let formData = new FormData()
-        formData.set('searchValue', searchValue.value)
         store.state.axios({
           url: '/go/article/searchArticle',
-          method: 'post',
-          data: formData,
+          method: 'get',
+          params: {
+            searchValue: searchValue.value
+          }
         }).then(r => {
           router.push('search')
           if (r.data.data === "none"){
@@ -327,6 +325,7 @@ export default {
           if (r.status === 200) {
             feedbackValue.value = ""
             message.success("提交反馈成功，感谢您的反馈！")
+            showFeedback.value = !showFeedback.value
           } else {
             message.error("提交失败！")
           }
