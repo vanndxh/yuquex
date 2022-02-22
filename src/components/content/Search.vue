@@ -20,10 +20,16 @@
       <n-list>
         <n-list-item v-for="item in searchData" :key="item">
           <n-card :title=item.ArticleName hoverable>
-            articleContent前30字
-            <div>
-              <n-button style="float: right" @click="lookDetail(item.ArticleId)">详情</n-button>
-            </div>
+            <n-grid :col="24">
+              <n-gi :span="20">
+                <p style="font-size: 13px">
+                  点赞：{{ item.LikeAmount}}  收藏： {{item.StarAmount}}
+                </p>
+              </n-gi>
+              <n-gi :span="4" style="float: right">
+                <n-button style="float: right" @click="lookDetail(item.ArticleId)">详情</n-button>
+              </n-gi>
+            </n-grid>
           </n-card>
         </n-list-item>
       </n-list>

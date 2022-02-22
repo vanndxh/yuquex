@@ -20,17 +20,15 @@
                 <n-gi span="1" offset="6">
                   <n-space justify="center" vertical>
                     <h1 style="text-align: center">{{ articleData.LikeAmount }}</h1>
-                    <n-icon size="40" @click="clickLike()" :component="isLiked ? LikeFilled : LikeOutlined"/>
-                    <n-icon size="40" v-show="isLiked" @click="clickLike()"><LikeFilled /></n-icon>
-                    <n-icon size="40" v-show="!isLiked" @click="clickLike()"><LikeOutlined /></n-icon>
+                    <n-icon size="40" v-if="isLiked" @click="clickLike()"><LikeFilled /></n-icon>
+                    <n-icon size="40" v-else @click="clickLike()"><LikeOutlined /></n-icon>
                   </n-space>
                 </n-gi>
                 <n-gi span="1" offset="8" >
                   <n-space justify="center" vertical>
                     <h1 style="text-align: center">{{ articleData.StarAmount }}</h1>
-                    <n-icon size="40" @click="clickStar()" :component="isStared === true ? StarFilled : StarOutlined"/>
-                    <n-icon size="40" v-show="isStared" @click="clickStar()"><StarFilled /></n-icon>
-                    <n-icon size="40" v-show="!isStared" @click="clickStar()"><StarOutlined /></n-icon>
+                    <n-icon size="40" v-if="isStared" @click="clickStar()"><StarFilled /></n-icon>
+                    <n-icon size="40" v-else @click="clickStar()"><StarOutlined /></n-icon>
                   </n-space>
                 </n-gi>
               </n-grid>
@@ -39,7 +37,7 @@
               <n-list>
                 <n-list-item v-for="item in commentData" :key="item">
                   <n-card hoverable>
-                    <h3>{{ item.UserName }}</h3>
+                    <h3>{{ item.UserId }}</h3>
                     {{ item.CommentContent }}
                     <div>
                       <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)" ghost>删除</n-button>
@@ -131,7 +129,6 @@ export default {
           },
         }).then(r => {
           isLiked.value = r.data.data
-          message.success("like:" + isLiked.value)
         })
       }
     }
@@ -148,7 +145,6 @@ export default {
           },
         }).then(r => {
           isStared.value = r.data.data
-          message.success("star:" + isStared.value)
         })
       }
     }
@@ -186,33 +182,38 @@ export default {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else if (isLiked.value === false) {
-            let formData = new FormData()
-            formData.set('userId', store.state.uid)
-            formData.set('articleId', store.state.aid)
-            store.state.axios({
-              url: '/go/like/addLike',
-              method: 'post',
-              data: formData,
-            }).then(() => {
-              message.success("点赞成功")
-            })
+          let formData = new FormData()
+          formData.set('userId', store.state.uid)
+          formData.set('articleId', store.state.aid)
+          formData.set('handle', 0)
+          store.state.axios({
+            url: '/go/like/handleLike',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("点赞成功")
+            isLiked.value = true
+            articleData.value.LikeAmount++
+          })
         } else if (isLiked.value === true) {
           let formData = new FormData()
           formData.set('userId', store.state.uid)
           formData.set('articleId', store.state.aid)
+          formData.set('handle', 1)
           store.state.axios({
-            url: '/go/like/cancelLike',
+            url: '/go/like/handleLike',
             method: 'post',
             data: formData,
           }).then(() => {
             message.success("取消点赞成功")
+            isLiked.value = false
+            articleData.value.LikeAmount--
           })
         }
-        getIsLiked()
-        getArticleData()
+        // getIsLiked()
+        // getArticleData()
       },
       clickStar() {
-        console.log(isStared.value);
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else {
@@ -220,28 +221,34 @@ export default {
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
+            formData.set('handle', 0)
             store.state.axios({
-              url: '/go/star/addStar',
+              url: '/go/star/handleStar',
               method: 'post',
               data: formData,
             }).then(() => {
-              message.success("收藏成功", isStared.value)
+              message.success("收藏成功")
+              isStared.value = true
+              articleData.value.StarAmount++
             })
           } else if (isStared.value === true) {
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
+            formData.set('handle', 1)
             store.state.axios({
-              url: '/go/star/cancelStar',
+              url: '/go/star/handleStar',
               method: 'post',
               data: formData,
             }).then(() => {
-              message.success("取消收藏成功")
+              message.success("取消收藏成功!")
+              isStared.value = false
+              articleData.value.StarAmount--
             })
           }
         }
-        getIsStared()
-        getArticleData()
+        // getIsStared()
+        // getArticleData()
       },
       clickComment() {
         if (store.state.uid === 0){

@@ -230,11 +230,11 @@ export default {
       },
     ]
     const searchValue = ref(null)
+    const log = ref(store.state.isLogged)
 
     return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue,
+      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log,
 
-      log: store.state.isLogged,
       activeKey: ref(null),
       avatarOptions: [
         {
@@ -263,8 +263,9 @@ export default {
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              store.state.uid = null
+              store.state.uid = 0
               store.state.isLogged = false
+              log.value = false
               message.info('退出登录~')
               router.push("/")
             }
