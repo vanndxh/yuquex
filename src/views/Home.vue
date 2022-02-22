@@ -21,7 +21,6 @@
                       @update:value="handleUpdateValue"
                       #="{ year, month, date }"
                       v-model:value="value"
-                      :is-date-disabled="isDateDisabled"
                   >
                     {{ year }}-{{ month }}-{{ date }}
                   </n-calendar>
@@ -109,7 +108,6 @@ export default {
       value: ref(addDays(Date.now(), 1).valueOf()),
       isDateDisabled (timestamp) {
         return isYesterday(timestamp);
-
       },
       handleUpdateValue () {},
       welcome() {

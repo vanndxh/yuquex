@@ -14,28 +14,37 @@
                     :size="200"
                     style="horiz-align: center"
                     round
-                    src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                    src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
                 />
               </n-space>
-<!--              <h1 class="user">{{ userData.username }}</h1>-->
-              <n-space justify="center">
-                <n-button v-if="uid === uidt">编辑资料</n-button>
+              <h1 class="user">{{ userData.Username }}</h1>
+              <n-icon><MessageOutlined /></n-icon>
+              {{ userData.UserInfo }}
+              <n-space justify="space-around">
+                <n-space vertical :size=1>
+                  <p style="text-align: center" @click="showFollow = true">{{userData.FollowAmount}}</p>
+                  关注
+                </n-space>
+                <n-space vertical :size=1>
+                  <p style="text-align: center" @click="showFollower = true">{{userData.FollowerAmount}}</p>
+                  粉丝
+                </n-space>
+                <n-space justify="center">
+                  <n-button v-if="uid === uidt" style="width: 200px" @click="handleChangeInfo">编辑资料</n-button>
+                </n-space>
               </n-space>
-<!--              <p>{{ userData.userInfo }}</p>-->
             </n-card>
             <n-card hoverable>
               <n-statistic tabular-nums>
                 <n-icon size="20"><BookOutline/></n-icon>共有
-                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=6 />
-<!--                userData.articleAmount-->
+                <n-number-animation ref="numberAnimationInstRef" :from=0 :to= userData.ArticleAmount />
                 <template #suffix>
                   篇文章
                 </template>
               </n-statistic>
               <n-statistic tabular-nums>
                 <n-icon size="20"><LikeOutlined/></n-icon>共收获
-                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=6 />
-<!--                userData.likeTotal-->
+                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeTotal />
                 <template #suffix>
                   个赞
                 </template>
@@ -45,32 +54,72 @@
         </n-gi>
         <n-gi span="11">
           <n-card hoverable>
-<!--            <n-tabs type="line">-->
-<!--              <n-tab-pane name="articles" tab="文档">-->
-<!--                <n-data-table :columns="columns" :data="data1" :pagination="pagination" size="small"/>-->
-<!--              </n-tab-pane>-->
-<!--              <n-tab-pane name="teams" tab="知识小组">-->
-<!--                <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>-->
-<!--              </n-tab-pane>-->
-<!--              <n-tab-pane name="favorites" tab="收藏夹">-->
-<!--                <n-data-table :columns="columns3" :data="data3" :pagination="pagination" size="small"/>-->
-<!--              </n-tab-pane>-->
-<!--              <n-tab-pane name="comments" tab="历史评论">-->
-<!--                <n-data-table :columns="columns4" :data="data4" :pagination="pagination" size="small"/>-->
-<!--              </n-tab-pane>-->
-<!--            </n-tabs>-->
+            <n-tabs type="line">
+              <n-tab-pane name="articles" tab="文档">
+                <n-data-table :columns="columns" :data="data1" :pagination="pagination" size="small"/>
+              </n-tab-pane>
+              <n-tab-pane name="teams" tab="知识小组">
+                <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>
+              </n-tab-pane>
+              <n-tab-pane name="favorites" tab="收藏夹">
+                <n-data-table :columns="columns3" :data="data3" :pagination="pagination" size="small"/>
+              </n-tab-pane>
+              <n-tab-pane name="comments" tab="历史评论">
+                <n-data-table :columns="columns4" :data="data4" :pagination="pagination" size="small"/>
+              </n-tab-pane>
+            </n-tabs>
           </n-card>
         </n-gi>
       </n-grid>
 
     </n-layout-content>
   </n-layout>
+
+  <n-modal v-model:show="showChangeInfo">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-space vertical>
+        用户昵称<n-input v-model:value="newUsername" type="text"/>
+        用户密码<n-input v-model:value="newPassword" type="text"/>
+        个人简介<n-input v-model:value="newInfo" type="text"/>
+        <n-button type="primary" ghost @click="changeInfo" style="float: right">保存</n-button>
+      </n-space>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showFollow">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-data-table :columns="columns5" :data="data5" :pagination="pagination" size="small"/>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showFollower">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
+    </n-card>
+  </n-modal>
+
 </template>
 
 <script>
 import tabBar from "../common/tabBar";
 import { BookOutline } from '@vicons/ionicons5'
-import { LikeOutlined } from '@vicons/antd'
+import { LikeOutlined, MessageOutlined } from '@vicons/antd'
 import { h , ref } from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
@@ -78,18 +127,26 @@ import {useRouter} from "vue-router";
 
 export default {
   components: {
-    tabBar, BookOutline, LikeOutlined
+    tabBar, BookOutline, LikeOutlined, MessageOutlined
   },
   setup() {
     const router = useRouter()
     const message = useMessage()
     const store = useStore()
 
-    const userData = ref(null)
-    const data1 = ref(null)
-    const data2 = ref(null)
-    const data3 = ref(null)
-    const data4 = ref(null)
+    const showFollow = ref(false)
+    const showFollower = ref(false)
+    const showChangeInfo = ref(false)
+    const newUsername = ref(null)
+    const newPassword = ref(null)
+    const newInfo = ref(null)
+    const userData = ref({})
+    const data1 = ref([])
+    const data2 = ref([])
+    const data3 = ref([])
+    const data4 = ref([])
+    const data5 = ref([])
+    const data6 = ref([])
     const createColumns = ({ lookDetail }) => {
       return [
         {
@@ -191,6 +248,63 @@ export default {
         },
       ]
     }
+    const createColumns5 = ({ lookDetail, follow }) => {
+      return [
+        {
+          key: 'CommentContent',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        },{
+          key: 'follow',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => follow(row)
+                },
+                { default: () => '关注' }
+            )
+          }
+        },
+      ]
+    }
+    const createColumns6 = ({ lookDetail }) => {
+      return [
+        {
+          key: 'CommentContent',
+          align: 'center'
+        },
+        {
+          key: 'lookDetail',
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => lookDetail(row)
+                },
+                { default: () => '查看' }
+            )
+          }
+        }
+      ]
+    }
 
     const getArticles = () => {
       if (store.state.uid === 0) {
@@ -255,10 +369,22 @@ export default {
         message.error("获取收藏夹出错！")
       })
     }
+    const getUserData = () => {
+      store.state.axios({
+        url: '/go/user/getUserInfo',
+        method: 'get',
+        params: {
+          userId: store.state.uid
+        }
+      }).then(r => {
+        userData.value = r.data.data
+      })
+    }
 
     return {
-      data1, data2, data3, data4, userData,
-      getTeams, getArticles, getFavorite, getUserComment,
+      data1, data2, data3, data4, data5, data6, userData, showChangeInfo, showFollow, showFollower, newUsername, newPassword, newInfo,
+      getTeams, getArticles, getFavorite, getUserComment, getUserData,
+
 
       uid: store.state.uid,
       uidt: store.state.uidTemp,
@@ -303,15 +429,54 @@ export default {
           })
         }
       }),
-      getUserData() {
+      columns5: createColumns5({
+        lookDetail (rowData) {
+          store.state.uidt = rowData.UserId
+          router.push("ArticleInfo")
+        },
+        follow (rowData) {
+          let formData = new FormData()
+          formData.set('up', rowData.UserId)
+          formData.set('follower', store.state.uid)
+          store.state.axios({
+            url: '/go/follow/addFollow',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("关注成功！")
+
+          }).catch(() => {
+            message.error("error!")
+          })
+        }
+      }),
+      columns6: createColumns6({
+        lookDetail (rowData) {
+          store.state.uidt = rowData.UserId
+          router.push("ArticleInfo")
+        },
+      }),
+      handleChangeInfo() {
+        newUsername.value = userData.value.Username
+        newPassword.value = userData.value.Password
+        newInfo.value = userData.value.UserInfo
+        showChangeInfo.value = true
+      },
+      changeInfo() {
+        let formData = new FormData()
+        formData.set('username', newUsername.value)
+        formData.set('password', newPassword.value)
+        formData.set('userInfo', newInfo.value)
         store.state.axios({
-          url: '/go/user/getUserInfo',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          }
-        }).then(r => {
-          userData.value = r.data.data
+          url: '/go/user/updateUserInfo',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("修改个人信息成功！")
+          showChangeInfo.value = false
+          getUserData()
+        }).catch(() => {
+          message.error("error!")
         })
       }
     }

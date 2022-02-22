@@ -27,10 +27,10 @@
           </n-card>
         </n-list-item>
       </n-list>
-      <n-pagination v-model:page="page" :page-count=pageTotal />
-
+<!--      <n-pagination v-model:page="page" :page-count=pageTotal />-->
     </n-gi>
   </n-grid>
+  <n-back-top :right="100" />
 </template>
 
 <script>

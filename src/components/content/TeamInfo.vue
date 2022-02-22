@@ -21,7 +21,7 @@
         </n-gi>
       </n-grid>
       <br>
-<!--      三个主要内容-->
+      <!--三个主要内容-->
       <n-tabs type="segment" size="large">
         <n-tab-pane name="members" tab="组内成员">
           <n-data-table :columns="columns1" :data="data1" :pagination="pagination" size="small"/>
@@ -29,14 +29,27 @@
         <n-tab-pane name="articles" tab="组内文章">
           <n-data-table :columns="columns2" :data="data2" :pagination="pagination" size="small"/>
         </n-tab-pane>
-        <n-tab-pane name="clockInfo" tab="打卡详情">
-          <n-statistic tabular-nums>
-            您共在本小组打卡
-            <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
-            <template #suffix>
-              次
-            </template>
-          </n-statistic>
+        <n-tab-pane name="punchInfo" tab="打卡详情" @click="handlePunch">
+          <n-grid :cols="24">
+
+            <n-gi :span="12" :offset="3">
+              <n-space vertical>
+                <n-statistic tabular-nums>
+                  您共在本小组打卡
+                  <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
+                  <template #suffix>
+                    次
+                  </template>
+                </n-statistic>
+                <n-button style="width: 200px" @click="punch">今日打卡</n-button>
+              </n-space>
+            </n-gi>
+
+            <n-gi :span="6" :offset="1">
+              打卡排行榜
+            </n-gi>
+
+          </n-grid>
         </n-tab-pane>
       </n-tabs>
     </n-gi>
@@ -98,7 +111,7 @@ export default {
     const data1 = ref([])
     const data2 = ref([])
     const teamData = ref({})
-    const count = ref(null)
+    const count = ref(0)
     const newTeamName = ref("")
     const newTeamNotice = ref("")
     const newUserId = ref("")
@@ -180,16 +193,18 @@ export default {
         }
       }).then(r => {
         teamData.value = r.data.data
-        if(store.state.uid === teamData.value.TeamLeader) {
+        if(store.state.uid == r.data.data.TeamLeader) {
           count.value = r.data.data.LeaderCount
-        } else if (store.state.uid === teamData.value.TeamMember1) {
+        } else if (store.state.uid == teamData.value.TeamMember1) {
           count.value = r.data.data.Member1Count
-        } else if (store.state.uid === teamData.value.TeamMember2) {
+        } else if (store.state.uid == teamData.value.TeamMember2) {
           count.value = r.data.data.Member2Count
-        } else if (store.state.uid === teamData.value.TeamMember3) {
+        } else if (store.state.uid == teamData.value.TeamMember3) {
           count.value = r.data.data.Member3Count
-        } else if (store.state.uid === teamData.value.TeamMember4) {
+        } else if (store.state.uid == teamData.value.TeamMember4) {
           count.value = r.data.data.Member4Count
+        } else {
+          count.value = -1
         }
       })
     }
@@ -331,6 +346,24 @@ export default {
           })
         }
       },
+      handlePunch() {
+        if(count.value === -1) {
+          message.info("您不是该组成员，没有打卡数据！")
+        }
+      },
+      punch() {
+        let formData = new FormData()
+        formData.set('userId', store.state.uid)
+        formData.set('teamId', store.state.tid)
+        store.state.axios({
+          url: '/go/team/punch',
+          method: 'post',
+          data: formData,
+        }).then(() => {
+          message.success("打卡成功！")
+          getTeamInfo()
+        })
+      }
     }
   },
   mounted() {

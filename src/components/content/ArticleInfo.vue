@@ -19,16 +19,18 @@
               <n-grid :col="24">
                 <n-gi span="1" offset="6">
                   <n-space justify="center" vertical>
-                    <h4 style="text-align: center">{{ articleData.LikeAmount }}</h4>
-                    <n-icon size="40" v-if="isLiked" @click="clickLike()"><LikeOutlined /></n-icon>
-                    <n-icon size="40" v-if="!isLiked" @click="clickLike()"><LikeFilled /></n-icon>
+                    <h1 style="text-align: center">{{ articleData.LikeAmount }}</h1>
+                    <n-icon size="40" @click="clickLike()" :component="isLiked ? LikeFilled : LikeOutlined"/>
+                    <n-icon size="40" v-show="isLiked" @click="clickLike()"><LikeFilled /></n-icon>
+                    <n-icon size="40" v-show="!isLiked" @click="clickLike()"><LikeOutlined /></n-icon>
                   </n-space>
                 </n-gi>
                 <n-gi span="1" offset="8" >
                   <n-space justify="center" vertical>
-                    <h4 style="text-align: center">{{ articleData.StarAmount }}</h4>
-                    <n-icon size="40" v-if="isStared" @click="clickStar()"><StarOutlined /></n-icon>
-                    <n-icon size="40" v-else @click="clickStar()"><StarFilled /></n-icon>
+                    <h1 style="text-align: center">{{ articleData.StarAmount }}</h1>
+                    <n-icon size="40" @click="clickStar()" :component="isStared === true ? StarFilled : StarOutlined"/>
+                    <n-icon size="40" v-show="isStared" @click="clickStar()"><StarFilled /></n-icon>
+                    <n-icon size="40" v-show="!isStared" @click="clickStar()"><StarOutlined /></n-icon>
                   </n-space>
                 </n-gi>
               </n-grid>
@@ -40,7 +42,7 @@
                     <h3>{{ item.UserName }}</h3>
                     {{ item.CommentContent }}
                     <div>
-                      <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)">删除</n-button>
+                      <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)" ghost>删除</n-button>
                     </div>
                   </n-card>
                 </n-list-item>
@@ -52,9 +54,7 @@
                     :autosize="{minRows: 3,maxRows: 5}"
                     maxlength="50" show-count
                 />
-                <n-button type="success" @click="clickComment()"
-                          :disabled="uid === 0"
-                >回复</n-button>
+                <n-button type="success" @click="clickComment()" :disabled="uid === 0">回复</n-button>
               </n-space>
             </n-gi>
             <!--作者信息card-->
@@ -69,6 +69,10 @@
                   />
                 </n-space>
                 <h1 class="user">{{ authorName }}</h1>
+                <n-space justify="space-around">
+                  <n-button @click="follow()" ghost style="width: 80px">关注</n-button>
+                  <n-button @click="lookDetail()" ghost style="width: 80px">详情</n-button>
+                </n-space>
               </n-card>
             </n-gi>
           </n-grid>
@@ -127,6 +131,7 @@ export default {
           },
         }).then(r => {
           isLiked.value = r.data.data
+          message.success("like:" + isLiked.value)
         })
       }
     }
@@ -164,6 +169,7 @@ export default {
       isLiked, isStared, commentValue, articleData, userData, commentData, authorName,
       getCommentData, getIsLiked, getIsStared, getArticleData,
 
+      iconName: null,
       uid: store.state.uid,
       getUserData() {
         store.state.axios({
@@ -176,7 +182,6 @@ export default {
           userData.value = r.data.data
         })
       },
-
       clickLike() {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
@@ -212,7 +217,6 @@ export default {
           message.error("您尚未登录！")
         } else {
           if (isStared.value === false) {
-            console.log(isStared.value);
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
@@ -224,7 +228,6 @@ export default {
               message.success("收藏成功", isStared.value)
             })
           } else if (isStared.value === true) {
-            console.log(isStared.value);
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
@@ -286,6 +289,24 @@ export default {
             }
           })
         }
+      },
+      follow() {
+        let formData = new FormData()
+        formData.set('up', articleData.value.ArticleAuthor)
+        formData.set('follower', store.state.uid)
+        store.state.axios({
+          url: '/go/follow/addFollow',
+          method: 'post',
+          data: formData,
+        }).then(() => {
+          message.success("关注成功！")
+
+        }).catch(() => {
+          message.error("error!")
+        })
+      },
+      lookDetail() {
+
       }
     }
   },
