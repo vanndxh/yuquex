@@ -11,7 +11,7 @@
             <n-card hoverable>
               <n-space justify="center">
                 <n-avatar
-                    :size="200"
+                    :size="160"
                     style="horiz-align: center"
                     round
                     src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
@@ -344,7 +344,7 @@ export default {
         message.error("您尚未登录！")
       } else {
         store.state.axios({
-          url: '/go/star/getFavorite',
+          url: '/go/collection/getFavorite',
           method: 'get',
           params: {
             userId: store.state.uid

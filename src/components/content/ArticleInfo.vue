@@ -15,7 +15,7 @@
             <!--文章部分-->
             <n-gi span="14">
               <h1>{{ articleData.ArticleName }}</h1>
-              <p class="content">{{ articleData.ArticleContent }}</p>
+              <pre class="content">{{ articleData.ArticleContent }}</pre>
               <n-grid :col="24">
                 <n-gi span="1" offset="6">
                   <n-space justify="center" vertical>
@@ -26,9 +26,9 @@
                 </n-gi>
                 <n-gi span="1" offset="8" >
                   <n-space justify="center" vertical>
-                    <h1 style="text-align: center">{{ articleData.StarAmount }}</h1>
-                    <n-icon size="40" v-if="isStared" @click="clickStar()"><StarFilled /></n-icon>
-                    <n-icon size="40" v-else @click="clickStar()"><StarOutlined /></n-icon>
+                    <h1 style="text-align: center">{{ articleData.CollectionAmount }}</h1>
+                    <n-icon size="40" v-if="isCollected" @click="clickCollection()"><StarFilled /></n-icon>
+                    <n-icon size="40" v-else @click="clickCollection()"><StarOutlined /></n-icon>
                   </n-space>
                 </n-gi>
               </n-grid>
@@ -40,7 +40,9 @@
                     <h3>{{ item.UserId }}</h3>
                     {{ item.CommentContent }}
                     <div>
-                      <n-button type="error" style="float: right" @click="deleteComment(item.UserId, item.CommentId)" ghost>删除</n-button>
+                      <n-button type="error" style="float: right"
+                                v-if="uid == 1 || uid == item.UserId || uid == articleData.ArticleAuthor"
+                                @click="deleteComment(item.UserId, item.CommentId)" ghost>删除</n-button>
                     </div>
                   </n-card>
                 </n-list-item>
@@ -99,7 +101,7 @@ export default {
     const store = useStore()
 
     const isLiked =  ref(false)
-    const isStared = ref(false)
+    const isCollected = ref(false)
     const commentValue = ref(null)
     const articleData = ref({})
     const authorName = ref(null)
@@ -132,19 +134,19 @@ export default {
         })
       }
     }
-    const getIsStared = () => {
+    const getIsCollected = () => {
       if (store.state.uid === 0) {
-        isStared.value = false
+        isCollected.value = false
       } else {
         store.state.axios({
-          url: '/go/star/getIsStared',
+          url: '/go/collection/getIsCollected',
           method: 'get',
           params: {
             articleId: store.state.aid,
             userId: store.state.uid
           },
         }).then(r => {
-          isStared.value = r.data.data
+          isCollected.value = r.data.data
         })
       }
     }
@@ -162,8 +164,8 @@ export default {
     }
 
     return {
-      isLiked, isStared, commentValue, articleData, userData, commentData, authorName,
-      getCommentData, getIsLiked, getIsStared, getArticleData,
+      isLiked, isCollected, commentValue, articleData, userData, commentData, authorName,
+      getCommentData, getIsLiked, getIsCollected, getArticleData,
 
       iconName: null,
       uid: store.state.uid,
@@ -210,45 +212,41 @@ export default {
             articleData.value.LikeAmount--
           })
         }
-        // getIsLiked()
-        // getArticleData()
       },
-      clickStar() {
+      clickCollection() {
         if (store.state.uid === 0){
           message.error("您尚未登录！")
         } else {
-          if (isStared.value === false) {
+          if (isCollected.value === false) {
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
             formData.set('handle', 0)
             store.state.axios({
-              url: '/go/star/handleStar',
+              url: '/go/collection/handleCollection',
               method: 'post',
               data: formData,
             }).then(() => {
               message.success("收藏成功")
-              isStared.value = true
-              articleData.value.StarAmount++
+              isCollected.value = true
+              articleData.value.CollectionAmount++
             })
-          } else if (isStared.value === true) {
+          } else if (isCollected.value === true) {
             let formData = new FormData()
             formData.set('userId', store.state.uid)
             formData.set('articleId', store.state.aid)
             formData.set('handle', 1)
             store.state.axios({
-              url: '/go/star/handleStar',
+              url: '/go/collection/handleCollection',
               method: 'post',
               data: formData,
             }).then(() => {
               message.success("取消收藏成功!")
-              isStared.value = false
-              articleData.value.StarAmount--
+              isCollected.value = false
+              articleData.value.CollectionAmount--
             })
           }
         }
-        // getIsStared()
-        // getArticleData()
       },
       clickComment() {
         if (store.state.uid === 0){
@@ -322,7 +320,7 @@ export default {
     this.getUserData()
     this.getCommentData()
     this.getIsLiked()
-    this.getIsStared()
+    this.getIsCollected()
   }
 }
 </script>

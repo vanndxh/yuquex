@@ -4,7 +4,7 @@
       <n-card>
         <n-grid :cols="15" x-gap="20">
           <n-gi span="2">
-            <img src="../../assets/img/xhw.png" alt="xhw" width="120" height="40" align="left" style="outline: none">
+            <img src="../../assets/img/xhw.png" alt="xhw" width="120" height="40" style="outline: none">
           </n-gi>
 
           <n-gi span="3" >
@@ -23,15 +23,31 @@
             </n-space>
           </n-gi>
 
-          <n-gi offset="4">
-            <n-popover trigger="hover">
-              <template #trigger>
-                <n-icon size="30" class="create" @click="clickCreate">
-                  <AddCircleOutline/>
-                </n-icon>
-              </template>
-              <span>新建文档</span>
-            </n-popover>
+          <n-gi offset="3" :span="2">
+            <n-space justify="right">
+              <n-popover trigger="hover">
+                <template #trigger>
+                  <n-icon size="25" style="line-height: 40px" @click="clickCreate">
+                    <AddCircleOutline/>
+                  </n-icon>
+                </template>
+                <span>新建文档</span>
+              </n-popover>
+
+              <n-badge dot :show="!showRead">
+                <div style="all: initial">
+                  <n-popover trigger="hover">
+                    <template #trigger>
+                      <n-icon size="25" style="line-height: 40px" @click="clickMessage">
+                        <NotificationsOutline/>
+                      </n-icon>
+                    </template>
+                    <span>消息</span>
+                  </n-popover>
+                </div>
+              </n-badge>
+
+            </n-space>
           </n-gi>
 
           <n-gi span="2">
@@ -47,6 +63,7 @@
                   src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
               />
             </n-dropdown>
+
           </n-gi>
 
         </n-grid>
@@ -125,14 +142,14 @@
 
 <script>
 import { ref , h , resolveComponent, } from 'vue'
-import { AddCircleOutline, SearchOutline } from '@vicons/ionicons5'
+import { AddCircleOutline, SearchOutline, NotificationsOutline} from '@vicons/ionicons5'
 import { useRouter } from "vue-router";
 import { useStore } from "vuex"
 import {useDialog, useMessage} from 'naive-ui'
 
 export default {
   components:{
-    AddCircleOutline, SearchOutline
+    AddCircleOutline, SearchOutline, NotificationsOutline
   },
   setup () {
     const message = useMessage()
@@ -140,6 +157,7 @@ export default {
     const router = useRouter()
     const store = useStore()
 
+    const showRead = ref(true)
     const showFeedback = ref(false)
     const showUserInstruction = ref(false)
     const feedbackValue = ref(null)
@@ -200,40 +218,30 @@ export default {
                 ),
             key: 'update',
           },
-          {
-            label: () =>
-                h(
-                    resolveComponent('router-link'),
-                    {
-                      to: {
-                        name: 'ArticleInfo',
-                      }
-                    },
-                    { default: () => '文档详情测试页' }
-                ),
-            key: 'articleInfo',
-          },
-          {
-            label: () =>
-                h(
-                    resolveComponent('router-link'),
-                    {
-                      to: {
-                        name: 'TeamInfo',
-                      }
-                    },
-                    { default: () => '小组详情测试页' }
-                ),
-            key: 'teamInfo',
-          },
         ]
       },
     ]
     const searchValue = ref(null)
     const log = ref(store.state.isLogged)
+    const getRead = () => {
+      if (store.state.uid !== 0) {
+        store.state.axios({
+          url: '/go/message/getRead',
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          }
+        }).then(r => {
+          showRead.value = r.data.data
+        })
+      } else {
+        showRead.value = true
+      }
+    }
 
     return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log,
+      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead,
+      getRead,
 
       activeKey: ref(null),
       avatarOptions: [
@@ -266,6 +274,7 @@ export default {
               store.state.uid = 0
               store.state.isLogged = false
               log.value = false
+              showRead.value = true
               message.info('退出登录~')
               router.push("/")
             }
@@ -281,6 +290,13 @@ export default {
       },
       clickCreate () {
         router.push('Create')
+      },
+      clickMessage () {
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          router.push('Message')
+        }
       },
       clickLog () {
         router.push('Log')
@@ -328,13 +344,13 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getRead()
+  }
 }
 </script>
 
 <style scoped>
-.create{
-  line-height: 45px;
-}
 .input{
   width: 200px;
 }

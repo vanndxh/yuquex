@@ -72,6 +72,11 @@ const routes = [
     name: 'DashBoard',
     component: () => import('../views/DashBoard')
   },
+  {
+    path: '/Message',
+    name: 'Message',
+    component: () => import('../components/content/Message')
+  },
 ]
 
 const router = createRouter({

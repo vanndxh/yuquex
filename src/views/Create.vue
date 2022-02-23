@@ -102,6 +102,8 @@ export default {
           message.error("您尚未登录！")
         } else if (newArticleName.value === null){
           message.error("文章名不能为空！")
+        } else if (newArticleName.value.indexOf(" ") !== -1 || newArticleName.value.indexOf("　") !== -1) {
+          message.error("文章名不能含空格！")
         } else {
           let formData = new FormData()
           formData.set('articleName', newArticleName.value)
@@ -117,7 +119,6 @@ export default {
             newArticleContent.value = ""
             message.success("创建文章成功！")
             store.state.aid = r.data.articleId
-            console.log(r.data.articleId);
             router.push("/ArticleInfo")
           }).catch(() => {
             message.error("新建文章出错！")

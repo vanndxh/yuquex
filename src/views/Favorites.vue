@@ -92,7 +92,7 @@ export default {
         message.error("您尚未登录！")
       } else {
         store.state.axios({
-          url: '/go/star/getFavorite',
+          url: '/go/collection/getFavorite',
           method: 'get',
           params: {
             userId: store.state.uid

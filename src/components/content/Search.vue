@@ -22,8 +22,8 @@
           <n-card :title=item.ArticleName hoverable>
             <n-grid :col="24">
               <n-gi :span="20">
-                <p style="font-size: 13px">
-                  点赞：{{ item.LikeAmount}}  收藏： {{item.StarAmount}}
+                <p style="font-size: 12px">
+                  点赞：{{ item.LikeAmount}}    收藏：{{item.CollectionAmount}}
                 </p>
               </n-gi>
               <n-gi :span="4" style="float: right">
@@ -58,7 +58,6 @@ export default {
 
     const searchValue = ref(null)
     const searchData = ref([])
-
 
     return {
       searchData, searchValue,
