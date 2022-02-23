@@ -70,8 +70,9 @@
                 </n-space>
                 <h1 class="user">{{ authorName }}</h1>
                 <n-space justify="space-around">
-                  <n-button @click="follow()" ghost style="width: 80px">关注</n-button>
-                  <n-button @click="lookDetail()" ghost style="width: 80px">详情</n-button>
+                  <n-button @click="follow()" ghost style="width: 80px" v-if="uid != articleData.ArticleAuthor">关注</n-button>
+                  <n-button @click="lookDetail()" ghost style="width: 80px" v-if="uid != articleData.ArticleAuthor">详情</n-button>
+                  <n-button @click="clickUpdata()" type="success" ghost style="width: 120px" v-if="uid == articleData.ArticleAuthor">编辑文章</n-button>
                 </n-space>
               </n-card>
             </n-gi>
@@ -80,7 +81,33 @@
       </n-layout>
     </n-layout>
   </div>
-  <n-back-top :right="100" :visibility-height="300"/>
+
+  <n-modal v-model:show="showUpdate">
+    <n-card
+        style="width: 600px;"
+        title="修改文章"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-space vertical>
+        <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
+                 maxlength="20" show-count/>
+        <n-input
+            v-model:value="newArticleContent"
+            type="textarea"
+            placeholder="正文"
+            size="small"
+            :autosize="{minRows: 20,maxRows: 30}"
+            maxlength="200" show-count
+        />
+        <div style="float: right">
+          <n-button type="success" class="save" @click="updateArticle()">保存</n-button>
+        </div>
+      </n-space>
+    </n-card>
+  </n-modal>
 </template>
 
 <script>
@@ -100,6 +127,9 @@ export default {
     const message = useMessage()
     const store = useStore()
 
+    const newArticleName = ref(null)
+    const newArticleContent = ref(null)
+    const showUpdate = ref(false)
     const isLiked =  ref(false)
     const isCollected = ref(false)
     const commentValue = ref(null)
@@ -164,7 +194,7 @@ export default {
     }
 
     return {
-      isLiked, isCollected, commentValue, articleData, userData, commentData, authorName,
+      isLiked, isCollected, commentValue, articleData, userData, commentData, authorName, showUpdate, newArticleName, newArticleContent,
       getCommentData, getIsLiked, getIsCollected, getArticleData,
 
       iconName: null,
@@ -312,6 +342,26 @@ export default {
       },
       lookDetail() {
 
+      },
+      clickUpdata() {
+        newArticleName.value = articleData.value.ArticleName
+        newArticleContent.value = articleData.value.ArticleContent
+        showUpdate.value = true
+      },
+      updateArticle() {
+        let formData = new FormData()
+        formData.set('articleId', store.state.aid)
+        formData.set('newArticleName', newArticleName.value)
+        formData.set('newArticleContent', newArticleContent.value)
+        store.state.axios({
+          url: '/go/article/updateArticle',
+          method: 'post',
+          data: formData,
+        }).then(() => {
+          message.success("修改成功！")
+          showUpdate.value = false
+          getArticleData()
+        })
       }
     }
   },
