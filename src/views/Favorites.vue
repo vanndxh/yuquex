@@ -47,17 +47,24 @@ export default {
     const createColumns = ({ lookDetail, removeStar }) => {
       return [
         {
+          width: 50
+        },
+        {
           title: '文章标题',
           key: 'ArticleName',
-          align: 'center'
+          align: 'left'
         },
         {
           title: '作者',
+          align: 'center',
+          width: 100,
           key: 'ArticleAuthor'
         },
         {
           title: '查看详情',
           key: 'lookDetail',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -72,6 +79,8 @@ export default {
         },
         {
           title: '移除收藏夹',
+          align: 'center',
+          width: 150,
           key: 'delete',
           render (row) {
             return h(
@@ -84,6 +93,9 @@ export default {
                 { default: () => '移除' }
             )
           }
+        },
+        {
+          width: 100
         }
       ]
     }

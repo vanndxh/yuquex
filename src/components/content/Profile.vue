@@ -22,33 +22,35 @@
               {{ userData.UserInfo }}
               <n-space justify="space-around">
                 <n-space vertical :size=1>
-                  <p style="text-align: center" @click="showFollow = true">{{userData.FollowAmount}}</p>
+                  <p style="text-align: center" @click="clickFollow">{{userData.FollowAmount}}</p>
                   关注
                 </n-space>
                 <n-space vertical :size=1>
-                  <p style="text-align: center" @click="showFollower = true">{{userData.FollowerAmount}}</p>
+                  <p style="text-align: center" @click="clickFollower">{{userData.FollowerAmount}}</p>
                   粉丝
                 </n-space>
                 <n-space justify="center">
                   <n-button v-if="uid === uidt" style="width: 200px" @click="handleChangeInfo">编辑资料</n-button>
                 </n-space>
               </n-space>
-            </n-card>
-            <n-card hoverable>
-              <n-statistic tabular-nums>
-                <n-icon size="20"><BookOutline/></n-icon>共有
-                <n-number-animation ref="numberAnimationInstRef" :from=0 :to= userData.ArticleAmount />
-                <template #suffix>
-                  篇文章
-                </template>
-              </n-statistic>
-              <n-statistic tabular-nums>
-                <n-icon size="20"><LikeOutlined/></n-icon>共收获
-                <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeTotal />
-                <template #suffix>
-                  个赞
-                </template>
-              </n-statistic>
+              <n-divider />
+              <div style="font-size: 14px">
+                <n-statistic tabular-nums>
+                  <n-icon size="20"><BookOutline/></n-icon>共有
+                  <n-number-animation ref="numberAnimationInstRef" :from=0 :to= userData.ArticleAmount />
+                  <template #suffix>
+                    篇文章
+                  </template>
+                </n-statistic>
+                <n-statistic tabular-nums>
+                  <n-icon size="20"><LikeOutlined/></n-icon>共收获
+                  <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeTotal />
+                  <template #suffix>
+                    个赞
+                  </template>
+                </n-statistic>
+              </div>
+
             </n-card>
           </n-space>
         </n-gi>
@@ -150,11 +152,16 @@ export default {
     const createColumns = ({ lookDetail }) => {
       return [
         {
+          width: 100
+        },
+        {
           key: 'ArticleName',
-          align: 'center'
+          align: 'left',
         },
         {
           key: 'lookDetail',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -167,16 +174,23 @@ export default {
             )
           }
         },
+        {
+          width: 50
+        }
       ]
     }
     const createColumns2 = ({ lookDetail }) => {
       return [
         {
+          width: 100
+        },
+        {
           key: 'TeamName',
-          align: 'center'
+          align: 'left'
         },
         {
           key: 'lookDetail',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -189,16 +203,23 @@ export default {
             )
           }
         },
+        {
+          width: 50
+        }
       ]
     }
     const createColumns3 = ({ lookDetail }) => {
       return [
         {
+          width: 100
+        },
+        {
           key: 'ArticleName',
-          align: 'center'
+          align: 'left',
         },
         {
           key: 'lookDetail',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -216,11 +237,16 @@ export default {
     const createColumns4 = ({ lookDetail, deleteComment }) => {
       return [
         {
+          width: 20
+        },
+        {
           key: 'CommentContent',
-          align: 'center'
+          align: 'left'
         },
         {
           key: 'lookDetail',
+          width: 50,
+          align: 'center',
           render (row) {
             return h(
                 NButton,
@@ -234,6 +260,8 @@ export default {
           }
         },{
           key: 'deleteComment',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -248,27 +276,19 @@ export default {
         },
       ]
     }
-    const createColumns5 = ({ lookDetail, follow }) => {
+    const createColumns5 = ({ follow }) => {
       return [
         {
-          key: 'CommentContent',
-          align: 'center'
+          width: 50
         },
         {
-          key: 'lookDetail',
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'info',
-                  onClick: () => lookDetail(row)
-                },
-                { default: () => '查看' }
-            )
-          }
-        },{
+          key: 'UpName',
+          align: 'left'
+        },
+        {
           key: 'follow',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -281,27 +301,38 @@ export default {
             )
           }
         },
+        {
+          width: 50
+        }
       ]
     }
-    const createColumns6 = ({ lookDetail }) => {
+    const createColumns6 = ({ unFollow }) => {
       return [
         {
-          key: 'CommentContent',
-          align: 'center'
+          width: 50
         },
         {
-          key: 'lookDetail',
+          key: 'FollowerName',
+          align: 'left'
+        },
+        {
+          key: 'unFollow',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
                 {
                   size: 'small',
                   type: 'info',
-                  onClick: () => lookDetail(row)
+                  onClick: () => unFollow(row)
                 },
-                { default: () => '查看' }
+                { default: () => '取消关注' }
             )
           }
+        },
+        {
+          width: 50
         }
       ]
     }
@@ -380,6 +411,28 @@ export default {
         userData.value = r.data.data
       })
     }
+    const getUps = () => {
+      store.state.axios({
+        url: '/go/follow/getUps',
+        method: 'get',
+        params: {
+          userId: store.state.uid
+        }
+      }).then(r => {
+        data5.value = r.data.data
+      })
+    }
+    const getFollowers = () => {
+      store.state.axios({
+        url: '/go/follow/getFollowers',
+        method: 'get',
+        params: {
+          userId: store.state.uid
+        }
+      }).then(r => {
+        data6.value = r.data.data
+      })
+    }
 
     return {
       data1, data2, data3, data4, data5, data6, userData, showChangeInfo, showFollow, showFollower, newUsername, newPassword, newInfo,
@@ -430,10 +483,6 @@ export default {
         }
       }),
       columns5: createColumns5({
-        lookDetail (rowData) {
-          store.state.uidt = rowData.UserId
-          router.push("ArticleInfo")
-        },
         follow (rowData) {
           let formData = new FormData()
           formData.set('up', rowData.UserId)
@@ -444,17 +493,26 @@ export default {
             data: formData,
           }).then(() => {
             message.success("关注成功！")
-
           }).catch(() => {
             message.error("error!")
           })
         }
       }),
       columns6: createColumns6({
-        lookDetail (rowData) {
-          store.state.uidt = rowData.UserId
-          router.push("ArticleInfo")
-        },
+        unFollow (rowData) {
+          let formData = new FormData()
+          formData.set('up', rowData.UserId)
+          formData.set('follower', store.state.uid)
+          store.state.axios({
+            url: '/go/follow/unFollow',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("取消关注成功！")
+          }).catch(() => {
+            message.error("error!")
+          })
+        }
       }),
       handleChangeInfo() {
         newUsername.value = userData.value.Username
@@ -478,6 +536,14 @@ export default {
         }).catch(() => {
           message.error("error!")
         })
+      },
+      clickFollow() {
+        getUps()
+        showFollow.value = true
+      },
+      clickFollower() {
+        getFollowers()
+        showFollower.value = true
       }
     }
   },

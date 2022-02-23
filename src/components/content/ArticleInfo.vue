@@ -37,7 +37,7 @@
               <n-list>
                 <n-list-item v-for="item in commentData" :key="item">
                   <n-card hoverable>
-                    <h3>{{ item.UserId }}</h3>
+                    <h3>{{ item.Username }}</h3>
                     {{ item.CommentContent }}
                     <div>
                       <n-button type="error" style="float: right"
@@ -335,7 +335,6 @@ export default {
           data: formData,
         }).then(() => {
           message.success("关注成功！")
-
         }).catch(() => {
           message.error("error!")
         })

@@ -63,18 +63,23 @@ export default {
     const createColumns = ({ lookDetail }) => {
       return [
         {
+          width: 100
+        },
+        {
           title: '小组名称',
           key: 'TeamName',
-          align: 'center'
+          align: 'left'
         },
         {
           title: '组长',
           key: 'TeamLeader',
-          align: 'right'
+          align: 'center',
+          width: 100
         },
         {
           title: '查看详情',
           align: 'center',
+          width: 150,
           key: 'lookDetail',
           render (row) {
             return h(
@@ -88,6 +93,9 @@ export default {
             )
           }
         },
+        {
+          width: 100
+        }
       ]
     }
     const data = ref([])

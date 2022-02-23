@@ -41,17 +41,24 @@ export default {
     const createColumns = ({ recover, deleteArticle }) => {
       return [
         {
+          width: 100
+        },
+        {
           title: '文章标题',
           key: 'ArticleName',
-          align: 'center'
+          align: 'left'
         },
         {
           title: '作者',
-          key: 'ArticleAuthor'
+          key: 'ArticleAuthor',
+          align: 'center',
+          width: 200
         },
         {
           title: '恢复',
           key: 'lookDetail',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -67,6 +74,8 @@ export default {
         {
           title: '彻底删除',
           key: 'delete',
+          align: 'center',
+          width: 150,
           render (row) {
             return h(
                 NButton,
@@ -78,6 +87,9 @@ export default {
                 { default: () => '删除' }
             )
           }
+        },
+        {
+          width: 100
         }
       ]
     }

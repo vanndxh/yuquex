@@ -45,12 +45,18 @@ export default {
     const createColumns = ({ lookDetail, deleteArticle }) => {
       return [
         {
+          width: 100
+        },
+        {
           title: '文章标题',
           key: 'ArticleName',
-          align: 'center'
+          width: 400,
+          align: 'left'
         },
         {
           title: '查看详情',
+          align: 'center',
+          width: 100,
           key: 'lookDetail',
           render (row) {
             return h(
@@ -66,6 +72,8 @@ export default {
         },
         {
           title: '删除文章',
+          align: 'center',
+          width: 100,
           key: 'delete',
           render (row) {
             return h(
@@ -78,6 +86,9 @@ export default {
                 { default: () => '删除' }
             )
           }
+        },
+        {
+          width: 100
         }
       ]
     }

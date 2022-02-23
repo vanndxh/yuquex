@@ -119,6 +119,12 @@ export default {
         account: 'vanndxh',
         url:"https://github.com/vanndxh?tab=repositories"
       },
+      {
+        key: 4,
+        platform: '语雀',
+        account: 'van能的小黑',
+        url:"https://www.yuque.com/vannengdexiaohei"
+      },
     ]
     const getSupportCount = () => {
       store.state.axios({
