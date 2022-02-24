@@ -28,6 +28,7 @@
                     </n-form-item-row>
                   </n-form>
                   <n-button type="primary" block @click="signIn()">登录</n-button>
+                  <p class="forget" @click="showForget = true">忘记密码</p>
                 </n-tab-pane>
                 <!--注册表单-->
                 <n-tab-pane name="signup" tab="注册">
@@ -71,7 +72,6 @@
     </n-layout>
   </div>
 
-  <!--用户须知-->
   <n-modal v-model:show="showUserInstruction">
     <n-card
         style="width: 800px;"
@@ -120,6 +120,17 @@
         注意：如果您认为自己或他人的版权、著作权或其他合法权益在本网上受到他人侵害，请立即与小黑屋联系,并提供相关证据。</p>
     </n-card>
   </n-modal>
+  <n-modal v-model:show="showForget">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      请联系管理员:1025196468@qq.com
+    </n-card>
+  </n-modal>
 </template>
 
 <script>
@@ -151,12 +162,13 @@ export default {
       repasswordSignup: null,
       isAgree: null,
     })
+    const showForget = ref(false)
     const showUserInstruction = ref(false)
     const tabDef = ref(store.state.choice)
     let tabValue = ref()
 
     return {
-      SigninRef, SignupRef, modelSignin, modelSignup, showUserInstruction, tabValue, tabDef,
+      SigninRef, SignupRef, modelSignin, modelSignup, showUserInstruction, tabValue, tabDef, showForget,
 
       rulesSignin: {
         useridSignin: [{
@@ -284,5 +296,10 @@ export default {
 <style scoped>
 .userInstruction {
   color: blue;
+}
+.forget{
+  font-size: 12px;
+  color: darkgray;
+  float: right;
 }
 </style>

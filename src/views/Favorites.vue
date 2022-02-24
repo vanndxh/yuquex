@@ -8,7 +8,6 @@
         <!--侧边栏-->
         <n-layout-sider content-style="padding: 24px;">
           <tabBarS></tabBarS>
-          <catgif></catgif>
         </n-layout-sider>
         <!--主要内容-->
         <n-layout-content content-style="padding: 24px;">
@@ -28,7 +27,6 @@
 <script>
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
-import catgif from "../components/common/catgif";
 import { h, ref } from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
@@ -36,7 +34,7 @@ import {useRouter} from "vue-router";
 
 export default {
   components: {
-    tabBar, tabBarS, catgif
+    tabBar, tabBarS
   },
   setup() {
     const message = useMessage()
@@ -58,7 +56,7 @@ export default {
           title: '作者',
           align: 'center',
           width: 100,
-          key: 'ArticleAuthor'
+          key: 'AuthorName'
         },
         {
           title: '查看详情',

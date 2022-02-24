@@ -72,7 +72,7 @@ export default {
         },
         {
           title: '组长',
-          key: 'TeamLeader',
+          key: 'LeaderName',
           align: 'center',
           width: 100
         },

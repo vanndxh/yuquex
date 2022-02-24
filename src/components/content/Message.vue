@@ -3,9 +3,11 @@
   <n-grid :col="24">
     <n-gi :span="16" :offset="4">
       <br>
-      <div>
+      <n-space>
         <n-button @click="readAll">全部已读</n-button>
-      </div>
+        <n-select v-model:value="messageValue" :options="messageOptions" :consistent-menu-width="false" style="width: 160px;"
+        @update:value="changeType"/>
+      </n-space>
       <n-list>
         <n-list-item v-for="item in messageData" :key="item">
           <n-card hoverable>
@@ -25,6 +27,7 @@
       </n-list>
     </n-gi>
   </n-grid>
+  <n-back-top :right="100"/>
 </template>
 
 <script>
@@ -42,28 +45,42 @@ export default {
     const store = useStore()
 
     const messageData = ref([])
-    const getMessages = () => {
+    const messageValue = ref("all")
+    const getMessages = (type) => {
       store.state.axios({
         url: '/go/message/getMessages',
         method: 'get',
         params: {
-          userId: store.state.uid
+          userId: store.state.uid,
+          type: type
         }
       }).then(r => {
         messageData.value = r.data.data
         if(r.data.data.length === 0) {
           message.info("暂无信息~")
         }
-      }).catch(e => {
-        message.error("error!")
-        console.log(e);
       })
     }
 
     return {
-      messageData,
+      messageData, messageValue,
       getMessages,
 
+
+      messageOptions:[
+        {
+          label: '全部',
+          value: 'all'
+        },
+        {
+          label: '已读',
+          value: 'yes'
+        },
+        {
+          label: '未读',
+          value: 'no'
+        },
+      ],
       read(id) {
         let formData = new FormData()
         formData.set('messageId', id)
@@ -87,11 +104,20 @@ export default {
           message.success("全部已读~")
           getMessages()
         })
+      },
+      changeType() {
+        if (messageValue.value === "all") {
+          getMessages(0)
+        } else if (messageValue.value === "yes") {
+          getMessages(1)
+        } else if (messageValue.value === "no") {
+          getMessages(2)
+        }
       }
     }
   },
   mounted() {
-    this.getMessages()
+    this.getMessages(0)
   }
 }
 </script>

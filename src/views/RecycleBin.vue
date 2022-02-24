@@ -50,7 +50,7 @@ export default {
         },
         {
           title: '作者',
-          key: 'ArticleAuthor',
+          key: 'AuthorName',
           align: 'center',
           width: 200
         },
