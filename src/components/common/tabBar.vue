@@ -71,7 +71,6 @@
     </n-layout-header>
   </div>
 
-  <!--用户须知-->
   <n-modal v-model:show="showUserInstruction">
     <n-card
         style="width: 800px;"
@@ -120,7 +119,6 @@
         注意：如果您认为自己或他人的版权、著作权或其他合法权益在本网上受到他人侵害，请立即与小黑屋联系,并提供相关证据。</p>
     </n-card>
   </n-modal>
-  <!--提交反馈-->
   <n-modal v-model:show="showFeedback">
     <n-card
         style="width: 600px;"
@@ -132,8 +130,25 @@
     >
       <n-space vertical>
         <n-input v-model:value="feedbackValue" type="textarea" placeholder="Please input~" :clearable="true" maxlength="200" show-count
-                 :autosize="{minRows: 3,maxRows: 15}"/>
+                 :autosize="{minRows: 3,maxRows: 15}"
+                 @keyup.enter="addFeedback()"/>
         <n-button type="primary" ghost @click="addFeedback()" style="float: right">提交</n-button>
+      </n-space>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showAdmin">
+    <n-card
+        style="width: 600px;"
+        title="管理员密码"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-space vertical>
+        <n-input v-model:value="adminPass" placeholder="Please input~" :clearable="true"
+                 @keyup.enter="submit()" type="password"/>
+        <n-button type="primary" ghost @click="submit()" style="float: right">确认</n-button>
       </n-space>
     </n-card>
   </n-modal>
@@ -157,6 +172,7 @@ export default {
     const router = useRouter()
     const store = useStore()
 
+    const adminPass = ref("")
     const showRead = ref(true)
     const showFeedback = ref(false)
     const showUserInstruction = ref(false)
@@ -238,9 +254,10 @@ export default {
         showRead.value = true
       }
     }
+    const showAdmin = ref(false)
 
     return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead,
+      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead, showAdmin, adminPass,
       getRead,
 
       activeKey: ref(null),
@@ -257,6 +274,10 @@ export default {
         {
           label: '用户须知',
           key: "userInstruction"
+        },
+        {
+          label: '管理员入口',
+          key: "manager"
         },
         {
           label: '退出登录',
@@ -286,6 +307,8 @@ export default {
         } else if (key === "profile") {
           store.state.uidTemp = store.state.uid
           router.push("Profile")
+        } else if (key === "manager") {
+          showAdmin.value = true
         }
       },
       clickCreate () {
@@ -341,6 +364,13 @@ export default {
             message.error("提交失败！")
           }
         })
+      },
+      submit() {
+        if (adminPass.value === "notAdmin") {
+          router.push("Manager")
+        } else {
+          message.error("密码错误~")
+        }
       }
     }
   },

@@ -77,6 +77,11 @@ const routes = [
     name: 'Message',
     component: () => import('../components/content/Message')
   },
+  {
+    path: '/Manager',
+    name: 'Manager',
+    component: () => import('../components/content/Manager')
+  },
 ]
 
 const router = createRouter({
