@@ -32,7 +32,7 @@
         <n-tab-pane name="punchInfo" tab="打卡详情" @click="handlePunch">
           <n-grid :cols="24">
 
-            <n-gi :span="12" :offset="3">
+            <n-gi :span="6" :offset="1">
               <n-space vertical>
                 <n-statistic tabular-nums>
                   您共在本小组打卡
@@ -45,8 +45,8 @@
               </n-space>
             </n-gi>
 
-            <n-gi :span="6" :offset="1">
-              打卡排行榜
+            <n-gi :span="15" :offset="1">
+              <n-data-table :columns="columns" :data="data" :pagination="pagination" size="small"/>
             </n-gi>
 
           </n-grid>
@@ -54,7 +54,7 @@
       </n-tabs>
     </n-gi>
   </n-grid>
-  <!--修改信息模块-->
+
   <n-modal v-model:show="showChangeInfo">
     <n-card
         style="width: 600px;"
@@ -71,7 +71,6 @@
       </n-space>
     </n-card>
   </n-modal>
-  <!--新增用户模块  -->
   <n-modal v-model:show="showAddUser">
     <n-card
         style="width: 600px;"
@@ -81,8 +80,27 @@
         role="dialog"
         aria-modal="true"
     >
-      <n-input v-model:value="newUserId" type="text" placeholder="请输入添加用户的id~" style="width: 80%"/>
-      <n-button type="primary" ghost @click="addUser(newUserId)">添加</n-button>
+      <n-space>
+        <n-input v-model:value="newUserId" type="text" placeholder="请输入添加用户的id~" style="width: 400px"
+        @keyup.enter="addUser()"/>
+        <n-button type="primary" ghost @click="addUser()">添加</n-button>
+      </n-space>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showDeleteUser">
+    <n-card
+        style="width: 600px;"
+        title="踢出组员"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <n-space>
+        <n-input v-model:value="oldUserId" type="text" placeholder="请输入要踢出用户的id~" style="width: 400px"
+        @keyup.enter="deleteUser()"/>
+        <n-button type="primary" ghost @click="deleteUser()">删除</n-button>
+      </n-space>
     </n-card>
   </n-modal>
 </template>
@@ -106,8 +124,10 @@ export default {
     const store = useStore()
     const dialog = useDialog()
 
+    const showDeleteUser = ref(false)
     const showAddUser = ref(false)
     const showChangeInfo = ref(false)
+    const data = ref([])
     const data1 = ref([])
     const data2 = ref([])
     const teamData = ref({})
@@ -115,45 +135,87 @@ export default {
     const newTeamName = ref("")
     const newTeamNotice = ref("")
     const newUserId = ref("")
-    const createColumns1 = ({ deleteUser }) => {
+    const oldUserId = ref(null)
+    const createColumns = () => {
       return [
         {
+          width: 50
+        },
+        {
           title: '用户',
-          key: 'username'
+          width: 100,
+          key: 'Username'
         },
         {
           title: '职位',
-          key: 'position'
+          width: 100,
+          key: 'Position',
+          align: 'center',
         },
         {
-          title: '操作',
-          key: 'delete',
-          align: 'canter',
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'warning',
-                  onClick: () => deleteUser(row)
-                },
-                { default: () => '踢出' }
-            )
-          }
+          title: '打卡数',
+          width: 60,
+          key: 'Count',
+          align: 'center',
+        },
+        {
+          width: 50,
         }
       ]
     }
-    const createColumns2 = ({ lookDetail, deleteArticle }) => {
+    const createColumns1 = () => {
       return [
+        {
+          width: 100
+        },
+        {
+          title: 'Id',
+          key: 'UserId',
+          width: 100,
+        },
+        {
+          title: '用户',
+          width: 100,
+          key: 'Username'
+        },
+        {
+          title: '简介',
+          key: 'UserInfo',
+          align: 'left',
+        },
+        {
+          title: '文章数',
+          width: 100,
+          key: 'ArticleAmount'
+        },
+        {
+          title: '点赞数',
+          width: 60,
+          key: 'LikeTotal',
+          align: 'center',
+        },
+        {
+          width: 100,
+        }
+      ]
+    }
+    const createColumns2 = ({ lookDetail }) => {
+      return [
+        {
+          width: 100
+        },
         {
           key: 'ArticleName',
           align: 'left'
         },
         {
-          key: 'ArticleAuthor'
+          key: 'AuthorName',
+          align: 'center',
+          width: 100,
         },
         {
           key: 'lookDetail',
+          width: 150,
           align: 'right',
           render (row) {
             return h(
@@ -168,19 +230,7 @@ export default {
           }
         },
         {
-          key: 'delete',
-          align: 'right',
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'warning',
-                  onClick: () => deleteArticle(row)
-                },
-                { default: () => '删除' }
-            )
-          }
+          width: 100
         }
       ]
     }
@@ -206,6 +256,33 @@ export default {
         } else {
           count.value = -1
         }
+        data.value = [
+          {
+            Username: teamData.value.LeaderName,
+            Position: "组长",
+            Count: teamData.value.LeaderCount
+          },
+          {
+            Username: teamData.value.Member1Name,
+            Position: "组员",
+            Count: teamData.value.Member1Count
+          },
+          {
+            Username: teamData.value.Member2Name,
+            Position: "组员",
+            Count: teamData.value.Member2Count
+          },
+          {
+            Username: teamData.value.Member3Name,
+            Position: "组员",
+            Count: teamData.value.Member3Count
+          },
+          {
+            Username: teamData.value.Member4Name,
+            Position: "组员",
+            Count: teamData.value.Member4Count
+          },
+        ]
       })
     }
     const getTeamArticles = () => {
@@ -232,18 +309,13 @@ export default {
     }
 
     return {
-      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2, newUserId,
+      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2, newUserId, showDeleteUser, oldUserId, data,
       getTeamInfo, getTeamArticles, getTeamMembers,
 
-      columns1: createColumns1({
-        deleteUser (rowData) {
-          console.log(rowData);
-        },
-      }),
+
+      columns: createColumns({}),
+      columns1: createColumns1({}),
       columns2: createColumns2({
-        deleteArticle (rowData) {
-          console.log(rowData);
-        },
         lookDetail (rowData) {
           store.state.aid = rowData.ArticleId
           router.push("ArticleInfo")
@@ -260,6 +332,10 @@ export default {
         {
           label: '添加组员',
           key: "addUser"
+        },
+        {
+          label: '踢出组员',
+          key: "deleteUser"
         },
         {
           label: '退出小组',
@@ -299,15 +375,23 @@ export default {
                 })
               }
             },
-            onNegativeClick: () => {
-            }
           })
-        }else if(key === "addUser") {
-          showAddUser.value = !showAddUser.value
-        } else if(key === "changeTeamInfo") {
+        } else if (key === "addUser") {
+          if (store.state.uid != teamData.value.TeamLeader) {
+            message.error("您没有权限！")
+          } else {
+            showAddUser.value = true
+          }
+        } else if (key === "changeTeamInfo") {
           newTeamName.value = teamData.value.TeamName
           newTeamNotice.value = teamData.value.TeamNotice
           showChangeInfo.value = !showChangeInfo.value
+        } else if (key === "deleteUser") {
+          if (store.state.uid != teamData.value.TeamLeader) {
+            message.error("您没有权限！")
+          } else {
+            showDeleteUser.value = true
+          }
         }
       },
       addUser() {
@@ -322,7 +406,7 @@ export default {
           message.success("成功添加新成员！")
           newUserId.value = ""
           showAddUser.value = false
-          // getTeamMembers()
+          getTeamMembers()
         }).catch(() => {
           message.error("添加失败!请检查输入id后再试~")
         })
@@ -363,6 +447,25 @@ export default {
           message.success("打卡成功！")
           getTeamInfo()
         })
+      },
+      deleteUser() {
+        if (oldUserId.value == teamData.value.TeamLeader) {
+          message.error("您不能踢出您自己！")
+        } else {
+          store.state.axios({
+            url: '/go/team/deleteTeamUser',
+            method: 'delete',
+            params: {
+              teamId: store.state.tid,
+              teamUser: oldUserId.value
+            }
+          }).then(() => {
+            message.success("成功踢出！")
+            showDeleteUser.value = false
+            oldUserId.value = ""
+            getTeamMembers()
+          })
+        }
       }
     }
   },
