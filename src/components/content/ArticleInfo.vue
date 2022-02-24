@@ -68,10 +68,24 @@
                       src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
                   />
                 </n-space>
-                <h1 class="user">{{ authorName }}</h1>
+                <h1 class="user">{{ authorData.Username }}</h1>
+                <n-icon><MessageOutlined /></n-icon>
+                {{ authorData.UserInfo }}
+
                 <n-space justify="space-around">
-                  <n-button @click="follow()" ghost style="width: 80px" v-if="uid != articleData.ArticleAuthor">关注</n-button>
-                  <n-button @click="lookDetail()" ghost style="width: 80px" v-if="uid != articleData.ArticleAuthor">详情</n-button>
+                  <n-space vertical :size=1>
+                    <p style="text-align: center">{{authorData.FollowAmount}}</p>
+                    关注
+                  </n-space>
+                  <n-space vertical :size=1>
+                    <p style="text-align: center">{{authorData.FollowerAmount}}</p>
+                    粉丝
+                  </n-space>
+                </n-space>
+                <br>
+                <n-space justify="space-around">
+                  <n-button @click="follow()" ghost style="width: 120px" v-if="uid != articleData.ArticleAuthor && !isFollowed">关注</n-button>
+                  <n-button @click="unFollow()" ghost style="width: 120px" v-if="uid != articleData.ArticleAuthor && isFollowed">取消关注</n-button>
                   <n-button @click="clickUpdata()" type="success" ghost style="width: 120px" v-if="uid == articleData.ArticleAuthor">编辑文章</n-button>
                 </n-space>
               </n-card>
@@ -114,13 +128,13 @@
 import tabBar from "../common/tabBar";
 import tabBarS from "../common/tabBarS";
 import { ref } from "vue";
-import { LikeOutlined, LikeFilled, StarOutlined, StarFilled } from "@vicons/antd";
+import { LikeOutlined, LikeFilled, StarOutlined, StarFilled, MessageOutlined } from "@vicons/antd";
 import {useStore} from "vuex";
 import {useDialog, useMessage} from "naive-ui";
 
 export default {
   components: {
-    tabBar, tabBarS, LikeOutlined, LikeFilled, StarOutlined, StarFilled
+    tabBar, tabBarS, LikeOutlined, LikeFilled, StarOutlined, StarFilled, MessageOutlined
   },
   setup() {
     const dialog = useDialog()
@@ -130,11 +144,13 @@ export default {
     const newArticleName = ref(null)
     const newArticleContent = ref(null)
     const showUpdate = ref(false)
+    const showAuthor = ref(false)
     const isLiked =  ref(false)
     const isCollected = ref(false)
+    const isFollowed = ref(false)
     const commentValue = ref(null)
     const articleData = ref({})
-    const authorName = ref(null)
+    const authorData = ref({})
     const userData = ref({})
     const commentData = ref([])
     const getCommentData = () => {
@@ -189,13 +205,42 @@ export default {
         }
       }).then(r => {
         articleData.value = r.data.data
-        authorName.value = r.data.authorName
+        getAuthorData()
+        getIsFollowed()
       })
+    }
+    const getAuthorData = () => {
+      store.state.axios({
+        url: '/go/user/getUserInfo',
+        method: 'get',
+        params: {
+          userId: articleData.value.ArticleAuthor,
+        }
+      }).then(r => {
+        authorData.value = r.data.data
+      })
+    }
+    const getIsFollowed = () => {
+      if (store.state.uid === 0) {
+        isFollowed.value = false
+      } else {
+        store.state.axios({
+          url: '/go/follow/getIsFollowed',
+          method: 'get',
+          params: {
+            userId: store.state.uid,
+            upId: articleData.value.ArticleAuthor
+          }
+        }).then(r => {
+          isFollowed.value = r.data.data
+        })
+      }
     }
 
     return {
-      isLiked, isCollected, commentValue, articleData, userData, commentData, authorName, showUpdate, newArticleName, newArticleContent,
-      getCommentData, getIsLiked, getIsCollected, getArticleData,
+      isLiked, isCollected, commentValue, articleData, userData, commentData,
+      showUpdate, newArticleName, newArticleContent, isFollowed, authorData, showAuthor,
+      getCommentData, getIsLiked, getIsCollected, getArticleData, getAuthorData, getIsFollowed,
 
       iconName: null,
       uid: store.state.uid,
@@ -326,21 +371,40 @@ export default {
         }
       },
       follow() {
+        if (store.state.uid === 0) {
+          message.error("您尚未登录！")
+        } else {
+          let formData = new FormData()
+          formData.set('up', articleData.value.ArticleAuthor)
+          formData.set('follower', store.state.uid)
+          formData.set('handle', 0)
+          store.state.axios({
+            url: '/go/follow/handleFollow',
+            method: 'post',
+            data: formData,
+          }).then(() => {
+            message.success("关注成功！")
+            isFollowed.value = true
+          }).catch(() => {
+            message.error("error!")
+          })
+        }
+      },
+      unFollow() {
         let formData = new FormData()
         formData.set('up', articleData.value.ArticleAuthor)
         formData.set('follower', store.state.uid)
+        formData.set('handle', 1)
         store.state.axios({
-          url: '/go/follow/addFollow',
+          url: '/go/follow/handleFollow',
           method: 'post',
           data: formData,
         }).then(() => {
-          message.success("关注成功！")
+          message.success("取消关注成功！")
+          isFollowed.value = false
         }).catch(() => {
           message.error("error!")
         })
-      },
-      lookDetail() {
-
       },
       clickUpdata() {
         newArticleName.value = articleData.value.ArticleName
@@ -361,7 +425,7 @@ export default {
           showUpdate.value = false
           getArticleData()
         })
-      }
+      },
     }
   },
   mounted() {

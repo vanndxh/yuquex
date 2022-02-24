@@ -86,7 +86,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"

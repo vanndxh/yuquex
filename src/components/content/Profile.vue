@@ -29,9 +29,9 @@
                   <p style="text-align: center" @click="clickFollower">{{userData.FollowerAmount}}</p>
                   粉丝
                 </n-space>
-                <n-space justify="center">
-                  <n-button v-if="uid === uidt" style="width: 200px" @click="handleChangeInfo">编辑资料</n-button>
-                </n-space>
+              </n-space>
+              <n-space justify="center">
+                <n-button v-if="uid === uidt" style="width: 200px" @click="handleChangeInfo">编辑资料</n-button>
               </n-space>
               <n-divider />
               <div style="font-size: 14px">

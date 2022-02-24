@@ -9,7 +9,7 @@
       <n-list>
         <n-list-item v-for="item in messageData" :key="item">
           <n-card hoverable>
-            {{ item.Op }} {{ item.Type }} 了您的文章《 {{ item.ArticleId }} 》
+            {{ item.OpName }} {{ item.TypeName }} 了您的文章《 {{ item.ArticleName }} 》
             <n-grid :col="24">
               <n-gi :span="22">
                 <div style="line-height: 30px">
