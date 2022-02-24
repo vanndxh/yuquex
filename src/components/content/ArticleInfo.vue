@@ -242,7 +242,6 @@ export default {
       showUpdate, newArticleName, newArticleContent, isFollowed, authorData, showAuthor,
       getCommentData, getIsLiked, getIsCollected, getArticleData, getAuthorData, getIsFollowed,
 
-      iconName: null,
       uid: store.state.uid,
       getUserData() {
         store.state.axios({
