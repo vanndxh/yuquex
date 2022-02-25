@@ -5,13 +5,15 @@
       <br>
       <n-space>
         <n-button @click="readAll">全部已读</n-button>
-        <n-select v-model:value="messageValue" :options="messageOptions" :consistent-menu-width="false" style="width: 160px;"
-        @update:value="changeType"/>
+        <n-select v-model:value="messageValue1" :options="messageOptions1" :consistent-menu-width="false" style="width: 160px;"
+        @update:value="changeType" placeholder="选择是否已读"/>
+        <n-select v-model:value="messageValue2" :options="messageOptions2" :consistent-menu-width="false" style="width: 160px;"
+                  @update:value="changeType" placeholder="选择消息类型"/>
       </n-space>
       <n-list>
         <n-list-item v-for="item in messageData" :key="item">
           <n-card hoverable>
-            {{ item.OpName }} {{ item.TypeName }} 了您的文章《 {{ item.ArticleName }} 》
+            {{ item.Content }}
             <n-grid :col="24">
               <n-gi :span="22">
                 <div style="line-height: 30px">
@@ -19,7 +21,7 @@
                 </div>
               </n-gi>
               <n-gi :span="2">
-                <n-button v-if="!item.Read" size="small" @click="read(item.MessageId)" type="info" ghost>已读</n-button>
+                <n-button v-if="item.Read == 1" size="small" @click="read(item.MessageId)" type="info" ghost>已读</n-button>
               </n-gi>
             </n-grid>
           </n-card>
@@ -27,7 +29,7 @@
       </n-list>
     </n-gi>
   </n-grid>
-  <n-back-top :right="100"/>
+  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>
@@ -45,14 +47,16 @@ export default {
     const store = useStore()
 
     const messageData = ref([])
-    const messageValue = ref("all")
-    const getMessages = (type) => {
+    const messageValue1 = ref(null)
+    const messageValue2 = ref(null)
+    const getMessages = (handle1, handle2) => {
       store.state.axios({
         url: '/go/message/getMessages',
         method: 'get',
         params: {
           userId: store.state.uid,
-          type: type
+          handle1: handle1,
+          handle2: handle2,
         }
       }).then(r => {
         messageData.value = r.data.data
@@ -63,23 +67,48 @@ export default {
     }
 
     return {
-      messageData, messageValue,
+      messageData, messageValue1, messageValue2,
       getMessages,
 
-
-      messageOptions:[
+      messageOptions1:[
         {
           label: '全部',
-          value: 'all'
-        },
-        {
-          label: '已读',
-          value: 'yes'
+          value: '0'
         },
         {
           label: '未读',
-          value: 'no'
+          value: '1'
         },
+        {
+          label: '已读',
+          value: '2'
+        },
+      ],
+      messageOptions2:[
+        {
+          label: '全部',
+          value: '0'
+        },
+        {
+          label: '点赞',
+          value: '1'
+        },
+        {
+          label: '收藏',
+          value: '2'
+        },
+        {
+          label: '评论',
+          value: '3'
+        },
+        {
+          label: '关注',
+          value: '4'
+        },
+        {
+          label: '其他',
+          value: '5'
+        }
       ],
       read(id) {
         let formData = new FormData()
@@ -90,7 +119,7 @@ export default {
           data: formData
         }).then(() => {
           message.success("已读~")
-          getMessages()
+          getMessages(messageValue1.value, messageValue2.value)
         })
       },
       readAll() {
@@ -102,22 +131,16 @@ export default {
           data: formData
         }).then(() => {
           message.success("全部已读~")
-          getMessages()
+          getMessages(messageValue1.value, messageValue2.value)
         })
       },
       changeType() {
-        if (messageValue.value === "all") {
-          getMessages(0)
-        } else if (messageValue.value === "yes") {
-          getMessages(1)
-        } else if (messageValue.value === "no") {
-          getMessages(2)
-        }
+        getMessages(messageValue1.value, messageValue2.value)
       }
     }
   },
   mounted() {
-    this.getMessages(0)
+    this.getMessages(0, 0)
   }
 }
 </script>

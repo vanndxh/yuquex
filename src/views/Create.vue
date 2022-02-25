@@ -14,7 +14,7 @@
           <n-gi span="16">
             <n-space vertical>
               <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
-                       maxlength="20" show-count/>
+                       maxlength="15" show-count/>
               <n-input
                   v-model:value="newArticleContent"
                   type="textarea"

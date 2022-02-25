@@ -15,7 +15,7 @@
         </n-timeline>
       </n-gi>
     </n-grid>
-    <n-back-top :right="100" :visibility-height="300"/>
+    <div><n-back-top :right="40"/></div>
   </div>
 </template>
 

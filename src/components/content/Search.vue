@@ -36,7 +36,7 @@
 <!--      <n-pagination v-model:page="page" :page-count=pageTotal />-->
     </n-gi>
   </n-grid>
-  <n-back-top :right="100" />
+  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>

@@ -41,6 +41,7 @@
       </n-space>
     </n-card>
   </n-modal>
+  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>

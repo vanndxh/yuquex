@@ -20,6 +20,7 @@
       </n-layout>
     </n-layout>
   </div>
+  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>

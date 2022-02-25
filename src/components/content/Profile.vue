@@ -115,7 +115,7 @@
       <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
     </n-card>
   </n-modal>
-
+  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>
@@ -411,26 +411,16 @@ export default {
         userData.value = r.data.data
       })
     }
-    const getUps = () => {
+    const getFollows = () => {
       store.state.axios({
-        url: '/go/follow/getUps',
+        url: '/go/follow/getFollows',
         method: 'get',
         params: {
           userId: store.state.uid
         }
       }).then(r => {
-        data5.value = r.data.data
-      })
-    }
-    const getFollowers = () => {
-      store.state.axios({
-        url: '/go/follow/getFollowers',
-        method: 'get',
-        params: {
-          userId: store.state.uid
-        }
-      }).then(r => {
-        data6.value = r.data.data
+        data5.value = r.data.upData
+        data6.value = r.data.followerData
       })
     }
 
@@ -538,11 +528,11 @@ export default {
         })
       },
       clickFollow() {
-        getUps()
+        getFollows()
         showFollow.value = true
       },
       clickFollower() {
-        getFollowers()
+        getFollows()
         showFollower.value = true
       }
     }
