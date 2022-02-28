@@ -35,7 +35,7 @@ const routes = [
   {
     path: '/Log',
     name: 'Log',
-    component: () => import('../components/content/Log')
+    component: () => import('../components/content/Login')
   },
   {
     path: '/Update',

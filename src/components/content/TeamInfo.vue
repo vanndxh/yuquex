@@ -150,13 +150,13 @@ export default {
         {
           title: '职位',
           width: 100,
-          key: 'Position',
+          key: 'PositionName',
           align: 'center',
         },
         {
           title: '打卡数',
           width: 60,
-          key: 'Count',
+          key: 'Punch',
           align: 'center',
         },
         {
@@ -175,24 +175,20 @@ export default {
           width: 100,
         },
         {
-          title: '用户',
+          title: '用户名',
           width: 100,
           key: 'Username'
         },
         {
-          title: '简介',
-          key: 'UserInfo',
-          align: 'left',
-        },
-        {
-          title: '文章数',
+          title: '职位',
+          key: 'PositionName',
           width: 100,
-          key: 'ArticleAmount'
+          align: 'center',
         },
         {
-          title: '点赞数',
-          width: 60,
-          key: 'LikeTotal',
+          title: '打卡数',
+          key: 'Punch',
+          width: 100,
           align: 'center',
         },
         {
@@ -206,17 +202,32 @@ export default {
           width: 100
         },
         {
+          title: '文章名',
           key: 'ArticleName',
           align: 'left'
         },
         {
+          title: '作者',
           key: 'AuthorName',
           align: 'center',
           width: 100,
         },
         {
+          title: '点赞数',
+          key: 'LikeAmount',
+          align: 'center',
+          width: 80,
+        },
+        {
+          title: '收藏数',
+          key: 'CollectionAmount',
+          align: 'center',
+          width: 80,
+        },
+        {
+          title: '查看详情',
           key: 'lookDetail',
-          width: 150,
+          width: 100,
           align: 'right',
           render (row) {
             return h(
@@ -244,46 +255,6 @@ export default {
         }
       }).then(r => {
         teamData.value = r.data.data
-        if(store.state.uid == r.data.data.TeamLeader) {
-          count.value = r.data.data.LeaderCount
-        } else if (store.state.uid == teamData.value.TeamMember1) {
-          count.value = r.data.data.Member1Count
-        } else if (store.state.uid == teamData.value.TeamMember2) {
-          count.value = r.data.data.Member2Count
-        } else if (store.state.uid == teamData.value.TeamMember3) {
-          count.value = r.data.data.Member3Count
-        } else if (store.state.uid == teamData.value.TeamMember4) {
-          count.value = r.data.data.Member4Count
-        } else {
-          count.value = -1
-        }
-        data.value = [
-          {
-            Username: teamData.value.LeaderName,
-            Position: "组长",
-            Count: teamData.value.LeaderCount
-          },
-          {
-            Username: teamData.value.Member1Name,
-            Position: "组员",
-            Count: teamData.value.Member1Count
-          },
-          {
-            Username: teamData.value.Member2Name,
-            Position: "组员",
-            Count: teamData.value.Member2Count
-          },
-          {
-            Username: teamData.value.Member3Name,
-            Position: "组员",
-            Count: teamData.value.Member3Count
-          },
-          {
-            Username: teamData.value.Member4Name,
-            Position: "组员",
-            Count: teamData.value.Member4Count
-          },
-        ]
       })
     }
     const getTeamArticles = () => {
@@ -303,9 +274,15 @@ export default {
         method: 'get',
         params: {
           teamId: store.state.tid
-        },
+        }
       }).then(r => {
         data1.value = r.data.data
+        data.value = r.data.data
+        for (const i in r.data.data) {
+          if (r.data.data[i].UserId == store.state.uid) {
+            count.value = r.data.data[i].Punch
+          }
+        }
       })
     }
 
@@ -446,7 +423,7 @@ export default {
           data: formData,
         }).then(() => {
           message.success("打卡成功！")
-          getTeamInfo()
+          getTeamMembers()
         })
       },
       deleteUser() {

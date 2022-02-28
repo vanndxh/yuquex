@@ -138,7 +138,7 @@ export default {
         } else {
           let formData = new FormData()
           formData.set('teamName', newTeamName.value)
-          formData.set('teamLeader', store.state.uid)
+          formData.set('userId', store.state.uid)
           store.state.axios({
             url: '/go/team/createTeam',
             method: 'post',

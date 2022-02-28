@@ -214,30 +214,6 @@ export default {
           align: 'center',
         },
         {
-          title: '组员1',
-          width: 100,
-          key: 'Member1Name',
-          align: 'center',
-        },
-        {
-          title: '组员2',
-          width: 100,
-          key: 'Member2Name',
-          align: 'center',
-        },
-        {
-          title: '组员3',
-          width: 100,
-          key: 'Member3Name',
-          align: 'center',
-        },
-        {
-          title: '组员4',
-          width: 100,
-          key: 'Member4Name',
-          align: 'center',
-        },
-        {
           title: '查看详情',
           key: 'lookDetail',
           align: 'center',

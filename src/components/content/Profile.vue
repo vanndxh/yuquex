@@ -44,7 +44,7 @@
                 </n-statistic>
                 <n-statistic tabular-nums>
                   <n-icon size="20"><LikeOutlined/></n-icon>共收获
-                  <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeTotal />
+                  <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeAmount />
                   <template #suffix>
                     个赞
                   </template>

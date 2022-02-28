@@ -135,7 +135,7 @@
 
 <script>
 import tabBar from "../common/tabBar";
-import {ref,} from 'vue'
+import {ref} from 'vue'
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 import { useMessage, useNotification } from 'naive-ui'
