@@ -354,12 +354,12 @@ export default {
             positiveText: '确定',
             negativeText: '取消',
             onPositiveClick: () => {
-              let formData = new FormData()
-              formData.set('commentId', c)
               store.state.axios({
                 url: '/go/comment/deleteComment',
                 method: 'delete',
-                data: formData,
+                params: {
+                  commentId: c
+                }
               }).then(() => {
                 message.success("删除成功！")
                 getCommentData()

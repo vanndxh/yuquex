@@ -331,21 +331,19 @@ export default {
       },
       search() {
         store.state.axios({
-          url: '/go/article/searchArticle',
+          url: '/go/search',
           method: 'get',
           params: {
-            searchValue: searchValue.value
+            searchValue: searchValue.value,
+            handle: "0"
           }
         }).then(r => {
           router.push('search')
-          if (r.data.data === "none"){
-            store.state.searchData = []
+          store.state.searchData = r.data.data
+          if (r.data.data.length === 0) {
             message.error("没有找到文章！")
-          } else {
-            store.state.searchData = r.data.data
           }
-        })
-
+        }).catch(() => {})
       },
       addFeedback() {
         let formData = new FormData()
