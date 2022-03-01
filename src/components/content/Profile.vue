@@ -10,6 +10,10 @@
           <n-space vertical>
             <n-card hoverable>
               <n-space justify="center">
+                <p style="font-size: 12px">UID</p>
+                <p style="font-size: 12px">{{ userData.UserId }}</p>
+              </n-space>
+              <n-space justify="center">
                 <n-avatar
                     :size="160"
                     style="horiz-align: center"
@@ -101,6 +105,12 @@
         role="dialog"
         aria-modal="true"
     >
+      <n-space>
+        <n-input v-model:value="upId" type="text" placeholder="请输入你要关注用户的id~" @keyup.enter="follow"/>
+        <n-button type="primary" ghost @click="follow" style="float: right">关注</n-button>
+      </n-space>
+
+      <br>
       <n-data-table :columns="columns5" :data="data5" :pagination="pagination" size="small"/>
     </n-card>
   </n-modal>
@@ -136,12 +146,14 @@ export default {
     const message = useMessage()
     const store = useStore()
 
+    const isFollowed = ref(null)
     const showFollow = ref(false)
     const showFollower = ref(false)
     const showChangeInfo = ref(false)
     const newUsername = ref(null)
     const newPassword = ref(null)
     const newInfo = ref(null)
+    const upId = ref(null)
     const userData = ref({})
     const data1 = ref([])
     const data2 = ref([])
@@ -214,10 +226,18 @@ export default {
           width: 100
         },
         {
+          title: '文章名',
           key: 'ArticleName',
           align: 'left',
         },
         {
+          title: '作者',
+          key: 'AuthorName',
+          align: 'center',
+          width: 100,
+        },
+        {
+          title: '查看详情',
           key: 'lookDetail',
           width: 150,
           render (row) {
@@ -276,46 +296,24 @@ export default {
         },
       ]
     }
-    const createColumns5 = ({ follow }) => {
+    const createColumns5 = ({ unFollow }) => {
       return [
         {
           width: 50
         },
         {
+          title: 'Id',
+          key: 'UpId',
+          width: 100,
+          align: 'center'
+        },
+        {
+          title: '用户名',
           key: 'UpName',
           align: 'left'
         },
         {
-          key: 'follow',
-          align: 'center',
-          width: 150,
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'info',
-                  onClick: () => follow(row)
-                },
-                { default: () => '关注' }
-            )
-          }
-        },
-        {
-          width: 50
-        }
-      ]
-    }
-    const createColumns6 = ({ unFollow }) => {
-      return [
-        {
-          width: 50
-        },
-        {
-          key: 'FollowerName',
-          align: 'left'
-        },
-        {
+          title: '取消关注',
           key: 'unFollow',
           align: 'center',
           width: 150,
@@ -328,6 +326,44 @@ export default {
                   onClick: () => unFollow(row)
                 },
                 { default: () => '取消关注' }
+            )
+          }
+        },
+        {
+          width: 50
+        }
+      ]
+    }
+    const createColumns6 = ({ follow }) => {
+      return [
+        {
+          width: 50
+        },
+        {
+          title: 'Id',
+          key: 'FollowerId',
+          width: 100,
+          align: 'center'
+        },
+        {
+          title: '用户名',
+          key: 'FollowerName',
+          align: 'left'
+        },
+        {
+          title: '关注',
+          key: 'follow',
+          align: 'center',
+          width: 150,
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'info',
+                  onClick: () => follow(row)
+                },
+                { default: () => '关注' }
             )
           }
         },
@@ -423,11 +459,24 @@ export default {
         data6.value = r.data.followerData
       })
     }
+    const getIsFollowed = (followerId, upId) => {
+      store.state.axios({
+        url: '/go/follow/getIsFollowed',
+        method: 'get',
+        params: {
+          userId: followerId,
+          upId: upId,
+        }
+      }).then(r => {
+        isFollowed.value = r.data.data
+      })
+      return isFollowed.value
+    }
 
     return {
-      data1, data2, data3, data4, data5, data6, userData, showChangeInfo, showFollow, showFollower, newUsername, newPassword, newInfo,
-      getTeams, getArticles, getFavorite, getUserComment, getUserData,
-
+      data1, data2, data3, data4, data5, data6, userData, showChangeInfo, showFollow, showFollower, newUsername, newPassword, newInfo, upId,
+      isFollowed,
+      getTeams, getArticles, getFavorite, getUserComment, getUserData, getIsFollowed,
 
       uid: store.state.uid,
       uidt: store.state.uidTemp,
@@ -458,12 +507,12 @@ export default {
           router.push("ArticleInfo")
         },
         deleteComment (rowData) {
-          let formData = new FormData()
-          formData.set('commentId', rowData.CommentId)
           store.state.axios({
             url: '/go/comment/deleteComment',
-            method: 'post',
-            data: formData,
+            method: 'delete',
+            params: {
+              commentId: rowData.CommentId
+            }
           }).then(() => {
             message.success("删除成功！")
             getUserComment()
@@ -473,35 +522,48 @@ export default {
         }
       }),
       columns5: createColumns5({
-        follow (rowData) {
+        unFollow (rowData) {
           let formData = new FormData()
-          formData.set('up', rowData.UserId)
+          formData.set('up', rowData.UpId)
           formData.set('follower', store.state.uid)
+          formData.set('handle', "1")
           store.state.axios({
-            url: '/go/follow/addFollow',
+            url: '/go/follow/handleFollow',
             method: 'post',
             data: formData,
           }).then(() => {
-            message.success("关注成功！")
+            message.success("取消关注成功！")
+            getFollows()
+            getUserData()
           }).catch(() => {
             message.error("error!")
           })
         }
       }),
       columns6: createColumns6({
-        unFollow (rowData) {
-          let formData = new FormData()
-          formData.set('up', rowData.UserId)
-          formData.set('follower', store.state.uid)
-          store.state.axios({
-            url: '/go/follow/unFollow',
-            method: 'post',
-            data: formData,
-          }).then(() => {
-            message.success("取消关注成功！")
-          }).catch(() => {
-            message.error("error!")
-          })
+        follow (rowData) {
+          getIsFollowed(store.state.uid, rowData.FollowerId)
+          setTimeout(() => {
+            if (isFollowed.value) {
+              message.error("您已经关注，不能重复关注！")
+            } else {
+              let formData = new FormData()
+              formData.set('up', rowData.FollowerId)
+              formData.set('follower', store.state.uid)
+              formData.set('handle', "0")
+              store.state.axios({
+                url: '/go/follow/handleFollow',
+                method: 'post',
+                data: formData,
+              }).then(() => {
+                message.success("关注成功！")
+                getFollows()
+                getUserData()
+              }).catch(() => {
+                message.error("error!")
+              })
+            }
+          }, 500)
         }
       }),
       handleChangeInfo() {
@@ -534,6 +596,33 @@ export default {
       clickFollower() {
         getFollows()
         showFollower.value = true
+      },
+      follow() {
+        if (upId.value == store.state.uid) {
+          message.error("您不能关注你自己！")
+        }
+        getIsFollowed(store.state.uid, upId.value)
+        setTimeout(() => {
+          if (isFollowed.value) {
+            message.error("您已经关注，不能重复关注！")
+          } else {
+            let formData = new FormData()
+            formData.set('up', upId.value)
+            formData.set('follower', store.state.uid)
+            formData.set('handle', "0")
+            store.state.axios({
+              url: '/go/follow/handleFollow',
+              method: 'post',
+              data: formData,
+            }).then(() => {
+              message.success("关注成功！")
+              getFollows()
+              getUserData()
+            }).catch(() => {
+              message.error("error!")
+            })
+          }
+        }, 500)
       }
     }
   },

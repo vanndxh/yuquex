@@ -361,9 +361,13 @@ export default {
             showAddUser.value = true
           }
         } else if (key === "changeTeamInfo") {
-          newTeamName.value = teamData.value.TeamName
-          newTeamNotice.value = teamData.value.TeamNotice
-          showChangeInfo.value = !showChangeInfo.value
+          if (store.state.uid != teamData.value.TeamLeader) {
+            message.error("您没有权限！")
+          } else {
+            newTeamName.value = teamData.value.TeamName
+            newTeamNotice.value = teamData.value.TeamNotice
+            showChangeInfo.value = !showChangeInfo.value
+          }
         } else if (key === "deleteUser") {
           if (store.state.uid != teamData.value.TeamLeader) {
             message.error("您没有权限！")
