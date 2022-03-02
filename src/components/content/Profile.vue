@@ -125,7 +125,7 @@
       <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
     </n-card>
   </n-modal>
-  <div><n-back-top :right="40"/></div>
+
 </template>
 
 <script>
@@ -147,6 +147,7 @@ export default {
     const store = useStore()
 
     const isFollowed = ref(null)
+    // 模块相关
     const showFollow = ref(false)
     const showFollower = ref(false)
     const showChangeInfo = ref(false)
@@ -154,6 +155,7 @@ export default {
     const newPassword = ref(null)
     const newInfo = ref(null)
     const upId = ref(null)
+    // 数据类初始化
     const userData = ref({})
     const data1 = ref([])
     const data2 = ref([])
@@ -161,6 +163,7 @@ export default {
     const data4 = ref([])
     const data5 = ref([])
     const data6 = ref([])
+
     const createColumns = ({ lookDetail }) => {
       return [
         {

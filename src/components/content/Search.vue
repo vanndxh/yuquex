@@ -64,6 +64,11 @@ export default {
           width: 50
         },
         {
+          title: 'Id',
+          key: 'ArticleId',
+          align: 'center'
+        },
+        {
           title: '文章名',
           key: 'ArticleName',
           align: 'left'

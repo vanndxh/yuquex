@@ -15,10 +15,12 @@
 <!--      <n-pagination v-model:page="page" :page-count=pageTotal />-->
       <n-back-top :right="100"/>
     </n-gi>
-    <div>
-      <n-back-top :right="40"/>
-    </div>
+    <n-gi :span="6">
+      <el-backtop />
+    </n-gi>
   </n-grid>
+
+
 </template>
 
 <script>

@@ -71,39 +71,43 @@
       </n-space>
     </n-card>
   </n-modal>
-  <n-modal v-model:show="showAddUser">
+  <n-modal v-model:show="showUser">
     <n-card
         style="width: 600px;"
-        title="添加组员"
+        title="组员管理"
         :bordered="false"
         size="huge"
         role="dialog"
         aria-modal="true"
     >
       <n-space>
-        <n-input v-model:value="newUserId" type="text" placeholder="请输入添加用户的id~" style="width: 400px"
-        @keyup.enter="addUser()"/>
-        <n-button type="primary" ghost @click="addUser()">添加</n-button>
+        <n-space>
+          <n-input v-model:value="userId" type="text" placeholder="请输入用户的id~" style="width: 300px"/>
+          <n-button type="primary" ghost @click="handleUser(0)">添加</n-button>
+          <n-button type="primary" ghost @click="handleUser(1)">删除</n-button>
+        </n-space>
       </n-space>
     </n-card>
   </n-modal>
-  <n-modal v-model:show="showDeleteUser">
+  <n-modal v-model:show="showManager">
     <n-card
         style="width: 600px;"
-        title="踢出组员"
+        title="管理员管理"
         :bordered="false"
         size="huge"
         role="dialog"
         aria-modal="true"
     >
       <n-space>
-        <n-input v-model:value="oldUserId" type="text" placeholder="请输入要踢出用户的id~" style="width: 400px"
-        @keyup.enter="deleteUser()"/>
-        <n-button type="primary" ghost @click="deleteUser()">删除</n-button>
+        <n-space>
+          <n-input v-model:value="managerId" type="text" placeholder="请输入管理员的id~" style="width: 350px"/>
+          <n-button type="primary" ghost @click="handleManager(0)">添加</n-button>
+          <n-button type="primary" ghost @click="handleManager(1)">删除</n-button>
+        </n-space>
       </n-space>
     </n-card>
   </n-modal>
-  <div><n-back-top :right="40"/></div>
+
 </template>
 
 <script>
@@ -125,18 +129,23 @@ export default {
     const store = useStore()
     const dialog = useDialog()
 
-    const showDeleteUser = ref(false)
-    const showAddUser = ref(false)
-    const showChangeInfo = ref(false)
+    // 数据初始化
     const data = ref([])
     const data1 = ref([])
     const data2 = ref([])
     const teamData = ref({})
+    // 当前用户信息初始化
+    const pos = ref(null)
     const count = ref(0)
+    // 模块信息初始化
+    const showManager = ref(false)
+    const showUser = ref(false)
+    const showChangeInfo = ref(false)
     const newTeamName = ref("")
     const newTeamNotice = ref("")
-    const newUserId = ref("")
-    const oldUserId = ref(null)
+    const userId = ref(null)
+    const managerId = ref(null)
+
     const createColumns = () => {
       return [
         {
@@ -149,7 +158,7 @@ export default {
         },
         {
           title: '职位',
-          width: 100,
+          width: 80,
           key: 'PositionName',
           align: 'center',
         },
@@ -157,6 +166,11 @@ export default {
           title: '打卡数',
           width: 60,
           key: 'Punch',
+          align: 'center',
+        },
+        {
+          title: '最后一次打卡时间',
+          key: 'LastPunchTime',
           align: 'center',
         },
         {
@@ -278,18 +292,22 @@ export default {
       }).then(r => {
         data1.value = r.data.data
         data.value = r.data.data
-        for (const i in r.data.data) {
+        for (let i in r.data.data) {
           if (r.data.data[i].UserId == store.state.uid) {
             count.value = r.data.data[i].Punch
+            pos.value = r.data.data[i].Position
           }
+          let date = new Date(r.data.data[i].LastPunchTime)
+          let formatTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
+          r.data.data[i].LastPunchTime = formatTime
         }
       })
     }
 
     return {
-      showAddUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2, newUserId, showDeleteUser, oldUserId, data,
+      showUser, showChangeInfo, teamData, newTeamName, newTeamNotice, count, data1, data2, showManager, data, pos,
+      userId, managerId,
       getTeamInfo, getTeamArticles, getTeamMembers,
-
 
       columns: createColumns({}),
       columns1: createColumns1({}),
@@ -308,12 +326,12 @@ export default {
           key: "changeTeamInfo"
         },
         {
-          label: '添加组员',
-          key: "addUser"
+          label: '组员管理',
+          key: "user"
         },
         {
-          label: '踢出组员',
-          key: "deleteUser"
+          label: '管理员管理',
+          key: "manager"
         },
         {
           label: '退出小组',
@@ -354,11 +372,11 @@ export default {
               }
             },
           })
-        } else if (key === "addUser") {
-          if (store.state.uid != teamData.value.TeamLeader) {
+        } else if (key === "user") {
+          if (pos.value == 2) {
             message.error("您没有权限！")
           } else {
-            showAddUser.value = true
+            showUser.value = true
           }
         } else if (key === "changeTeamInfo") {
           if (store.state.uid != teamData.value.TeamLeader) {
@@ -368,29 +386,54 @@ export default {
             newTeamNotice.value = teamData.value.TeamNotice
             showChangeInfo.value = !showChangeInfo.value
           }
-        } else if (key === "deleteUser") {
+        } else if (key === "manager") {
           if (store.state.uid != teamData.value.TeamLeader) {
             message.error("您没有权限！")
           } else {
-            showDeleteUser.value = true
+            showManager.value = true
           }
         }
       },
-      addUser() {
+      handleUser(handle) {
+        if (userId.value == teamData.value.TeamLeader) {
+          message.error("您不能操作您自己！")
+        }
         let formData = new FormData()
         formData.set('teamId', store.state.tid)
-        formData.set('newUserId', newUserId.value)
+        formData.set('teamUser', userId.value)
+        formData.set('handle', handle)
         store.state.axios({
-          url: '/go/team/addTeamUser',
+          url: '/go/team/handleTeamUser',
           method: 'post',
           data: formData,
         }).then(() => {
-          message.success("成功添加新成员！")
-          newUserId.value = ""
-          showAddUser.value = false
+          message.success("操作成功！")
+          userId.value = ""
+          showUser.value = false
           getTeamMembers()
         }).catch(() => {
-          message.error("添加失败!请检查输入id后再试~")
+          message.error("操作失败!请检查输入id后再试~")
+        })
+      },
+      handleManager(handle) {
+        if (managerId.value == teamData.value.TeamLeader) {
+          message.error("您不能操作您自己！")
+        }
+        let formData = new FormData()
+        formData.set('teamId', store.state.tid)
+        formData.set('teamUser', managerId.value)
+        formData.set('handle', handle)
+        store.state.axios({
+          url: '/go/team/handleManager',
+          method: 'post',
+          data: formData,
+        }).then(() => {
+          message.success("操作成功！")
+          managerId.value = ""
+          showManager.value = false
+          getTeamMembers()
+        }).catch(() => {
+          message.error("操作失败!请检查输入id后再试~")
         })
       },
       saveInfo() {
@@ -428,27 +471,10 @@ export default {
         }).then(() => {
           message.success("打卡成功！")
           getTeamMembers()
+        }).catch(() => {
+          message.error("您今日已经打卡，不能重复打卡！")
         })
       },
-      deleteUser() {
-        if (oldUserId.value == teamData.value.TeamLeader) {
-          message.error("您不能踢出您自己！")
-        } else {
-          store.state.axios({
-            url: '/go/team/deleteTeamUser',
-            method: 'delete',
-            params: {
-              teamId: store.state.tid,
-              teamUser: oldUserId.value
-            }
-          }).then(() => {
-            message.success("成功踢出！")
-            showDeleteUser.value = false
-            oldUserId.value = ""
-            getTeamMembers()
-          })
-        }
-      }
     }
   },
   mounted() {
