@@ -29,7 +29,7 @@
       </n-list>
     </n-gi>
   </n-grid>
-  <div><n-back-top :right="40"/></div>
+  <el-backtop />
 </template>
 
 <script>

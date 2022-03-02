@@ -15,7 +15,7 @@
         </n-timeline>
       </n-gi>
     </n-grid>
-    <div><n-back-top :right="40"/></div>
+    <el-backtop visibility-height="10"/>
   </div>
 </template>
 
@@ -42,7 +42,6 @@ export default {
           method: 'get',
         }).then(r => {
           timelineData.value = r.data.data
-          console.log(r.data.data);
         })
       }
     }

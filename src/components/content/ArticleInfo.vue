@@ -106,6 +106,8 @@
         aria-modal="true"
     >
       <n-space vertical>
+        <n-select v-model:value="secretValue" :options="secretOptions" :consistent-menu-width="false" style="width: 200px;"
+                  placeholder="选择他人是否可见"/>
         <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                  maxlength="20" show-count/>
         <n-input
@@ -122,7 +124,7 @@
       </n-space>
     </n-card>
   </n-modal>
-  <div><n-back-top :right="40"/></div>
+  <el-backtop/>
 </template>
 
 <script>
@@ -142,18 +144,23 @@ export default {
     const message = useMessage()
     const store = useStore()
 
+    // 模块相关
+    const secretValue = ref(null)
     const newArticleName = ref(null)
     const newArticleContent = ref(null)
     const showUpdate = ref(false)
     const showAuthor = ref(false)
+    // 文章初始化信息
     const isLiked =  ref(false)
     const isCollected = ref(false)
     const isFollowed = ref(false)
     const commentValue = ref(null)
+    // 数据初始化
     const articleData = ref({})
     const authorData = ref({})
     const userData = ref({})
     const commentData = ref([])
+
     const getCommentData = () => {
       store.state.axios({
         url: '/go/comment/getArticleComment',
@@ -239,10 +246,20 @@ export default {
     }
 
     return {
-      isLiked, isCollected, commentValue, articleData, userData, commentData,
+      isLiked, isCollected, commentValue, articleData, userData, commentData, secretValue,
       showUpdate, newArticleName, newArticleContent, isFollowed, authorData, showAuthor,
       getCommentData, getIsLiked, getIsCollected, getArticleData, getAuthorData, getIsFollowed,
 
+      secretOptions:[
+        {
+          label: '公开',
+          value: 0
+        },
+        {
+          label: '私密',
+          value: 1
+        },
+      ],
       uid: store.state.uid,
       getUserData() {
         store.state.axios({
@@ -409,6 +426,7 @@ export default {
       clickUpdata() {
         newArticleName.value = articleData.value.ArticleName
         newArticleContent.value = articleData.value.ArticleContent
+        secretValue.value = articleData.value.Secret
         showUpdate.value = true
       },
       updateArticle() {
@@ -416,6 +434,7 @@ export default {
         formData.set('articleId', store.state.aid)
         formData.set('newArticleName', newArticleName.value)
         formData.set('newArticleContent', newArticleContent.value)
+        formData.set('newSecret', secretValue.value)
         store.state.axios({
           url: '/go/article/updateArticle',
           method: 'post',
