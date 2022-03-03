@@ -10,8 +10,8 @@
       </n-layout-sider>
       <!--主要内容-->
       <n-layout-content content-style="padding: 24px;">
-        <n-grid :col="24" x-gap="12">
-          <n-gi span="16">
+        <n-grid :col="24">
+          <n-gi span="15">
             <n-space vertical>
               <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                        maxlength="15" show-count/>
@@ -20,40 +20,34 @@
                   type="textarea"
                   placeholder="正文"
                   size="small"
-                  :autosize="{minRows: 20,maxRows: 30}"
-                  maxlength="200" show-count
+                  :autosize="{minRows: 20,maxRows: 20}"
+                  maxlength="2000" show-count
+
               />
               <n-button type="success" class="save" @click="createArticle()">保存</n-button>
             </n-space>
           </n-gi>
-          <n-gi span="6" offset="1">
+          <n-gi span="8" :offset="1">
             <n-card hoverable>
               <h4>你也可以直接</h4>
-              <!--action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"-->
-              <n-space justify="center">
-                <n-upload action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f" :headers="{'naive-info': 'hello!'}"
-                    @before-upload="beforeUpload" @finish="handleFinish" @change="handleUploadChange">
-                  <n-button>上传文件</n-button>
-                </n-upload>
-              </n-space>
-              <h4>或者</h4>
-              <n-upload action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
-                        :headers="{'naive-info': 'hello!'}"
-                  @before-upload="beforeUpload" @finish="handleFinish" @change="handleUploadChange">
-                <n-upload-dragger>
-                  <div style="margin-bottom: 12px;">
-                    <n-icon size="48" :depth="3">
-                      <archive-icon />
-                    </n-icon>
-                  </div>
-                  <n-text style="font-size: 16px;">点击或者拖动文件到该区域来上传</n-text>
-                  <n-p depth="3" style="margin: 8px 0 0 0;">
-                    请不要上传敏感数据，比如你的银行卡号和密码，信用卡号有效期和安全码
-                  </n-p>
-                </n-upload-dragger>
-              </n-upload>
-
-              <n-button @click="readFile">上传文件</n-button>
+              <el-upload
+                  drag
+                  with-credentials
+                  name="upfile"
+                  action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
+                  :on-success="parseText"
+                  :before-upload="checkExt"
+                  :on-preview="parseTextAgain"
+                  :on-error="handleError"
+              >
+                <el-icon class="el-icon--upload" size="50px"><upload-filled /></el-icon>
+                <div class="el-upload__text" style="font-size: 16px">
+                  点击或者拖动文件到该区域来上传
+                </div>
+                <n-p depth="3" style="margin: 8px 0 0 0">
+                  请不要上传敏感数据! 文件格式目前只支持txt！
+                </n-p>
+              </el-upload>
             </n-card>
           </n-gi>
         </n-grid>
@@ -66,20 +60,21 @@
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import { ref } from 'vue'
-import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
 import {useStore} from "vuex";
 import {useMessage} from "naive-ui";
 import {useRouter} from "vue-router";
+import { UploadFilled } from '@element-plus/icons-vue'
 
 export default {
   components: {
-    tabBar, tabBarS, ArchiveIcon
+    tabBar, tabBarS, UploadFilled
   },
   setup() {
     const router = useRouter()
     const message = useMessage()
     const store = useStore()
 
+    const upload = ref()
     const newArticleName = ref(null)
     const newArticleContent = ref(null)
     const articleData = ref({
@@ -89,7 +84,7 @@ export default {
     const fileList = ref([])
 
     return {
-      articleData, newArticleName, newArticleContent, fileList,
+      articleData, newArticleName, newArticleContent, fileList, upload,
 
       createArticle() {
         if (store.state.uid === 0){
@@ -124,54 +119,37 @@ export default {
           message.error("您尚未登录！")
         }
       },
-      readFile() {
-        let fileSelect = document.querySelector('input[type=file]').files[0]//找到文件上传的元素
-        let reader = new FileReader()
-        if (typeof FileReader === 'undefined') {
-          console.log('您的浏览器不支持FileReader接口')
-          return
-        }
-        reader.readAsText(fileSelect, 'gb2312')//注意读取中文的是用这个编码，不是utf-8
-        reader.onload = function(e) {
-          console.log(e.target.result);
-        }
-        console.log(reader)
-      },
-      async beforeUpload ( data ) {
-        if (data.file.file?.type !== "application/msword" && data.file.file?.type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-          message.error("只能上传doc或者docx文件！")
+      checkExt(file) {
+        if (file.name.split('.')[1] !== "txt") {
+          message.error("只能上传txt文件！")
           return false
         }
         return true
       },
-      handleUploadChange( data ) {
-        console.log(data.fileList[0].file);
-      },
-      handleFinish({file, data}) {
-        message.info("上传成功，但是自动提取功能未实装！")
-        // data test
-        console.log(data);
-        // file的Blob
-        console.log(file.name);
-        console.log(file);
-        let filefile = new Blob([file.file], {type: 'application/msword'})
-        console.log(filefile);
-        console.log(typeof (file.file));
-        console.log(file.file);
-        let fileBlob = new Blob([file.name], {type: 'application/msword'})
-        console.log(fileBlob);
-
-        // 能正常使用的测试Blob
-        const debug = {hello: "world"};
-        const blob = new Blob([JSON.stringify(debug, null, 2)], {type: 'application/json'});
-        console.log(blob);
-
-        const reader = new FileReader()
-        reader.readAsText(fileBlob, 'GB2312');
-        reader.onload = e => {
-          console.log(e.target.result);
-          newArticleContent.value = e.target.result
+      parseText(res, file) {
+        newArticleName.value = file.name.split('.')[0].slice(0,15)
+        if (file.raw) {
+          const reader = new FileReader()
+          reader.readAsText(file.raw);
+          reader.onload = e => {
+            newArticleContent.value = e.target.result.slice(0,2000)
+            message.success("自动解析成功！")
+          }
         }
+      },
+      parseTextAgain(file) {
+        newArticleName.value = file.name.split('.')[0].slice(0,15)
+        if (file.raw) {
+          const reader = new FileReader()
+          reader.readAsText(file.raw);
+          reader.onload = e => {
+            newArticleContent.value = e.target.result.slice(0,2000)
+            message.success("自动解析成功！")
+          }
+        }
+      },
+      handleError() {
+        message.error("自动解析失败，请上传正常文件！")
       }
     }
   },
