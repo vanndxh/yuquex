@@ -90,7 +90,7 @@ import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"
 import {ref} from "vue";
-import { isYesterday, addDays } from 'date-fns'
+import {  addDays } from 'date-fns'
 import {useDialog} from "naive-ui";
 
 export default {
@@ -105,15 +105,12 @@ export default {
       showUserInstruction,
 
       value: ref(addDays(Date.now(), 1).valueOf()),
-      isDateDisabled (timestamp) {
-        return isYesterday(timestamp);
-      },
       handleUpdateValue () {},
       welcome() {
         dialog.info({
           closable: false,
           title: '小黑屋',
-          content: '当前版本v1.2.0，为第一个稳定且具备所有基础功能的版本，该发布版本未部署后端/数据库，导致部分功能不能使用，敬请谅解，欢迎给作者提供修改建议，共同完成更成熟的作品！' + "\n" +
+          content: '当前版本v1.2.5stable，该发布版本未部署后端/数据库，导致部分功能不能使用，敬请谅解，欢迎给作者提供修改建议，共同完成更成熟的作品！' + "\n" +
               'email:1025196468@qq.com',
           positiveText: '朕知道了~',
           onPositiveClick: () => {},
