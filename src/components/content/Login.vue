@@ -57,7 +57,7 @@
                     <n-form-item-row path="isAgree">
                       <n-checkbox v-model:checked="modelSignup.isAgree">
                         我已阅读并同意
-                        <a @click="showUserInstruction = !showUserInstruction" class="userInstruction">用户须知</a>
+                        <a @click="showUserInstruction = !showUserInstruction" class="userInstruction">《用户须知》</a>
                       </n-checkbox>
                     </n-form-item-row>
                   </n-form>
