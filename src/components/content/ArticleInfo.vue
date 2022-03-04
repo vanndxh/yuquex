@@ -15,7 +15,12 @@
             <!--文章部分-->
             <n-gi span="14">
               <h1>{{ articleData.ArticleName }}</h1>
-              <pre class="content">{{ articleData.ArticleContent }}</pre>
+              <div class="ql-container ql-snow" style="border:none;height: fit-content">
+                <div class="ql-editor" style="height: fit-content">
+                  <div v-html="articleData.ArticleContent"></div>
+                </div>
+              </div>
+              <div id="content"></div>
               <n-grid :col="24">
                 <n-gi span="1" offset="6">
                   <n-space justify="center" vertical>
@@ -445,6 +450,9 @@ export default {
           getArticleData()
         })
       },
+      test() {
+        document.getElementById('content').innerHTML = articleData.value.ArticleContent
+      }
     }
   },
   mounted() {

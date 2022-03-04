@@ -5,7 +5,7 @@
       <n-list>
         <n-list-item v-for="item in articleData" :key="item">
           <n-card :title=item.ArticleName hoverable>
-            {{ item.ArticleContent }}
+            {{ item.ArticleContent.slice(0, 30) }}
             <div>
               <n-button style="float: right" @click="lookDetail(item.ArticleId)">详情</n-button>
             </div>
