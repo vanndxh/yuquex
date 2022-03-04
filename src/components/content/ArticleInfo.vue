@@ -41,13 +41,14 @@
               <!--评论区板块-->
               <n-list>
                 <n-list-item v-for="item in commentData" :key="item">
-                  <n-card hoverable>
-                    <h3>{{ item.Username }}</h3>
-                    {{ item.CommentContent }}
+                  <n-card hoverable size="small">
+                    <h3 style="line-height: 10px">{{ item.Username }}</h3>
+                    <p class="small">{{ item.CommentContent }}</p>
                     <div>
                       <n-button type="error" style="float: right"
+                                class="small"
                                 v-if="uid == 1 || uid == item.UserId || uid == articleData.ArticleAuthor"
-                                @click="deleteComment(item.UserId, item.CommentId)" ghost>删除</n-button>
+                                @click="deleteComment(item.UserId, item.CommentId)" ghost size="small">删除</n-button>
                     </div>
                   </n-card>
                 </n-list-item>
@@ -115,20 +116,23 @@
                   placeholder="选择他人是否可见"/>
         <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                  maxlength="20" show-count/>
-        <n-input
-            v-model:value="newArticleContent"
-            type="textarea"
-            placeholder="正文"
-            size="small"
-            :autosize="{minRows: 20,maxRows: 30}"
-            maxlength="200" show-count
-        />
+        <div class="editor">
+          <Quill-editor
+              id="toolbar"
+              v-model:content="newArticleContent"
+              contentType="html"
+              :options="editorOption"
+          >
+          </Quill-editor>
+        </div>
+        <br><br><br>
         <div style="float: right">
           <n-button type="success" class="save" @click="updateArticle()">保存</n-button>
         </div>
       </n-space>
     </n-card>
   </n-modal>
+
   <el-backtop/>
 </template>
 
@@ -249,12 +253,45 @@ export default {
         })
       }
     }
+    const toolbarOptions = [
+      // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
+      ['bold', 'italic', 'underline', 'strike'],
+      // 引用  代码块-----['blockquote', 'code-block']
+      ['blockquote', 'code-block'],
+      // 1、2 级标题-----[{ header: 1 }, { header: 2 }]
+      [{ header: 1 }, { header: 2 }],
+      // 有序、无序列表-----[{ list: 'ordered' }, { list: 'bullet' }]
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      // 上标/下标-----[{ script: 'sub' }, { script: 'super' }]
+      [{ script: 'sub' }, { script: 'super' }],
+      // 缩进-----[{ indent: '-1' }, { indent: '+1' }]
+      [{ indent: '-1' }, { indent: '+1' }],
+      // 字体大小-----[{ size: ['small', false, 'large', 'huge'] }]
+      [{ size: ['small', false, 'large', 'huge'] }],
+      // 标题-----[{ header: [1, 2, 3, 4, 5, 6, false] }]
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      // 字体颜色、字体背景颜色-----[{ color: [] }, { background: [] }]
+      [{ color: [] }, { background: [] }],
+      // 对齐方式-----[{ align: [] }]
+      [{ align: [] }],
+      // 清除文本格式-----['clean']
+      ['clean'],
+      // 链接、图片、视频-----['link', 'image', 'video']
+      ['image']
+    ]
 
     return {
       isLiked, isCollected, commentValue, articleData, userData, commentData, secretValue,
       showUpdate, newArticleName, newArticleContent, isFollowed, authorData, showAuthor,
       getCommentData, getIsLiked, getIsCollected, getArticleData, getAuthorData, getIsFollowed,
 
+      editorOption: {
+        modules: {
+          toolbar: toolbarOptions
+        },
+        theme: 'snow',
+        placeholder: '请输入正文~'
+      },
       secretOptions:[
         {
           label: '公开',
@@ -469,9 +506,10 @@ export default {
 .user{
   text-align: center;
 }
-.content{
-  width: 100%;
-  word-break: break-all;
-  word-wrap: break-word;
+.editor {
+  height: 380px;
+}
+.small {
+  line-height: 0px;
 }
 </style>

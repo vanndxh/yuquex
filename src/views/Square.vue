@@ -16,7 +16,7 @@
       <n-back-top :right="100"/>
     </n-gi>
     <n-gi :span="6">
-      <el-backtop visibility-height="10"/>
+      <el-backtop :visibility-height="10"/>
     </n-gi>
   </n-grid>
 
