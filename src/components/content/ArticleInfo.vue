@@ -444,6 +444,7 @@ export default {
           }).then(() => {
             message.success("关注成功！")
             isFollowed.value = true
+            getAuthorData()
           }).catch(() => {
             message.error("error!")
           })
@@ -461,6 +462,7 @@ export default {
         }).then(() => {
           message.success("取消关注成功！")
           isFollowed.value = false
+          getAuthorData()
         }).catch(() => {
           message.error("error!")
         })

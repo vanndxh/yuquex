@@ -174,7 +174,6 @@ export default {
         return true
       },
       parseText(res, file) {
-        newArticleName.value = file.name.split('.')[0].slice(0,15)
         if (file.raw) {
           const reader = new FileReader()
           reader.readAsText(file.raw);
@@ -185,7 +184,6 @@ export default {
         }
       },
       parseTextAgain(file) {
-        newArticleName.value = file.name.split('.')[0].slice(0,15)
         if (file.raw) {
           const reader = new FileReader()
           reader.readAsText(file.raw);
