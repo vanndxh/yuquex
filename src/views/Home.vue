@@ -115,11 +115,12 @@ export default {
           positiveText: '朕知道了~',
           onPositiveClick: () => {},
         })
-      }
+      },
     }
   },
   mounted() {
     this.welcome()
+    this.test()
   }
 }
 </script>
@@ -127,8 +128,5 @@ export default {
 <style scoped>
 .content {
   text-align: center;
-}
-.userInstruction {
-  color: blue;
 }
 </style>
