@@ -112,10 +112,10 @@
 
 <script>
 import tabBar from "../common/tabBar";
-import { NotificationOutlined } from '@vicons/antd'
-import { EllipsisVerticalCircle } from '@vicons/ionicons5'
+import {NotificationOutlined} from '@vicons/antd'
+import {EllipsisVerticalCircle} from '@vicons/ionicons5'
 import {NButton, useDialog, useMessage} from 'naive-ui'
-import { h, ref } from "vue";
+import {h, ref} from "vue";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
@@ -298,8 +298,7 @@ export default {
             pos.value = r.data.data[i].Position
           }
           let date = new Date(r.data.data[i].LastPunchTime)
-          let formatTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
-          r.data.data[i].LastPunchTime = formatTime
+          r.data.data[i].LastPunchTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
         }
       })
     }

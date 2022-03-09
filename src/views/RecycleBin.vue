@@ -13,14 +13,16 @@
         <n-layout-content content-style="padding: 24px;">
           <n-grid :col="24">
             <n-gi :span="20" :offset="1">
-              <n-data-table :columns="columns" :data="data" :pagination="pagination" />
+              <n-space vertical>
+                <n-button type="error" ghost @click="clearBin">清空回收站</n-button>
+                <n-data-table :columns="columns" :data="data" :pagination="pagination" />
+              </n-space>
             </n-gi>
           </n-grid>
         </n-layout-content>
       </n-layout>
     </n-layout>
   </div>
-  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>

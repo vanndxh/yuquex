@@ -152,6 +152,27 @@
       </n-space>
     </n-card>
   </n-modal>
+  <n-modal v-model:show="showVip">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        title="会员服务"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <div>
+        您会员到期时间：{{ vipTime }}
+      </div>
+      <br>
+      <n-space>
+        <p style="line-height: 0">兑换码</p>
+        <n-input v-model:value="code" type="text" style="width: 500px" @keyup.enter="renewVip"/>
+        <n-button type="primary" ghost @click="renewVip" style="float: right">兑换</n-button>
+      </n-space>
+      <p style="font-size: 12px;color: darkgray">目前没有氪金会员，输入"xiaoheizhenshuai"续费一个月，感谢支持！</p>
+    </n-card>
+  </n-modal>
 
 </template>
 
@@ -172,7 +193,10 @@ export default {
     const router = useRouter()
     const store = useStore()
 
+    const vipTime = ref()
+    const code = ref()
     const adminPass = ref("")
+    const showVip = ref(false)
     const showRead = ref(true)
     const showFeedback = ref(false)
     const showUserInstruction = ref(false)
@@ -257,7 +281,7 @@ export default {
     const showAdmin = ref(false)
 
     return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead, showAdmin, adminPass,
+      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead, showAdmin, adminPass, showVip, code, vipTime,
       getRead,
 
       activeKey: ref(null),
@@ -270,7 +294,10 @@ export default {
           label: '提交反馈',
           key: "feedback"
         },
-
+        {
+          label: '会员服务',
+          key: "vip"
+        },
         {
           label: '用户须知',
           key: "userInstruction"
@@ -309,6 +336,18 @@ export default {
           router.push("Profile")
         } else if (key === "manager") {
           showAdmin.value = true
+        } else if (key === "vip") {
+          store.state.axios({
+            url: '/go/user/getUserInfo',
+            method: 'get',
+            params: {
+              userId: store.state.uid
+            }
+          }).then(r => {
+            let date = new Date(r.data.data.Vip)
+            vipTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
+            showVip.value = true
+          })
         }
       },
       clickCreate () {
@@ -369,6 +408,22 @@ export default {
         } else {
           message.error("密码错误~")
         }
+      },
+      renewVip() {
+        let formData = new FormData()
+        formData.set("userId", store.state.uid)
+        formData.set("code", code.value)
+        store.state.axios({
+          url: '/go/user/renewVip',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("续费成功！")
+          code.value = ""
+          showVip.value = false
+        }).catch(() => {
+          message.error("err")
+        })
       }
     }
   },

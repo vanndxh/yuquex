@@ -22,6 +22,15 @@
                 />
               </n-space>
               <h1 class="user">{{ userData.Username }}</h1>
+              <n-space justify="center">
+                <div v-if="userData.Authentication">
+                  <n-tag type="info">{{ userData.Authentication }}</n-tag>
+                </div>
+                <div v-if="userData.Vip">
+                  <n-tag type="warning" @click="showVip = true">vip</n-tag>
+                </div>
+              </n-space>
+              <br>
               <n-icon><MessageOutlined /></n-icon>
               {{ userData.UserInfo }}
               <n-space justify="space-around">
@@ -125,14 +134,35 @@
       <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
     </n-card>
   </n-modal>
+  <n-modal v-model:show="showVip">
+    <n-card
+        style="width: 800px;"
+        :bordered="false"
+        title="会员服务"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <div>
+        您会员到期时间：{{ userData.Vip }}
+      </div>
+      <br>
+      <n-space>
+        <p style="line-height: 0">兑换码</p>
+        <n-input v-model:value="code" type="text" style="width: 500px" @keyup.enter="renewVip"/>
+        <n-button type="primary" ghost @click="renewVip" style="float: right">兑换</n-button>
+      </n-space>
+      <p style="font-size: 12px;color: darkgray">目前没有氪金会员，输入"xiaoheizhenshuai"续费一个月，感谢支持！</p>
+    </n-card>
+  </n-modal>
 
 </template>
 
 <script>
 import tabBar from "../common/tabBar";
-import { BookOutline } from '@vicons/ionicons5'
-import { LikeOutlined, MessageOutlined } from '@vicons/antd'
-import { h , ref } from "vue";
+import {BookOutline} from '@vicons/ionicons5'
+import {LikeOutlined, MessageOutlined} from '@vicons/antd'
+import {h, ref} from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
@@ -146,8 +176,11 @@ export default {
     const message = useMessage()
     const store = useStore()
 
+    const isVip = ref(false)
     const isFollowed = ref(null)
     // 模块相关
+    const code = ref()
+    const showVip = ref(false)
     const showFollow = ref(false)
     const showFollower = ref(false)
     const showChangeInfo = ref(false)
@@ -448,6 +481,14 @@ export default {
         }
       }).then(r => {
         userData.value = r.data.data
+        let vip = new Date(r.data.data.Vip)
+        let now = new Date()
+        if (vip > now) {
+          isVip.value = true
+        } else {
+          isVip.value = false
+        }
+        userData.value.Vip = vip.getFullYear() + '-' + (vip.getMonth() + 1) + '-' + vip.getDate() + "  " + vip.getHours() + ":" + vip.getMinutes()
       })
     }
     const getFollows = () => {
@@ -478,7 +519,7 @@ export default {
 
     return {
       data1, data2, data3, data4, data5, data6, userData, showChangeInfo, showFollow, showFollower, newUsername, newPassword, newInfo, upId,
-      isFollowed,
+      isFollowed, showVip, code, isVip,
       getTeams, getArticles, getFavorite, getUserComment, getUserData, getIsFollowed,
 
       uid: store.state.uid,
@@ -626,6 +667,22 @@ export default {
             })
           }
         }, 500)
+      },
+      renewVip() {
+        let formData = new FormData()
+        formData.set("userId", store.state.uid)
+        formData.set("code", code.value)
+        store.state.axios({
+          url: '/go/user/renewVip',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("续费成功！")
+          code.value = ""
+          showVip.value = false
+        }).catch(() => {
+          message.error("err")
+        })
       }
     }
   },

@@ -14,7 +14,7 @@
               <n-list-item v-for="item in followArticleData" :key="item">
                 <n-card hoverable>
                   <n-space>
-                    <h2 style="line-height: 0">{{ item.ArticleName }}</h2>
+                    <h2 style="line-height: 0" @click="lookDetail(item.ArticleId)">{{ item.ArticleName }}</h2>
                     <div style="line-height: 32px" v-if="item.Hot > 5">
                       <n-tag type="error" size="small">火</n-tag>
                     </div>
@@ -55,11 +55,14 @@
           </n-tab-pane>
 
           <n-tab-pane name="recommend" tab="推荐">
+            <n-space justify="right">
+              <n-button><n-icon><RefreshOutline /></n-icon>换一批</n-button>
+            </n-space>
             <n-list>
               <n-list-item v-for="item in recommendArticleData" :key="item">
                 <n-card hoverable>
                   <n-space>
-                    <h2 style="line-height: 0">{{ item.ArticleName }}</h2>
+                    <h2 style="line-height: 0" @click="lookDetail(item.ArticleId)">{{ item.ArticleName }}</h2>
                     <div style="line-height: 32px" v-if="item.Hot > 5">
                       <n-tag type="error" size="small">火</n-tag>
                     </div>
@@ -116,12 +119,12 @@ import {useStore} from "vuex";
 import { ref } from "vue";
 import {useRouter} from "vue-router";
 import {useMessage} from "naive-ui";
-import { PersonOutline, BookOutline, TimeOutline } from "@vicons/ionicons5";
+import { PersonOutline, BookOutline, TimeOutline, RefreshOutline } from "@vicons/ionicons5";
 import { LikeOutlined, StarOutlined } from "@vicons/antd";
 
 export default {
   components:{
-    tabBar, PersonOutline, BookOutline, LikeOutlined, StarOutlined, TimeOutline
+    tabBar, PersonOutline, BookOutline, LikeOutlined, StarOutlined, TimeOutline, RefreshOutline
   },
   setup() {
     const message = useMessage()
@@ -173,12 +176,6 @@ export default {
             let formatTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
             r.data.data[i].Time = formatTime
             r.data.data[i].IsToday = date.getFullYear() == now.toLocaleDateString().split('/')[0] && (date.getMonth()+1) == now.toLocaleDateString().split('/')[1] && date.getDate() == now.toLocaleDateString().split('/')[2]
-            if (r.data.data[i].ArticleId === 22) {
-              console.log(date.getDate());
-              console.log(now.toLocaleDateString().split('/')[2]);
-              console.log(date.getDay() == now.toLocaleDateString().split('/')[2]);
-            }
-
           }
         })
       }
