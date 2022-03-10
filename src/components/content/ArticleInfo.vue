@@ -42,7 +42,16 @@
               <n-list>
                 <n-list-item v-for="item in commentData" :key="item">
                   <n-card hoverable size="small">
-                    <h3 style="line-height: 10px">{{ item.Username }}</h3>
+                    <n-space>
+                      <h3 style="line-height: 0">{{ item.Username }}</h3>
+                      <div v-if="item.UserAuth">
+                        <n-tag type="info" size="small">{{ item.UserAuth }}</n-tag>
+                      </div>
+                      <div v-if="item.UserVip == 1">
+                        <n-tag type="warning" size="small">vip</n-tag>
+                      </div>
+                    </n-space>
+
                     <p class="small">{{ item.CommentContent }}</p>
                     <div>
                       <n-button type="error" style="float: right"
@@ -75,6 +84,15 @@
                   />
                 </n-space>
                 <h1 class="user">{{ authorData.Username }}</h1>
+                <n-space justify="center">
+                  <div v-if="authorData.Authentication">
+                    <n-tag type="info">{{ authorData.Authentication }}</n-tag>
+                  </div>
+                  <div v-if="authorData.Vip == 1">
+                    <n-tag type="warning">vip</n-tag>
+                  </div>
+                </n-space>
+                <br>
                 <n-icon><MessageOutlined /></n-icon>
                 {{ authorData.UserInfo }}
 
@@ -179,6 +197,15 @@ export default {
         }
       }).then(r => {
         commentData.value = r.data.data
+        for (let i in r.data.data) {
+          let now = new Date()
+          let date = new Date(r.data.data[i].UserVip)
+          if (date > now) {
+            r.data.data[i].UserVip = 1
+          } else {
+            r.data.data[i].UserVip = 0
+          }
+        }
       })
     }
     const getIsLiked = () => {
@@ -235,6 +262,13 @@ export default {
         }
       }).then(r => {
         authorData.value = r.data.data
+        let now = new Date()
+        let date = new Date(r.data.data.Vip)
+        if (date > now) {
+          r.data.data.Vip = 1
+        } else {
+          r.data.data.Vip = 0
+        }
       })
     }
     const getIsFollowed = () => {

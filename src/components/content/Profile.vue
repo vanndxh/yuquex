@@ -26,7 +26,7 @@
                 <div v-if="userData.Authentication">
                   <n-tag type="info">{{ userData.Authentication }}</n-tag>
                 </div>
-                <div v-if="userData.Vip">
+                <div v-if="isVip">
                   <n-tag type="warning" @click="showVip = true">vip</n-tag>
                 </div>
               </n-space>

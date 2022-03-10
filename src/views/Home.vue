@@ -110,7 +110,7 @@ export default {
         dialog.info({
           closable: false,
           title: '小黑屋',
-          content: '当前版本v1.2.6beta，该发布版本未部署后端/数据库，导致部分功能不能使用，敬请谅解，欢迎给作者提供修改建议，共同完成更成熟的作品！' + "\n" +
+          content: '当前版本v1.3.0beta，该发布版本未部署后端/数据库，导致部分功能不能使用，敬请谅解，欢迎给作者提供修改建议，共同完成更成熟的作品！' + "\n" +
               'email:1025196468@qq.com',
           positiveText: '朕知道了~',
           onPositiveClick: () => {},

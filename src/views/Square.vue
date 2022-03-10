@@ -56,10 +56,10 @@
 
           <n-tab-pane name="recommend" tab="推荐">
             <n-space justify="right">
-              <n-button><n-icon><RefreshOutline /></n-icon>换一批</n-button>
+              <n-button @click="recRandom"><n-icon><RefreshOutline /></n-icon>换一批</n-button>
             </n-space>
             <n-list>
-              <n-list-item v-for="item in recommendArticleData" :key="item">
+              <n-list-item v-for="item in recommendArticleDataReal" :key="item">
                 <n-card hoverable>
                   <n-space>
                     <h2 style="line-height: 0" @click="lookDetail(item.ArticleId)">{{ item.ArticleName }}</h2>
@@ -133,9 +133,11 @@ export default {
 
     const followArticleData = ref([])
     const recommendArticleData = ref([])
+    const recommendArticleDataReal = ref([])
+    const last = ref([])
 
     return {
-      followArticleData, recommendArticleData,
+      followArticleData, recommendArticleData, recommendArticleDataReal, last,
 
       page: 1,
       pageTotal: 10,
@@ -173,12 +175,53 @@ export default {
           for (let i in r.data.data) {
             let now = new Date()
             let date = new Date(r.data.data[i].Time)
-            let formatTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
-            r.data.data[i].Time = formatTime
+            r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
             r.data.data[i].IsToday = date.getFullYear() == now.toLocaleDateString().split('/')[0] && (date.getMonth()+1) == now.toLocaleDateString().split('/')[1] && date.getDate() == now.toLocaleDateString().split('/')[2]
           }
+          this.recRandom()
         })
-      }
+      },
+      recRandom() {
+        // 计算三个流量池容量
+        let n = recommendArticleData.value.length
+        let aAmount = parseInt(n/10)
+        let bAmount = parseInt(n/10*3)
+        let cAmount = n-aAmount-bAmount
+        // 随机获取a
+        let a = parseInt(Math.random()*aAmount)
+        while(last.value.indexOf(a) >= 0) {
+          a = parseInt(Math.random()*aAmount)
+        }
+        last.value[0] = a
+        // b
+        let b1 = parseInt(Math.random()*bAmount + aAmount)
+        while(last.value.indexOf(b1) >= 0) {
+          b1 = parseInt(Math.random()*bAmount + aAmount)
+        }
+        let b2 = parseInt(Math.random()*bAmount + aAmount)
+        while(b2 == b1 || last.value.indexOf(b2) >= 0) {
+          b2 = parseInt(Math.random()*bAmount + aAmount)
+        }
+        let b3 = parseInt(Math.random()*bAmount + aAmount)
+        while (b3 == b1 || b3 == b2 || last.value.indexOf(b3) >= 0) {
+          b3 = parseInt(Math.random()*bAmount + aAmount)
+        }
+        last.value[1] = b1
+        last.value[2] = b2
+        last.value[3] = b3
+        // c
+        let c = parseInt(Math.random()*cAmount + aAmount + bAmount)
+        while(last.value.indexOf(c) >= 0) {
+          c = parseInt(Math.random()*cAmount + aAmount + bAmount)
+        }
+        last.value[4] = c
+        // 数据搬运
+        recommendArticleDataReal.value[0] = recommendArticleData.value[a]
+        recommendArticleDataReal.value[1] = recommendArticleData.value[b1]
+        recommendArticleDataReal.value[2] = recommendArticleData.value[b2]
+        recommendArticleDataReal.value[3] = recommendArticleData.value[b3]
+        recommendArticleDataReal.value[4] = recommendArticleData.value[c]
+      },
     }
   },
   mounted() {

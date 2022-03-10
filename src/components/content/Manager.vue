@@ -18,11 +18,23 @@
           <n-tab-pane name="comments" tab="评论">
             <n-data-table :columns="columns4" :data="data4" :pagination="pagination" size="small"/>
           </n-tab-pane>
+          <n-tab-pane name="auth" tab="认证">
+            <br>
+            <n-space justify="center">
+              <p style="line-height: 0">认证Id</p>
+              <n-input v-model:value="authId" type="text" style="width: 200px"/>
+              <p style="line-height: 0">认证内容</p>
+              <n-input v-model:value="authContent" type="text" style="width: 300px"/>
+            </n-space>
+            <br>
+            <div style="text-align: center">
+              <n-button type="primary" ghost @click="addAuth" style="width: 100px">认证</n-button>
+            </div>
+          </n-tab-pane>
         </n-tabs>
       </n-card>
     </n-gi>
   </n-grid>
-  <div><n-back-top :right="40"/></div>
 </template>
 
 <script>
@@ -41,11 +53,15 @@ export default {
     const router = useRouter()
     const store = useStore()
     const message = useMessage()
-
+    // other
+    const authId = ref()
+    const authContent = ref()
+    // data
     const data1 = ref([])
     const data2 = ref([])
     const data3 = ref([])
     const data4 = ref([])
+    // func
     const createColumns1 = ({ deleteUser }) => {
       return [
         {
@@ -344,7 +360,7 @@ export default {
     }
 
     return {
-      data1, data2, data3, data4,
+      data1, data2, data3, data4, authId, authContent,
       getAllArticles, getAllUsers, getAllTeams, getAllComments,
 
       pagination: {
@@ -451,6 +467,22 @@ export default {
           })
         }
       }),
+      addAuth() {
+        let formData = new FormData()
+        formData.set('authId', authId.value)
+        formData.set('authContent', authContent.value)
+        store.state.axios({
+          url: '/go/user/addAuth',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("认证成功！")
+          authId.value = ""
+          authContent.value = ""
+        }).catch(() => {
+          message.error("error!")
+        })
+      }
     }
   },
   mounted() {

@@ -256,48 +256,56 @@ export default {
       }),
       columns2: createColumns2({
         follow (rowData) {
-          getIsFollowed(store.state.uid, rowData.UserId)
-          setTimeout(() => {
-            if (isFollowed.value) {
-              message.error("您已经关注，不能重复关注！")
-            } else {
-              let formData = new FormData()
-              formData.set('up', rowData.UserId)
-              formData.set('follower', store.state.uid)
-              formData.set('handle', "0")
-              store.state.axios({
-                url: '/go/follow/handleFollow',
-                method: 'post',
-                data: formData,
-              }).then(() => {
-                message.success("关注成功！")
-              }).catch(() => {
-                message.error("error!")
-              })
-            }
-          }, 500)
+          if (store.state.uid == rowData.UserId) {
+            message.error("您不能关注您自己！")
+          } else {
+            getIsFollowed(store.state.uid, rowData.UserId)
+            setTimeout(() => {
+              if (isFollowed.value) {
+                message.error("您已经关注，不能重复关注！")
+              } else {
+                let formData = new FormData()
+                formData.set('up', rowData.UserId)
+                formData.set('follower', store.state.uid)
+                formData.set('handle', "0")
+                store.state.axios({
+                  url: '/go/follow/handleFollow',
+                  method: 'post',
+                  data: formData,
+                }).then(() => {
+                  message.success("关注成功！")
+                }).catch(() => {
+                  message.error("error!")
+                })
+              }
+            }, 500)
+          }
         },
         unFollow(rowData) {
-          getIsFollowed(store.state.uid, rowData.UserId)
-          setTimeout(() => {
-            if (!isFollowed.value) {
-              message.error("您没有关注该用户，不能取消关注！")
-            } else {
-              let formData = new FormData()
-              formData.set('up', rowData.UserId)
-              formData.set('follower', store.state.uid)
-              formData.set('handle', "1")
-              store.state.axios({
-                url: '/go/follow/handleFollow',
-                method: 'post',
-                data: formData,
-              }).then(() => {
-                message.success("取消关注成功！")
-              }).catch(() => {
-                message.error("error!")
-              })
-            }
-          }, 500)
+          if (store.state.uid == rowData.UserId) {
+            message.error("您不能操作您自己！")
+          } else {
+            getIsFollowed(store.state.uid, rowData.UserId)
+            setTimeout(() => {
+              if (!isFollowed.value) {
+                message.error("您没有关注该用户，不能取消关注！")
+              } else {
+                let formData = new FormData()
+                formData.set('up', rowData.UserId)
+                formData.set('follower', store.state.uid)
+                formData.set('handle', "1")
+                store.state.axios({
+                  url: '/go/follow/handleFollow',
+                  method: 'post',
+                  data: formData,
+                }).then(() => {
+                  message.success("取消关注成功！")
+                }).catch(() => {
+                  message.error("error!")
+                })
+              }
+            }, 500)
+          }
         }
       }),
       columns3: createColumns3({
