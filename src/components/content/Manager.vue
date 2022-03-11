@@ -33,7 +33,7 @@
               <n-button type="primary" ghost @click="addAuth" style="width: 100px">认证</n-button>
             </div>
           </n-tab-pane>
-          <n-tab-pane name="update" tab="更新">
+          <n-tab-pane name="update" tab="更新日志">
             <n-card title="发布新版本">
               <n-space justify="center">
                 <p style="line-height: 0">版本</p>
@@ -46,7 +46,7 @@
               <br>
               <n-space justify="center">
                 <p style="line-height: 0">更新内容</p>
-                <n-input v-model:value="content" type="text" style="width: 800px"/>
+                <n-input v-model:value="content" type="text" style="width: 700px"/>
               </n-space>
               <br>
               <div style="text-align: center">
@@ -56,11 +56,17 @@
             <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
           </n-tab-pane>
           <n-tab-pane name="notice" tab="发布新公告">
-            <p style="line-height: 0">新公告</p>
-            <n-input v-model:value="newNotice" type="text" style="width: 200px"/>
-            <div style="text-align: center">
-              <n-button type="primary" ghost @click="changeNotice" style="width: 100px">发布公告</n-button>
-            </div>
+            <br>
+            <n-grid :cols="24">
+              <n-gi :span="18" :offset="3">
+                <n-space vertical>
+                  <p style="line-height: 0">新公告内容</p>
+                  <n-input v-model:value="newNotice" type="textarea" style="width: 100%"
+                           :autosize="{minRows: 5,maxRows: 10}"/>
+                  <n-button type="primary" ghost @click="changeNotice" style="width: 100px;float: right">发布公告</n-button>
+                </n-space>
+              </n-gi>
+            </n-grid>
           </n-tab-pane>
         </n-tabs>
       </n-card>
@@ -104,9 +110,6 @@ export default {
     // tableColumn
     const createColumns1 = ({ deleteUser }) => {
       return [
-        {
-          width: 50
-        },
         {
           title: 'Id',
           width: 50,
@@ -172,9 +175,6 @@ export default {
             )
           }
         },
-        {
-          width: 50
-        }
       ]
     }
     const createColumns2 = ({ lookDetail, deleteArticle }) => {
@@ -683,6 +683,18 @@ export default {
           getTimelines()
         }).catch(() => {
           message.error("error!")
+        })
+      },
+      changeNotice() {
+        let formData = new FormData()
+        formData.set('newNotice', newNotice.value)
+        store.state.axios({
+          url: '/go/notice/changeNotice',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          newNotice.value = ""
+          message.success("公告发布成功！")
         })
       }
     }

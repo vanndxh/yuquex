@@ -89,9 +89,9 @@
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catgif"
-import {ref} from "vue";
-import {  addDays } from 'date-fns'
-import {useDialog} from "naive-ui";
+import {h, ref} from "vue";
+import { addDays } from 'date-fns'
+import {NButton, useMessage, useNotification} from "naive-ui";
 import {useStore} from "vuex";
 
 export default {
@@ -99,21 +99,34 @@ export default {
     tabBar, tabBarS, catgif
   },
   setup() {
+    const mesaage = useMessage()
+    const notification = useNotification()
     const store = useStore()
-    const dialog = useDialog()
 
-    const notice = ref()
+    const noticeContent = ref()
+    const noticeTime = ref()
     const showUserInstruction = ref(false)
 
     const welcome = () => {
       if (store.state.uid <= 0) {
         // 没登录
-        dialog.info({
-          closable: false,
+        const n = notification.info({
           title: '小黑屋',
-          content: notice.value,
-          positiveText: '朕知道了~',
-          onPositiveClick: () => {},
+          content: noticeContent.value,
+          meta: noticeTime.value,
+          action: () => h(
+              NButton,
+              {
+                text: true,
+                type: 'primary',
+                onClick: () => {
+                  n.destroy()
+                }
+              },
+              {
+                default: () => '朕知道了~'
+              }
+          )
         })
       } else {
         // 登录了，就判定一下
@@ -125,20 +138,33 @@ export default {
           }
         }).then(r => {
           if (r.data.data.ReadNotice != 1) {
-            dialog.info({
-              closable: false,
+            const n = notification.info({
               title: '小黑屋',
-              content: notice.value,
-              positiveText: '朕知道了~',
-              onPositiveClick: () => {
-                let formData = new FormData()
-                formData.set("userId", store.state.uid)
-                store.state.axios({
-                  url: '/go/user/readNotice',
-                  method: 'post',
-                  data: formData,
-                })
-              },
+              content: noticeContent.value,
+              meta: noticeTime.value,
+              action: () => h(
+                  NButton,
+                  {
+                    text: true,
+                    type: 'primary',
+                    onClick: () => {
+                      n.destroy()
+                      let formData = new FormData()
+                      formData.set("userId", store.state.uid)
+                      store.state.axios({
+                        url: '/go/user/readNotice',
+                        method: 'post',
+                        data: formData,
+                      })
+                    }
+                  },
+                  {
+                    default: () => '朕知道了~'
+                  }
+              ),
+              onClose: () => {
+                mesaage.info("点击'朕知道了'下次不再弹出~")
+              }
             })
           }
         })
@@ -146,7 +172,7 @@ export default {
     }
 
     return {
-      showUserInstruction, notice,
+      showUserInstruction, noticeContent, noticeTime,
 
       value: ref(addDays(Date.now(), 1).valueOf()),
       handleUpdateValue () {},
@@ -155,7 +181,9 @@ export default {
           url: '/go/notice/getNotice',
           method: 'get',
         }).then(r => {
-          notice.value = r.data.data
+          noticeContent.value = r.data.data.NoticeContent
+          let date = new Date(r.data.data.Time)
+          noticeTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
           welcome()
         })
       }

@@ -11,7 +11,7 @@
             <n-menu v-model:value="activeKey" mode="horizontal" :options="menuOptions" />
           </n-gi>
 
-          <n-gi span="3">
+          <n-gi span="4">
             <n-space>
               <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"
                        @keyup.enter="search(searchValue)">
@@ -23,7 +23,7 @@
             </n-space>
           </n-gi>
 
-          <n-gi offset="3" :span="2">
+          <n-gi offset="2" :span="2">
             <n-space justify="right">
               <n-popover trigger="hover">
                 <template #trigger>
