@@ -110,8 +110,8 @@ export default {
         dialog.info({
           closable: false,
           title: '小黑屋',
-          content: '当前版本v1.3.0beta，发布的第一个完整版本，欢迎给作者提供修改建议，共同完成更成熟的作品！' + "\n" +
-              'email:1025196468@qq.com',
+          content: '当前版本v1.3.1beta，此版本为删档内测，欢迎各位体验，也欢迎给作者提供修改建议' + "\n" +
+              'email:1025196468@qq.com' + "\n" + "已知bug：广场界面卡顿" + "\n" + "千万不要点广场！会卡住！还在定位问题中...",
           positiveText: '朕知道了~',
           onPositiveClick: () => {},
         })

@@ -1,6 +1,5 @@
 <template>
   <tabBar></tabBar>
-  <!--主体代码，不用管，你根据你自己的写-->
   <n-grid :col="24">
     <n-gi :span="16" :offset="4">
       <br>
@@ -18,10 +17,13 @@
           <n-tab-pane name="comments" tab="评论">
             <n-data-table :columns="columns4" :data="data4" :pagination="pagination" size="small"/>
           </n-tab-pane>
+          <n-tab-pane name="feedbacks" tab="反馈">
+            <n-data-table :columns="columns5" :data="data5" :pagination="pagination" size="small"/>
+          </n-tab-pane>
           <n-tab-pane name="auth" tab="认证">
             <br>
             <n-space justify="center">
-              <p style="line-height: 0">认证Id</p>
+              <p style="line-height: 0">认证用户Id</p>
               <n-input v-model:value="authId" type="text" style="width: 200px"/>
               <p style="line-height: 0">认证内容</p>
               <n-input v-model:value="authContent" type="text" style="width: 300px"/>
@@ -30,6 +32,28 @@
             <div style="text-align: center">
               <n-button type="primary" ghost @click="addAuth" style="width: 100px">认证</n-button>
             </div>
+          </n-tab-pane>
+          <n-tab-pane name="update" tab="更新">
+            <n-card title="发布新版本">
+              <n-space justify="center">
+                <p style="line-height: 0">版本</p>
+                <n-input v-model:value="title" type="text" style="width: 200px" placeholder="v0.0.0"/>
+                <p style="line-height: 0">日期</p>
+                <n-input v-model:value="time" type="text" style="width: 200px" placeholder="2000/11/11"/>
+                <p style="line-height: 0">类型</p>
+                <n-input v-model:value="type" type="text" style="width: 200px" placeholder="Can be null"/>
+              </n-space>
+              <br>
+              <n-space justify="center">
+                <p style="line-height: 0">更新内容</p>
+                <n-input v-model:value="content" type="text" style="width: 800px"/>
+              </n-space>
+              <br>
+              <div style="text-align: center">
+                <n-button type="primary" ghost @click="addTimeline" style="width: 100px">发布更新</n-button>
+              </div>
+            </n-card>
+            <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
           </n-tab-pane>
         </n-tabs>
       </n-card>
@@ -53,7 +77,12 @@ export default {
     const router = useRouter()
     const store = useStore()
     const message = useMessage()
-    // other
+    // update界面
+    const content = ref()
+    const type = ref()
+    const title = ref()
+    const time = ref()
+    // auth界面
     const authId = ref()
     const authContent = ref()
     // data
@@ -61,7 +90,9 @@ export default {
     const data2 = ref([])
     const data3 = ref([])
     const data4 = ref([])
-    // func
+    const data5 = ref([])
+    const data6 = ref([])
+    // tableColumn
     const createColumns1 = ({ deleteUser }) => {
       return [
         {
@@ -94,7 +125,7 @@ export default {
         {
           title: '点赞数',
           width: 60,
-          key: 'LikeTotal',
+          key: 'LikeAmount',
           align: 'center',
         },
         {
@@ -214,7 +245,7 @@ export default {
         },
         {
           title: '小组名',
-          width: 100,
+          width: 200,
           key: 'TeamName',
           align: 'center',
         },
@@ -326,6 +357,84 @@ export default {
         },
       ]
     }
+    const createColumns5 = ({ deleteFeedback }) => {
+      return [
+        {
+          title: 'Id',
+          key: 'FeedbackId',
+          width: 50,
+          align: 'center',
+        },
+        {
+          title: '反馈用户',
+          width: 80,
+          key: 'UserId',
+          align: 'center',
+        },
+        {
+          title: '反馈内容',
+          key: 'FeedbackInfo',
+          width: 200,
+          align: 'left',
+        },
+        {
+          title: '删除该反馈',
+          key: 'deleteFeedback',
+          align: 'center',
+          width: 100,
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => deleteFeedback(row)
+                },
+                { default: () => '删除' }
+            )
+          }
+        },
+      ]
+    }
+    const createColumns6 = ({ deleteTimeline }) => {
+      return [
+        {
+          title: '版本',
+          key: 'Title',
+          width: 80,
+          align: 'center',
+        },
+        {
+          title: '更新时间',
+          width: 120,
+          key: 'Time',
+          align: 'center',
+        },
+        {
+          title: '更新内容',
+          key: 'Content',
+          align: 'left',
+        },
+        {
+          title: '删除更新',
+          key: 'deleteTimeline',
+          align: 'center',
+          width: 80,
+          render (row) {
+            return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'warning',
+                  onClick: () => deleteTimeline(row)
+                },
+                { default: () => '删除' }
+            )
+          }
+        },
+      ]
+    }
+    // get data
     const getAllUsers = () => {
       store.state.axios({
         url: '/go/user/getAllUsers',
@@ -358,10 +467,26 @@ export default {
         data4.value = r.data.data
       })
     }
+    const getFeedbacks = () => {
+      store.state.axios({
+        url: '/go/feedback/getFeedbacks',
+        method: 'get',
+      }).then(r => {
+        data5.value = r.data.data
+      })
+    }
+    const getTimelines = () => {
+      store.state.axios({
+        url: '/go/timeline/getTimeline',
+        method: 'get',
+      }).then(r => {
+        data6.value = r.data.data
+      })
+    }
 
     return {
-      data1, data2, data3, data4, authId, authContent,
-      getAllArticles, getAllUsers, getAllTeams, getAllComments,
+      data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content,
+      getAllArticles, getAllUsers, getAllTeams, getAllComments, getFeedbacks, getTimelines,
 
       pagination: {
         pageSize: 10
@@ -467,6 +592,50 @@ export default {
           })
         }
       }),
+      columns5: createColumns5({
+        deleteFeedback (rowData) {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要删除这条反馈？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              store.state.axios({
+                url: '/go/feedback/deleteFeedback',
+                method: 'delete',
+                params: {
+                  feedbackId: rowData.FeedbackId
+                }
+              }).then(() => {
+                message.success("删除成功！")
+                getFeedbacks()
+              })
+            }
+          })
+        }
+      }),
+      columns6: createColumns6({
+        deleteTimeline (rowData) {
+          dialog.warning({
+            title: '警告',
+            content: '你确定要删除这条更新公告？',
+            positiveText: '确定',
+            negativeText: '取消',
+            onPositiveClick: () => {
+              store.state.axios({
+                url: '/go/timeline/deleteTimeline',
+                method: 'delete',
+                params: {
+                  title: rowData.Title
+                }
+              }).then(() => {
+                message.success("删除成功！")
+                getTimelines()
+              })
+            }
+          })
+        }
+      }),
       addAuth() {
         let formData = new FormData()
         formData.set('authId', authId.value)
@@ -482,6 +651,24 @@ export default {
         }).catch(() => {
           message.error("error!")
         })
+      },
+      addTimeline() {
+        let formData = new FormData()
+        formData.set('time', time.value)
+        formData.set('title', title.value)
+        formData.set('type', type.value)
+        formData.set('content', content.value)
+        store.state.axios({
+          url: '/go/timeline/addTimeline',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("发布成功！")
+          time.value = title.value = type.value = content.value = ""
+          getTimelines()
+        }).catch(() => {
+          message.error("error!")
+        })
       }
     }
   },
@@ -490,6 +677,8 @@ export default {
     this.getAllUsers()
     this.getAllTeams()
     this.getAllComments()
+    this.getFeedbacks()
+    this.getTimelines()
   }
 }
 </script>

@@ -256,7 +256,9 @@ export default {
       }),
       columns2: createColumns2({
         follow (rowData) {
-          if (store.state.uid == rowData.UserId) {
+          if (store.state.uid <= 0) {
+            message.error("您尚未登录!")
+          } else if (store.state.uid == rowData.UserId) {
             message.error("您不能关注您自己！")
           } else {
             getIsFollowed(store.state.uid, rowData.UserId)
@@ -282,7 +284,9 @@ export default {
           }
         },
         unFollow(rowData) {
-          if (store.state.uid == rowData.UserId) {
+          if (store.state.uid <= 0) {
+            message.error("您尚未登录!")
+          } else if (store.state.uid == rowData.UserId) {
             message.error("您不能操作您自己！")
           } else {
             getIsFollowed(store.state.uid, rowData.UserId)

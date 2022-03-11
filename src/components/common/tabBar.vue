@@ -387,7 +387,7 @@ export default {
       addFeedback() {
         let formData = new FormData()
         formData.set('feedbackInfo', feedbackValue.value)
-
+        formData.set('userId', store.state.uid)
         store.state.axios({
           url: '/go/feedback/submitFeedback',
           method: 'post',
