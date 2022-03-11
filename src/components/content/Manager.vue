@@ -111,6 +111,12 @@ export default {
           align: 'center',
         },
         {
+          title: '密码',
+          width: 100,
+          key: 'Password',
+          align: 'center',
+        },
+        {
           title: '简介',
           width: 200,
           key: 'UserInfo',
