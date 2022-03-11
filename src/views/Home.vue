@@ -102,58 +102,67 @@ export default {
     const store = useStore()
     const dialog = useDialog()
 
+    const notice = ref()
     const showUserInstruction = ref(false)
 
+    const welcome = () => {
+      if (store.state.uid <= 0) {
+        // 没登录
+        dialog.info({
+          closable: false,
+          title: '小黑屋',
+          content: notice.value,
+          positiveText: '朕知道了~',
+          onPositiveClick: () => {},
+        })
+      } else {
+        // 登录了，就判定一下
+        store.state.axios({
+          url: '/go/user/getUserInfo',
+          method: 'get',
+          params: {
+            userId: store.state.uid
+          }
+        }).then(r => {
+          if (r.data.data.ReadNotice != 1) {
+            dialog.info({
+              closable: false,
+              title: '小黑屋',
+              content: notice.value,
+              positiveText: '朕知道了~',
+              onPositiveClick: () => {
+                let formData = new FormData()
+                formData.set("userId", store.state.uid)
+                store.state.axios({
+                  url: '/go/user/readNotice',
+                  method: 'post',
+                  data: formData,
+                })
+              },
+            })
+          }
+        })
+      }
+    }
+
     return {
-      showUserInstruction,
+      showUserInstruction, notice,
 
       value: ref(addDays(Date.now(), 1).valueOf()),
       handleUpdateValue () {},
-      welcome() {
-        if (store.state.uid <= 0) {
-          // 没登录
-          dialog.info({
-            closable: false,
-            title: '小黑屋',
-            content: '当前版本v1.3.1beta，此版本为删档内测，欢迎各位体验，也欢迎给作者提供修改建议' + "\n\r" +
-                'email:1025196468@qq.com' + "\n\r" + "已知bug：广场界面卡顿" + "\n\r" + "千万不要点广场！会卡住！还在定位问题中...",
-            positiveText: '朕知道了~',
-            onPositiveClick: () => {},
-          })
-        } else {
-            // 登录了，就判定一下
-            store.state.axios({
-              url: '/go/user/getUserInfo',
-              method: 'get',
-              params: {
-                userId: store.state.uid
-              }
-            }).then(r => {
-              if (r.data.data.ReadNotice != 1) {
-                dialog.info({
-                  closable: false,
-                  title: '小黑屋',
-                  content: '当前版本v1.3.1beta，此版本为删档内测，欢迎各位体验，也欢迎给作者提供修改建议' + "\n\r" +
-                      'email:1025196468@qq.com' + "\n\r" + "已知bug：广场界面卡顿" + "\n\r" + "千万不要点广场！会卡住！还在定位问题中...",
-                  positiveText: '朕知道了~',
-                  onPositiveClick: () => {
-                    store.state.axios({
-                      url: '/go/user/readNotice',
-                      method: 'post',
-                      params: {
-                        userId: store.state.uid
-                      }
-                    })
-                  },
-                })
-              }
-            })
-          }
-      },
+      getNotice() {
+        store.state.axios({
+          url: '/go/notice/getNotice',
+          method: 'get',
+        }).then(r => {
+          notice.value = r.data.data
+          welcome()
+        })
+      }
     }
   },
   mounted() {
-    this.welcome()
+    this.getNotice()
   }
 }
 </script>

@@ -170,7 +170,7 @@
         <n-input v-model:value="code" type="text" style="width: 500px" @keyup.enter="renewVip"/>
         <n-button type="primary" ghost @click="renewVip" style="float: right">兑换</n-button>
       </n-space>
-      <p style="font-size: 12px;color: darkgray">目前没有氪金会员，输入"xiaoheizhenshuai"续费一个月，感谢支持！</p>
+      <p style="font-size: 12px;color: darkgray">目前没有氪金服务，输入"xiaoheizhenshuai"续费一个月，感谢支持！</p>
     </n-card>
   </n-modal>
 

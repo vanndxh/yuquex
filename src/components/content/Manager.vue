@@ -55,6 +55,13 @@
             </n-card>
             <n-data-table :columns="columns6" :data="data6" :pagination="pagination" size="small"/>
           </n-tab-pane>
+          <n-tab-pane name="notice" tab="发布新公告">
+            <p style="line-height: 0">新公告</p>
+            <n-input v-model:value="newNotice" type="text" style="width: 200px"/>
+            <div style="text-align: center">
+              <n-button type="primary" ghost @click="changeNotice" style="width: 100px">发布公告</n-button>
+            </div>
+          </n-tab-pane>
         </n-tabs>
       </n-card>
     </n-gi>
@@ -77,6 +84,8 @@ export default {
     const router = useRouter()
     const store = useStore()
     const message = useMessage()
+    // notice
+    const newNotice = ref()
     // update界面
     const content = ref()
     const type = ref()
@@ -491,7 +500,7 @@ export default {
     }
 
     return {
-      data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content,
+      data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content, newNotice,
       getAllArticles, getAllUsers, getAllTeams, getAllComments, getFeedbacks, getTimelines,
 
       pagination: {

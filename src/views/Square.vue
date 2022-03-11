@@ -148,23 +148,23 @@ export default {
       getFollowArticle() {
         if (store.state.uid <= 0) {
           message.error("您尚未登录！关注动态无法查看！")
+        } else {
+          store.state.axios({
+            url: '/go/article/getFollowArticles',
+            method: 'get',
+            params: {
+              userId: store.state.uid
+            }
+          }).then(r => {
+            followArticleData.value = r.data.data
+            for (let i in r.data.data) {
+              let now = new Date()
+              let date = new Date(r.data.data[i].Time)
+              r.data.data[i].isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()
+              r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
+            }
+          })
         }
-        store.state.axios({
-          url: '/go/article/getFollowArticles',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          }
-        }).then(r => {
-          followArticleData.value = r.data.data
-          for (let i in r.data.data) {
-            let now = new Date()
-            let date = new Date(r.data.data[i].Time)
-            let formatTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
-            r.data.data[i].isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()
-            r.data.data[i].Time = formatTime
-          }
-        })
       },
       getHotArticle() {
         store.state.axios({
