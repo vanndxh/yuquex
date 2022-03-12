@@ -120,6 +120,7 @@ export default {
         }).then(() => {
           message.success("已读~")
           getMessages(messageValue1.value, messageValue2.value)
+
         })
       },
       readAll() {

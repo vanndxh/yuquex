@@ -23,7 +23,7 @@
                       <n-input
                           type="password"
                           v-model:value="modelSignin.passwordSignin"
-                          @keydown.enter.prevent
+                          @keyup.enter="signIn"
                       />
                     </n-form-item-row>
                   </n-form>
@@ -276,16 +276,16 @@ export default {
           method: 'post',
           data: formData
         }).then(r => {
-            if (r.status === 200) {
+            if (r.data.data) {
               message.success("登录成功，将自动跳转！")
               store.state.isLogged = true
               store.state.uid = modelSignin.value.useridSignin
               router.push("/")
-            } else if (r.status === 404) {
+            } else {
               message.error("账号或密码错误！")
             }
           }).catch(() => {
-          message.error("账号或密码错误！")
+          message.error("err！")
         })
       },
     }

@@ -139,8 +139,6 @@ export default {
     return {
       followArticleData, recommendArticleData, recommendArticleDataReal, last,
 
-      page: 1,
-      pageTotal: 10,
       lookDetail(id) {
         store.state.aid = id
         router.push('ArticleInfo')

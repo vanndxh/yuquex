@@ -41,7 +41,7 @@
                 <p style="line-height: 0">日期</p>
                 <n-input v-model:value="time" type="text" style="width: 200px" placeholder="2000/11/11"/>
                 <p style="line-height: 0">类型</p>
-                <n-input v-model:value="type" type="text" style="width: 200px" placeholder="Can be null"/>
+                <n-input v-model:value="type" type="text" style="width: 200px" placeholder="default"/>
               </n-space>
               <br>
               <n-space justify="center">
@@ -498,10 +498,18 @@ export default {
         data6.value = r.data.data
       })
     }
+    const getNotice = () => {
+      store.state.axios({
+        url: '/go/notice/getNotice',
+        method: 'get',
+      }).then(r => {
+        newNotice.value = r.data.data.NoticeContent
+      })
+    }
 
     return {
       data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content, newNotice,
-      getAllArticles, getAllUsers, getAllTeams, getAllComments, getFeedbacks, getTimelines,
+      getAllArticles, getAllUsers, getAllTeams, getAllComments, getFeedbacks, getTimelines, getNotice,
 
       pagination: {
         pageSize: 10
@@ -693,7 +701,6 @@ export default {
           method: 'post',
           data: formData
         }).then(() => {
-          newNotice.value = ""
           message.success("公告发布成功！")
         })
       }
@@ -706,6 +713,7 @@ export default {
     this.getAllComments()
     this.getFeedbacks()
     this.getTimelines()
+    this.getNotice()
   }
 }
 </script>

@@ -193,14 +193,20 @@ export default {
     const router = useRouter()
     const store = useStore()
 
+    // model_admin
+    const showAdmin = ref(false)
+    const adminPass = ref("")
+    // model_vip
+    const showVip = ref(false)
     const vipTime = ref()
     const code = ref()
-    const adminPass = ref("")
-    const showVip = ref(false)
-    const showRead = ref(true)
+    // model_feedback
     const showFeedback = ref(false)
-    const showUserInstruction = ref(false)
     const feedbackValue = ref(null)
+    // model_ui
+    const showUserInstruction = ref(false)
+    // 基础信息初始化
+    const showRead = ref(true)
     const menuOptions = [
       {
         label: () =>
@@ -263,6 +269,7 @@ export default {
     ]
     const searchValue = ref(null)
     const log = ref(store.state.isLogged)
+    // func
     const getRead = () => {
       if (store.state.uid !== 0) {
         store.state.axios({
@@ -278,7 +285,6 @@ export default {
         showRead.value = true
       }
     }
-    const showAdmin = ref(false)
 
     return {
       menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead, showAdmin, adminPass, showVip, code, vipTime,
