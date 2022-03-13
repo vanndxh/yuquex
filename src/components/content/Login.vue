@@ -128,7 +128,7 @@
         role="dialog"
         aria-modal="true"
     >
-      请联系管理员:1025196468@qq.com
+      请联系管理员email:1025196468@qq.com
     </n-card>
   </n-modal>
 </template>
@@ -201,6 +201,8 @@ export default {
           validator(rule, value) {
             if (!value) {
               return new Error('不能为空')
+            } else if (value.indexOf(" ") >= 0 || value.indexOf(" ") >= 0) {
+              return new Error('名称不能有空格')
             } else
               return true
           },
@@ -213,6 +215,8 @@ export default {
               return new Error('不能为空')
             } else if (value.length < 6) {
               return new Error('密码不能小于6位')
+            } else if (value.indexOf(" ") !== -1 || value.indexOf(" ") !== -1) {
+              return new Error('密码不能有空格')
             } else
               return true
           },
@@ -241,29 +245,35 @@ export default {
         }],
       },
       register() {
-        let formData = new FormData()
-        formData.set('username', modelSignup.value.usernameSignup)
-        formData.set('password', modelSignup.value.passwordSignup)
-        formData.set('rePassword', modelSignup.value.repasswordSignup)
+        SignupRef.value?.validate((errors) => {
+          if (!errors) {
+            let formData = new FormData()
+            formData.set('username', modelSignup.value.usernameSignup)
+            formData.set('password', modelSignup.value.passwordSignup)
+            formData.set('rePassword', modelSignup.value.repasswordSignup)
 
-        store.state.axios({
-          url: '/go/user/register',
-          method: 'post',
-          data: formData
-        }).then(r => {
-          if (r.status === 200) {
-            store.state.choice = "signin"
-            modelSignin.value.useridSignin = r.data.userId
-            modelSignin.value.passwordSignin = r.data.password
-            message.success("注册成功！")
-            notification.warning({
-              title: "请牢记你的信息!",
-              content: "账号: " + r.data.userId + "\n" + "密码:" + r.data.password
+            store.state.axios({
+              url: '/go/user/register',
+              method: 'post',
+              data: formData
+            }).then(r => {
+              if (r.status === 200) {
+                store.state.choice = "signin"
+                modelSignin.value.useridSignin = r.data.userId
+                modelSignin.value.passwordSignin = r.data.password
+                message.success("注册成功！")
+                notification.warning({
+                  title: "请牢记你的信息!",
+                  content: "账号: " + r.data.userId + "\n" + "密码:" + r.data.password
+                })
+                tabValue.value = "signin"
+              }
+            }).catch(() => {
+              message.error("注册信息错误，请按提示修改！")
             })
-            tabValue.value = "signin"
+          } else {
+            message.error("注册信息错误，请按提示修改！")
           }
-        }).catch(() => {
-          message.error("注册信息错误，请按提示修改！")
         })
       },
       signIn() {

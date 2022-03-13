@@ -6,7 +6,7 @@
       <!--搜索框条-->
       <n-grid :col="24">
         <n-gi :span="18" :offset="2">
-          <n-input v-model:value="searchValue" type="text" placeholder="根据name模糊搜索" :clearable="true"
+          <n-input v-model:value="searchValue" type="text" placeholder="根据name搜索" :clearable="true"
                    maxlength="20" class="input" size="large" round :autofocus="true"
           @keyup.enter="search()">
             <template #affix>
@@ -61,10 +61,11 @@ export default {
     const createColumns1 = ({ lookDetail }) => {
       return [
         {
-          width: 50
+          width: 10
         },
         {
           title: 'Id',
+          width: 50,
           key: 'ArticleId',
           align: 'center'
         },
@@ -100,7 +101,7 @@ export default {
         {
           title: '查看详情',
           key: 'lookDetail',
-          width: 100,
+          width: 80,
           align: 'right',
           render (row) {
             return h(
@@ -115,14 +116,14 @@ export default {
           }
         },
         {
-          width: 50
+          width: 10
         }
       ]
     }
     const createColumns2 = ({ follow, unFollow }) => {
       return [
         {
-          width: 50
+          width: 20
         },
         {
           title: 'Id',
@@ -133,7 +134,6 @@ export default {
         {
           title: '用户名',
           key: 'Username',
-          width: 100,
           align: 'center'
         },
         {
@@ -195,18 +195,18 @@ export default {
         {
           title: 'Id',
           key: 'TeamId',
-          width: 70,
+          width: 80,
           align: 'center'
         },
         {
           title: '小组名',
           key: 'TeamName',
-          align: 'left'
+          align: 'center'
         },
         {
           title: '组长',
           key: 'LeaderName',
-          width: 100,
+          width: 120,
           align: 'center'
         },
         {
@@ -226,7 +226,7 @@ export default {
           }
         },
         {
-          width: 50
+          width: 20
         }
       ]
     }

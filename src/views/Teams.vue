@@ -86,6 +86,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -93,7 +94,7 @@ export default {
           }
         },
         {
-          width: 100
+          width: 50
         }
       ]
     }

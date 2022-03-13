@@ -39,6 +39,15 @@
               </n-grid>
               <n-divider />
               <!--评论区板块-->
+              <n-space vertical>
+                <n-input
+                    v-model:value="commentValue"
+                    type="textarea"
+                    :autosize="{minRows: 3,maxRows: 5}"
+                    maxlength="50" show-count
+                />
+                <n-button type="success" @click="clickComment()" :disabled="uid === 0">回复</n-button>
+              </n-space>
               <n-list>
                 <n-list-item v-for="item in commentData" :key="item">
                   <n-card hoverable size="small">
@@ -49,6 +58,9 @@
                       </div>
                       <div v-if="item.UserVip == 1">
                         <n-tag type="warning" size="small">vip</n-tag>
+                      </div>
+                      <div>
+                        <n-tag type="warning" size="small">作者</n-tag>
                       </div>
                     </n-space>
 
@@ -62,15 +74,6 @@
                   </n-card>
                 </n-list-item>
               </n-list>
-              <n-space vertical>
-                <n-input
-                    v-model:value="commentValue"
-                    type="textarea"
-                    :autosize="{minRows: 3,maxRows: 5}"
-                    maxlength="50" show-count
-                />
-                <n-button type="success" @click="clickComment()" :disabled="uid === 0">回复</n-button>
-              </n-space>
             </n-gi>
             <!--作者信息card-->
             <n-gi span="6" offset="2">

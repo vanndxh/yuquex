@@ -68,6 +68,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => recover(row)
                 },
                 { default: () => '恢复' }
@@ -84,7 +85,8 @@ export default {
                 NButton,
                 {
                   size: 'small',
-                  type: 'warning',
+                  type: 'error',
+                  ghost: true,
                   onClick: () => deleteArticle(row)
                 },
                 { default: () => '删除' }

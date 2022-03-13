@@ -62,6 +62,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -78,7 +79,8 @@ export default {
                 NButton,
                 {
                   size: 'small',
-                  type: 'warning',
+                  type: 'error',
+                  ghost: true,
                   onClick: () => deleteArticle(row)
                 },
                 { default: () => '删除' }

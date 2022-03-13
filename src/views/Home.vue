@@ -99,7 +99,7 @@ export default {
     tabBar, tabBarS, catgif
   },
   setup() {
-    const mesaage = useMessage()
+    const message = useMessage()
     const notification = useNotification()
     const store = useStore()
 
@@ -109,7 +109,7 @@ export default {
 
     const welcome = () => {
       if (store.state.uid <= 0) {
-        // 没登录
+        // 没登录x
         const n = notification.info({
           title: '小黑屋',
           content: noticeContent.value,
@@ -121,12 +121,16 @@ export default {
                 type: 'primary',
                 onClick: () => {
                   n.destroy()
+                  message.info("登录后本消息不再弹出~")
                 }
               },
               {
                 default: () => '朕知道了~'
               }
-          )
+          ),
+          onClose: () => {
+            message.info("登录后本消息不再弹出~")
+          }
         })
       } else {
         // 登录了，就判定一下
@@ -163,7 +167,7 @@ export default {
                   }
               ),
               onClose: () => {
-                mesaage.info("点击'朕知道了'下次不再弹出~")
+                message.info("点击'朕知道了'下次不再弹出~")
               }
             })
           }

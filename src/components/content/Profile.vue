@@ -216,6 +216,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -233,10 +234,12 @@ export default {
           width: 100
         },
         {
+          title: '小组名称',
           key: 'TeamName',
           align: 'left'
         },
         {
+          title: '查看详情',
           key: 'lookDetail',
           width: 150,
           render (row) {
@@ -245,6 +248,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -282,6 +286,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -296,10 +301,12 @@ export default {
           width: 20
         },
         {
+          title: '评论内容',
           key: 'CommentContent',
           align: 'left'
         },
         {
+          title: '查看',
           key: 'lookDetail',
           width: 50,
           align: 'center',
@@ -309,12 +316,14 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
             )
           }
         },{
+          title: '删除',
           key: 'deleteComment',
           align: 'center',
           width: 150,
@@ -323,7 +332,8 @@ export default {
                 NButton,
                 {
                   size: 'small',
-                  type: 'info',
+                  type: 'error',
+                  ghost: true,
                   onClick: () => deleteComment(row)
                 },
                 { default: () => '删除' }
