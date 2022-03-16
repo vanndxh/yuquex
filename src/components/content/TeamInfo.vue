@@ -438,6 +438,8 @@ export default {
       saveInfo() {
         if (newTeamName.value === "") {
           message.error("小组名称不能为空！请重新填写！")
+        } else if (newTeamName.value.indexOf(" ") !== -1 || newTeamName.value.indexOf(" ") !== -1) {
+          message.error("小组名不能有空格！")
         } else {
           let formData = new FormData()
           formData.set('teamId', store.state.tid)

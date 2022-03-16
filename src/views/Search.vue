@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import tabBar from "../common/tabBar";
+import tabBar from "../components/common/tabBar";
 import { ref, h } from "vue";
 import {SearchOutline} from '@vicons/ionicons5'
 import {useStore} from "vuex";
@@ -109,6 +109,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }
@@ -159,6 +160,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => follow(row)
                 },
                 { default: () => '关注' }
@@ -175,7 +177,8 @@ export default {
                 NButton,
                 {
                   size: 'small',
-                  type: 'info',
+                  type: 'error',
+                  ghost: true,
                   onClick: () => unFollow(row)
                 },
                 { default: () => '取消关注' }
@@ -219,6 +222,7 @@ export default {
                 {
                   size: 'small',
                   type: 'info',
+                  ghost: true,
                   onClick: () => lookDetail(row)
                 },
                 { default: () => '查看' }

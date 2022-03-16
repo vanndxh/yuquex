@@ -16,12 +16,12 @@
             {{ item.Content }}
             <n-grid :col="24">
               <n-gi :span="22">
-                <div style="line-height: 30px">
+                <div style="line-height: 30px;font-size: 13px;color: darkgray">
                   <n-time :time="new Date(item.Time)" format="yyyy-MM-dd hh:mm"/>
                 </div>
               </n-gi>
               <n-gi :span="2">
-                <n-button v-if="item.Read == 1" size="small" @click="read(item.MessageId)" type="info" ghost>已读</n-button>
+                <n-button v-if="item.Read === 1" size="small" @click="read(item.MessageId)" type="info" ghost>已读</n-button>
               </n-gi>
             </n-grid>
           </n-card>

@@ -60,7 +60,7 @@ const routes = [
   {
     path: '/Search',
     name: 'Search',
-    component: () => import('../components/content/Search')
+    component: () => import('../views/Search')
   },
   {
     path: '/TeamInfo',

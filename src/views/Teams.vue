@@ -134,6 +134,8 @@ export default {
       createTeam() {
         if (store.state.uid === 0) {
           message.error("您尚未登录！")
+        } else if (newTeamName.value.indexOf(" ") !== -1 || newTeamName.value.indexOf(" ") !== -1) {
+          message.error("小组名不能有空格！")
         } else {
           let formData = new FormData()
           formData.set('teamName', newTeamName.value)

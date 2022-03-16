@@ -68,6 +68,21 @@
               </n-gi>
             </n-grid>
           </n-tab-pane>
+          <n-tab-pane name="message" tab="发送消息">
+            <br>
+            <n-grid :cols="24">
+              <n-gi :span="18" :offset="3">
+                <n-space vertical>
+                  <p style="line-height: 0">接收者id</p>
+                  <n-input v-model:value="newMessageUser" type="text" style="width: 100%"/>
+                  <p style="line-height: 0">新消息内容</p>
+                  <n-input v-model:value="newMessage" type="textarea" style="width: 100%"
+                           :autosize="{minRows: 5,maxRows: 10}"/>
+                  <n-button type="primary" ghost @click="sendMessage" style="width: 100px;float: right">发送消息</n-button>
+                </n-space>
+              </n-gi>
+            </n-grid>
+          </n-tab-pane>
         </n-tabs>
       </n-card>
     </n-gi>
@@ -90,11 +105,14 @@ export default {
     const router = useRouter()
     const store = useStore()
     const message = useMessage()
+    // message
+    const newMessageUser = ref()
+    const newMessage = ref()
     // notice
     const newNotice = ref()
     // update界面
     const content = ref()
-    const type = ref()
+    const type = ref("default")
     const title = ref()
     const time = ref()
     // auth界面
@@ -517,12 +535,13 @@ export default {
     }
 
     return {
-      data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content, newNotice,
+      data1, data2, data3, data4, data5, data6, authId, authContent, type, time, title, content, newNotice, newMessageUser, newMessage,
       getAllArticles, getAllUsers, getAllTeams, getAllComments, getFeedbacks, getTimelines, getNotice,
 
       pagination: {
         pageSize: 10
       },
+      // column
       columns1: createColumns1({
         deleteUser (rowData) {
           dialog.warning({
@@ -711,6 +730,18 @@ export default {
           data: formData
         }).then(() => {
           message.success("公告发布成功！")
+        })
+      },
+      sendMessage() {
+        let formData = new FormData()
+        formData.set('userId', newMessageUser.value)
+        formData.set('messageContent', newMessage.value)
+        store.state.axios({
+          url: '/go/message/sendMessage',
+          method: 'post',
+          data: formData
+        }).then(() => {
+          message.success("发送成功！")
         })
       }
     }
