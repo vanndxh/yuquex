@@ -6,19 +6,14 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "bottom",
-  components: {
+<script setup>
 
-  }
-}
 </script>
 
 <style scoped>
 .bottom {
   font-size: x-small;
   color: cadetblue;
-  font-family: "黑体";
+  font-family: "黑体",serif;
 }
 </style>

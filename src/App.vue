@@ -8,10 +8,8 @@
   </n-notification-provider>
 </template>
 
-<script>
-export default {
+<script setup>
 
-}
 </script>
 
 <style>

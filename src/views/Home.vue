@@ -85,31 +85,59 @@
 
 </template>
 
-<script>
-import tabBar from "@/components/common/tabBar";
-import tabBarS from "@/components/common/tabBarS";
-import catgif from "@/components/common/catgif"
-import {h, ref} from "vue";
+<script setup>
+import {h, onMounted, ref} from "vue";
 import { addDays } from 'date-fns'
 import {NButton, useMessage, useNotification} from "naive-ui";
 import {useStore} from "vuex";
-
-export default {
-  components: {
-    tabBar, tabBarS, catgif
-  },
-  setup() {
-    const message = useMessage()
-    const notification = useNotification()
-    const store = useStore()
-
-    const noticeContent = ref()
-    const noticeTime = ref()
-    const showUserInstruction = ref(false)
-
-    const welcome = () => {
-      if (store.state.uid <= 0) {
-        // 没登录x
+import tabBar from "@/components/common/tabBar";
+import tabBarS from "@/components/common/tabBarS";
+import catgif from "@/components/common/catGif"
+// reactive state
+const message = useMessage()
+const notification = useNotification()
+const store = useStore()
+// reactive state
+const noticeContent = ref()
+const noticeTime = ref()
+const showUserInstruction = ref(false)
+const value = ref(addDays(Date.now(), 1).valueOf())
+// method
+const welcome = () => {
+  if (store.state.uid <= 0) {
+    // 没登录x
+    const n = notification.info({
+      title: '小黑屋',
+      content: noticeContent.value,
+      meta: noticeTime.value,
+      action: () => h(
+          NButton,
+          {
+            text: true,
+            type: 'primary',
+            onClick: () => {
+              n.destroy()
+              message.info("登录后本消息不再弹出~")
+            }
+          },
+          {
+            default: () => '朕知道了~'
+          }
+      ),
+      onClose: () => {
+        message.info("登录后本消息不再弹出~")
+      }
+    })
+  } else {
+    // 登录了，就判定一下
+    store.state.axios({
+      url: '/go/user/getUserInfo',
+      method: 'get',
+      params: {
+        userId: store.state.uid
+      }
+    }).then(r => {
+      if (r.data.data.ReadNotice != 1) {
         const n = notification.info({
           title: '小黑屋',
           content: noticeContent.value,
@@ -121,7 +149,13 @@ export default {
                 type: 'primary',
                 onClick: () => {
                   n.destroy()
-                  message.info("登录后本消息不再弹出~")
+                  let formData = new FormData()
+                  formData.set("userId", store.state.uid)
+                  store.state.axios({
+                    url: '/go/user/readNotice',
+                    method: 'post',
+                    data: formData,
+                  })
                 }
               },
               {
@@ -129,74 +163,29 @@ export default {
               }
           ),
           onClose: () => {
-            message.info("登录后本消息不再弹出~")
-          }
-        })
-      } else {
-        // 登录了，就判定一下
-        store.state.axios({
-          url: '/go/user/getUserInfo',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          }
-        }).then(r => {
-          if (r.data.data.ReadNotice != 1) {
-            const n = notification.info({
-              title: '小黑屋',
-              content: noticeContent.value,
-              meta: noticeTime.value,
-              action: () => h(
-                  NButton,
-                  {
-                    text: true,
-                    type: 'primary',
-                    onClick: () => {
-                      n.destroy()
-                      let formData = new FormData()
-                      formData.set("userId", store.state.uid)
-                      store.state.axios({
-                        url: '/go/user/readNotice',
-                        method: 'post',
-                        data: formData,
-                      })
-                    }
-                  },
-                  {
-                    default: () => '朕知道了~'
-                  }
-              ),
-              onClose: () => {
-                message.info("点击'朕知道了'下次不再弹出~")
-              }
-            })
+            message.info("点击'朕知道了'下次不再弹出~")
           }
         })
       }
-    }
-
-    return {
-      showUserInstruction, noticeContent, noticeTime,
-
-      value: ref(addDays(Date.now(), 1).valueOf()),
-      handleUpdateValue () {},
-      getNotice() {
-        store.state.axios({
-          url: '/go/notice/getNotice',
-          method: 'get',
-        }).then(r => {
-          noticeContent.value = r.data.data.NoticeContent
-          let date = new Date(r.data.data.Time)
-          noticeTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
-          welcome()
-        })
-      }
-    }
-  },
-  mounted() {
-    this.getNotice()
+    })
   }
 }
+const handleUpdateValue = () => {}
+const getNotice = () => {
+  store.state.axios({
+    url: '/go/notice/getNotice',
+    method: 'get',
+  }).then(r => {
+    noticeContent.value = r.data.data.NoticeContent
+    let date = new Date(r.data.data.Time)
+    noticeTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
+    welcome()
+  })
+}
+// lifecycle
+onMounted(() => {
+  getNotice()
+})
 </script>
 
 <style scoped>

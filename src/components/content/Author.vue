@@ -52,7 +52,7 @@
 import tabBar from "../common/tabBar";
 import { h, ref } from 'vue'
 import { NButton,  } from 'naive-ui'
-import catgif from "../common/catgif";
+import catgif from "../common/catGif";
 import {useStore} from "vuex";
 
 export default {

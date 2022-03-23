@@ -32,118 +32,107 @@
   <el-backtop />
 </template>
 
-<script>
-import tabBar from "@/components/common/tabBar";
-import { ref } from "vue";
+<script setup>
+import {onMounted, ref} from "vue";
 import {useStore} from "vuex";
 import {useMessage} from "naive-ui";
-
-export default {
-  components: {
-    tabBar
+import tabBar from "@/components/common/tabBar";
+// use
+const message = useMessage()
+const store = useStore()
+// state
+const messageData = ref([])
+const messageValue1 = ref(null)
+const messageValue2 = ref(null)
+const messageOptions1 = [
+  {
+    label: '全部',
+    value: '0'
   },
-  setup() {
-    const message = useMessage()
-    const store = useStore()
-
-    const messageData = ref([])
-    const messageValue1 = ref(null)
-    const messageValue2 = ref(null)
-    const getMessages = (handle1, handle2) => {
-      store.state.axios({
-        url: '/go/message/getMessages',
-        method: 'get',
-        params: {
-          userId: store.state.uid,
-          handle1: handle1,
-          handle2: handle2,
-        }
-      }).then(r => {
-        messageData.value = r.data.data
-        if(r.data.data.length === 0) {
-          message.info("暂无信息~")
-        }
-      })
-    }
-
-    return {
-      messageData, messageValue1, messageValue2,
-      getMessages,
-
-      messageOptions1:[
-        {
-          label: '全部',
-          value: '0'
-        },
-        {
-          label: '未读',
-          value: '1'
-        },
-        {
-          label: '已读',
-          value: '2'
-        },
-      ],
-      messageOptions2:[
-        {
-          label: '全部',
-          value: '0'
-        },
-        {
-          label: '点赞',
-          value: '1'
-        },
-        {
-          label: '收藏',
-          value: '2'
-        },
-        {
-          label: '评论',
-          value: '3'
-        },
-        {
-          label: '关注',
-          value: '4'
-        },
-        {
-          label: '其他',
-          value: '5'
-        }
-      ],
-      read(id) {
-        let formData = new FormData()
-        formData.set('messageId', id)
-        store.state.axios({
-          url: '/go/message/readMessage',
-          method: 'post',
-          data: formData
-        }).then(() => {
-          message.success("已读~")
-          getMessages(messageValue1.value, messageValue2.value)
-
-        })
-      },
-      readAll() {
-        let formData = new FormData()
-        formData.set('userId', store.state.uid)
-        store.state.axios({
-          url: '/go/message/readAllMessages',
-          method: 'post',
-          data: formData
-        }).then(() => {
-          message.success("全部已读~")
-          getMessages(messageValue1.value, messageValue2.value)
-        })
-      },
-      changeType() {
-        getMessages(messageValue1.value, messageValue2.value)
-      }
-    }
+  {
+    label: '未读',
+    value: '1'
   },
-  mounted() {
-    this.getMessages(0, 0)
+  {
+    label: '已读',
+    value: '2'
+  },
+]
+const messageOptions2 = [
+  {
+    label: '全部',
+    value: '0'
+  },
+  {
+    label: '点赞',
+    value: '1'
+  },
+  {
+    label: '收藏',
+    value: '2'
+  },
+  {
+    label: '评论',
+    value: '3'
+  },
+  {
+    label: '关注',
+    value: '4'
+  },
+  {
+    label: '其他',
+    value: '5'
   }
+]
+// method
+const getMessages = (handle1, handle2) => {
+  store.state.axios({
+    url: '/go/message/getMessages',
+    method: 'get',
+    params: {
+      userId: store.state.uid,
+      handle1: handle1,
+      handle2: handle2,
+    }
+  }).then(r => {
+    messageData.value = r.data.data
+    if(r.data.data.length === 0) {
+      message.info("暂无信息~")
+    }
+  })
 }
+const read = (id) => {
+  let formData = new FormData()
+  formData.set('messageId', id)
+  store.state.axios({
+    url: '/go/message/readMessage',
+    method: 'post',
+    data: formData
+  }).then(() => {
+    message.success("已读~")
+    getMessages(messageValue1.value, messageValue2.value)
+
+  })
+}
+const readAll = () => {
+  let formData = new FormData()
+  formData.set('userId', store.state.uid)
+  store.state.axios({
+    url: '/go/message/readAllMessages',
+    method: 'post',
+    data: formData
+  }).then(() => {
+    message.success("全部已读~")
+    getMessages(messageValue1.value, messageValue2.value)
+  })
+}
+const changeType = () => {
+  getMessages(messageValue1.value, messageValue2.value)
+}
+// lifecycle
+onMounted(() => {
+  getMessages(0, 0)
+})
 </script>
 
 <style scoped>

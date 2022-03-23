@@ -14,7 +14,7 @@
           <n-gi span="4">
             <n-space>
               <n-input v-model:value="searchValue" type="text" placeholder="搜索" :clearable="true" maxlength="20" class="input"
-                       @keyup.enter="search(searchValue)">
+                       @keyup.enter="search()">
                 <template #affix>
                   <n-icon><SearchOutline /></n-icon>
                 </template>
@@ -176,50 +176,74 @@
 
 </template>
 
-<script>
-import { ref , h , resolveComponent, } from 'vue'
+<script setup>
+import {ref, h, resolveComponent, onMounted,} from 'vue'
 import { AddCircleOutline, SearchOutline, NotificationsOutline} from '@vicons/ionicons5'
 import { useRouter } from "vue-router";
 import { useStore } from "vuex"
 import {useDialog, useMessage} from 'naive-ui'
-
-export default {
-  components:{
-    AddCircleOutline, SearchOutline, NotificationsOutline
+// reactive
+const message = useMessage()
+const dialog = useDialog()
+const router = useRouter()
+const store = useStore()
+// model_admin
+const showAdmin = ref(false)
+const adminPass = ref("")
+// model_vip
+const showVip = ref(false)
+const vipTime = ref()
+const code = ref()
+// model_feedback
+const showFeedback = ref(false)
+const feedbackValue = ref(null)
+// model_ui
+const showUserInstruction = ref(false)
+// 基础信息初始化
+const showRead = ref(true)
+const menuOptions = [
+  {
+    label: () =>
+        h(
+            resolveComponent('router-link'),
+            {
+              to: {
+                name: 'Home',
+              }
+            },
+            { default: () => '首页' }
+        ),
+    key: 'home',
   },
-  setup () {
-    const message = useMessage()
-    const dialog = useDialog()
-    const router = useRouter()
-    const store = useStore()
-
-    // model_admin
-    const showAdmin = ref(false)
-    const adminPass = ref("")
-    // model_vip
-    const showVip = ref(false)
-    const vipTime = ref()
-    const code = ref()
-    // model_feedback
-    const showFeedback = ref(false)
-    const feedbackValue = ref(null)
-    // model_ui
-    const showUserInstruction = ref(false)
-    // 基础信息初始化
-    const showRead = ref(true)
-    const menuOptions = [
+  {
+    label: () =>
+        h(
+            resolveComponent('router-link'),
+            {
+              to: {
+                name: 'Square',
+              }
+            },
+            { default: () => '广场' }
+        ),
+    key: 'square',
+  },
+  {
+    label: '关于',
+    key: 'about',
+    children: [
       {
         label: () =>
             h(
                 resolveComponent('router-link'),
                 {
                   to: {
-                    name: 'Home',
+                    name: 'Author',
                   }
                 },
-                { default: () => '首页' }
+                { default: () => '关于作者' }
             ),
-        key: 'home',
+        key: 'aboutAuthor',
       },
       {
         label: () =>
@@ -227,216 +251,179 @@ export default {
                 resolveComponent('router-link'),
                 {
                   to: {
-                    name: 'Square',
+                    name: 'Update',
                   }
                 },
-                { default: () => '广场' }
+                { default: () => '更新日志' }
             ),
-        key: 'square',
-      },
-      {
-        label: '关于',
-        key: 'about',
-        children: [
-          {
-            label: () =>
-                h(
-                    resolveComponent('router-link'),
-                    {
-                      to: {
-                        name: 'Author',
-                      }
-                    },
-                    { default: () => '关于作者' }
-                ),
-            key: 'aboutAuthor',
-          },
-          {
-            label: () =>
-                h(
-                    resolveComponent('router-link'),
-                    {
-                      to: {
-                        name: 'Update',
-                      }
-                    },
-                    { default: () => '更新日志' }
-                ),
-            key: 'update',
-          },
-        ]
+        key: 'update',
       },
     ]
-    const searchValue = ref(null)
-    const log = ref(store.state.isLogged)
-    // func
-    const getRead = () => {
-      if (store.state.uid !== 0) {
-        store.state.axios({
-          url: '/go/message/getRead',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          }
-        }).then(r => {
-          showRead.value = r.data.data
-        })
-      } else {
-        showRead.value = true
-      }
-    }
-
-    return {
-      menuOptions, showFeedback, feedbackValue, showUserInstruction, searchValue, log, showRead, showAdmin, adminPass, showVip, code, vipTime,
-      getRead,
-
-      activeKey: ref(null),
-      avatarOptions: [
-        {
-          label: '个人信息',
-          key: 'profile',
-        },
-        {
-          label: '提交反馈',
-          key: "feedback"
-        },
-        {
-          label: '会员服务',
-          key: "vip"
-        },
-        {
-          label: '用户须知',
-          key: "userInstruction"
-        },
-        {
-          label: '管理员入口',
-          key: "manager"
-        },
-        {
-          label: '退出登录',
-          key: "exit"
-        },
-      ],
-      handleSelect (key) {
-        if (key === "exit") {
-          dialog.warning({
-            title: '警告',
-            content: '你确定要退出登录？',
-            positiveText: '确定',
-            negativeText: '取消',
-            onPositiveClick: () => {
-              store.state.uid = 0
-              store.state.isLogged = false
-              log.value = false
-              showRead.value = true
-              message.info('退出登录~')
-              router.push("/")
-            }
-          })
-        }else if(key === "feedback") {
-          showFeedback.value = !showFeedback.value
-        }else if(key === "userInstruction") {
-          showUserInstruction.value = !showUserInstruction.value
-        } else if (key === "profile") {
-          store.state.uidTemp = store.state.uid
-          router.push("Profile")
-        } else if (key === "manager") {
-          showAdmin.value = true
-        } else if (key === "vip") {
-          store.state.axios({
-            url: '/go/user/getUserInfo',
-            method: 'get',
-            params: {
-              userId: store.state.uid
-            }
-          }).then(r => {
-            let date = new Date(r.data.data.Vip)
-            vipTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
-            showVip.value = true
-          })
-        }
-      },
-      clickCreate () {
-        router.push('Create')
-      },
-      clickMessage () {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        } else {
-          router.push('Message')
-        }
-      },
-      clickLog () {
-        router.push('Log')
-        store.state.choice = "signin"
-      },
-      clickRegister () {
-        router.push('Log')
-        store.state.choice = "signup"
-      },
-      search() {
-        store.state.axios({
-          url: '/go/search',
-          method: 'get',
-          params: {
-            searchValue: searchValue.value,
-            handle: "0"
-          }
-        }).then(r => {
-          router.push('search')
-          store.state.searchData = r.data.data
-          if (r.data.data.length === 0) {
-            message.error("没有找到文章！")
-          }
-        }).catch(() => {})
-      },
-      addFeedback() {
-        let formData = new FormData()
-        formData.set('feedbackInfo', feedbackValue.value)
-        formData.set('userId', store.state.uid)
-        store.state.axios({
-          url: '/go/feedback/submitFeedback',
-          method: 'post',
-          data: formData
-        }).then(r => {
-          if (r.status === 200) {
-            feedbackValue.value = ""
-            message.success("提交反馈成功，感谢您的反馈！")
-            showFeedback.value = !showFeedback.value
-          } else {
-            message.error("提交失败！")
-          }
-        })
-      },
-      submit() {
-        if (adminPass.value === "notAdmin") {
-          router.push("Manager")
-        } else {
-          message.error("密码错误~")
-        }
-      },
-      renewVip() {
-        let formData = new FormData()
-        formData.set("userId", store.state.uid)
-        formData.set("code", code.value)
-        store.state.axios({
-          url: '/go/user/renewVip',
-          method: 'post',
-          data: formData
-        }).then(() => {
-          message.success("续费成功！")
-          code.value = ""
-          showVip.value = false
-        }).catch(() => {
-          message.error("err")
-        })
-      }
-    }
   },
-  mounted() {
-    this.getRead()
+]
+const searchValue = ref(null)
+const log = ref(store.state.isLogged)
+const activeKey = ref(null)
+const avatarOptions = [
+  {
+    label: '个人信息',
+    key: 'profile',
+  },
+  {
+    label: '提交反馈',
+    key: "feedback"
+  },
+  {
+    label: '会员服务',
+    key: "vip"
+  },
+  {
+    label: '用户须知',
+    key: "userInstruction"
+  },
+  {
+    label: '管理员入口',
+    key: "manager"
+  },
+  {
+    label: '退出登录',
+    key: "exit"
+  },
+]
+// method
+const getRead = () => {
+  if (store.state.uid !== 0) {
+    store.state.axios({
+      url: '/go/message/getRead',
+      method: 'get',
+      params: {
+        userId: store.state.uid
+      }
+    }).then(r => {
+      showRead.value = r.data.data
+    })
+  } else {
+    showRead.value = true
   }
 }
+const handleSelect = (key) => {
+  if (key === "exit") {
+    dialog.warning({
+      title: '警告',
+      content: '你确定要退出登录？',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: () => {
+        store.state.uid = 0
+        store.state.isLogged = false
+        log.value = false
+        showRead.value = true
+        message.info('退出登录~')
+        router.push("/")
+      }
+    })
+  }else if(key === "feedback") {
+    showFeedback.value = !showFeedback.value
+  }else if(key === "userInstruction") {
+    showUserInstruction.value = !showUserInstruction.value
+  } else if (key === "profile") {
+    store.state.uidTemp = store.state.uid
+    router.push("Profile")
+  } else if (key === "manager") {
+    showAdmin.value = true
+  } else if (key === "vip") {
+    store.state.axios({
+      url: '/go/user/getUserInfo',
+      method: 'get',
+      params: {
+        userId: store.state.uid
+      }
+    }).then(r => {
+      let date = new Date(r.data.data.Vip)
+      vipTime.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours() + ":" + date.getMinutes()
+      showVip.value = true
+    })
+  }
+}
+const clickCreate = () => {
+  router.push('Create')
+}
+const clickMessage = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  } else {
+    router.push('Message')
+  }
+}
+const clickLog = () => {
+  router.push('Log')
+  store.state.choice = "signin"
+}
+const clickRegister = () => {
+  router.push('Log')
+  store.state.choice = "signup"
+}
+const search = () => {
+  store.state.axios({
+    url: '/go/search',
+    method: 'get',
+    params: {
+      searchValue: searchValue.value,
+      handle: "0"
+    }
+  }).then(r => {
+    router.push('search')
+    store.state.searchData = r.data.data
+    if (r.data.data.length === 0) {
+      message.error("没有找到文章！")
+    }
+  }).catch(() => {})
+}
+const addFeedback = () => {
+  let formData = new FormData()
+  formData.set('feedbackInfo', feedbackValue.value)
+  formData.set('userId', store.state.uid)
+  store.state.axios({
+    url: '/go/feedback/submitFeedback',
+    method: 'post',
+    data: formData
+  }).then(r => {
+    if (r.status === 200) {
+      feedbackValue.value = ""
+      message.success("提交反馈成功，感谢您的反馈！")
+      showFeedback.value = !showFeedback.value
+    } else {
+      message.error("提交失败！")
+    }
+  })
+}
+const submit = () => {
+  if (adminPass.value === "notAdmin") {
+    router.push("Manager")
+  } else {
+    message.error("密码错误~")
+  }
+}
+const renewVip = () => {
+  let formData = new FormData()
+  formData.set("userId", store.state.uid)
+  formData.set("code", code.value)
+  store.state.axios({
+    url: '/go/user/renewVip',
+    method: 'post',
+    data: formData
+  }).then(() => {
+    message.success("续费成功！")
+    code.value = ""
+    showVip.value = false
+  }).catch(() => {
+    message.error("err")
+  })
+}
+// lifecycle
+onMounted(() => {
+  getRead()
+})
 </script>
 
 <style scoped>

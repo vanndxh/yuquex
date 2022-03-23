@@ -19,37 +19,26 @@
   </div>
 </template>
 
-<script>
-import tabBar from "../common/tabBar";
+<script setup>
 import { useStore } from "vuex";
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
+import tabBar from "../common/tabBar";
+// use
+const store = useStore()
+const timelineData = ref([])
 
-export default {
-  components:{
-    tabBar
-  },
-  setup() {
-    const store = useStore()
-
-    const timelineData = ref([])
-
-    return {
-      timelineData,
-
-      getTimelineData() {
-        store.state.axios({
-          url: '/go/timeline/getTimeline',
-          method: 'get',
-        }).then(r => {
-          timelineData.value = r.data.data
-        })
-      }
-    }
-  },
-  mounted() {
-    this.getTimelineData()
-  }
+const getTimelineData = () => {
+  store.state.axios({
+    url: '/go/timeline/getTimeline',
+    method: 'get',
+  }).then(r => {
+    timelineData.value = r.data.data
+  })
 }
+
+onMounted(() => {
+  getTimelineData()
+})
 </script>
 
 <style scoped>
