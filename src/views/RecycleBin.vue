@@ -131,7 +131,6 @@ const columns = createColumns({
       onPositiveClick: () => {
         let formData = new FormData()
         formData.set('articleId', rowData.ArticleId)
-        formData.set('userId', store.state.uid)
         store.state.axios({
           url: '/go/article/deleteArticle',
           method: 'post',
@@ -146,7 +145,23 @@ const columns = createColumns({
     })
   }
 })
-// get data
+// method
+const clearBin = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  } else {
+    let formdata = new FormData
+    formdata.set("userId", store.state.uid)
+    store.state.axios({
+      url: '/go/article/deleteAllArticle',
+      method: 'delete',
+      data: formdata,
+    }).then(() => {
+      message.success("清空回收站！")
+      getArticles()
+    })
+  }
+}
 const getArticles = () => {
   if (store.state.uid === 0) {
     message.error("您尚未登录！")

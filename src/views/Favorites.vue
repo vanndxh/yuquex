@@ -25,13 +25,13 @@
   <div><n-back-top :right="40"/></div>
 </template>
 
-<script>
-import tabBar from "@/components/common/tabBar";
-import tabBarS from "@/components/common/tabBarS";
+<script setup>
 import {h, onMounted, ref} from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
+import tabBar from "@/components/common/tabBar";
+import tabBarS from "@/components/common/tabBarS";
 // use
 const message = useMessage()
 const router = useRouter()

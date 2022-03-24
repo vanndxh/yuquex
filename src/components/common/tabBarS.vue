@@ -12,6 +12,10 @@ import {
 } from '@vicons/ionicons5'
 // state
 const activeKey = ref(null)
+// method
+const renderIcon = (icon) => {
+  return () => h(NIcon, null, { default: () => h(icon) })
+}
 const menuOptions = [
   {
     label: () =>
@@ -84,10 +88,6 @@ const menuOptions = [
     icon: renderIcon(TrashBinOutline)
   },
 ]
-// method
-const renderIcon = (icon) => {
-  return () => h(NIcon, null, { default: () => h(icon) })
-}
 </script>
 
 <style scoped>

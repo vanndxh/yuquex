@@ -14,7 +14,7 @@
           <n-grid :col="24">
             <n-gi :span="20">
               <n-space vertical>
-                <n-button type="success" ghost @click="showCreateTeam = !showCreateTeam">创建小组</n-button>
+                <n-button type="success" ghost @click="showCreateTeam.value = !showCreateTeam">创建小组</n-button>
                 <n-data-table :columns="columns" :data="data" :pagination="pagination" />
               </n-space>
             </n-gi>
