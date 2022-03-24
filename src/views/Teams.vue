@@ -42,125 +42,115 @@
   <div><n-back-top :right="40"/></div>
 </template>
 
-<script>
-import tabBar from "@/components/common/tabBar";
-import tabBarS from "@/components/common/tabBarS";
-import { h, ref } from "vue";
+<script setup>
+import {h, onMounted, ref} from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
-
-export default {
-  components: {
-    tabBar, tabBarS
-  },
-  setup() {
-    const message = useMessage()
-    const router = useRouter()
-    const store = useStore()
-
-    const createColumns = ({ lookDetail }) => {
-      return [
-        {
-          width: 100
-        },
-        {
-          title: '小组名称',
-          key: 'TeamName',
-          align: 'left'
-        },
-        {
-          title: '组长',
-          key: 'LeaderName',
-          align: 'center',
-          width: 100
-        },
-        {
-          title: '查看详情',
-          align: 'center',
-          width: 150,
-          key: 'lookDetail',
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'info',
-                  ghost: true,
-                  onClick: () => lookDetail(row)
-                },
-                { default: () => '查看' }
-            )
-          }
-        },
-        {
-          width: 50
-        }
-      ]
-    }
-    const data = ref([])
-    const newTeamName = ref(null)
-    const showCreateTeam = ref(false)
-    const getTeams = () => {
-      if (store.state.uid === 0) {
-        message.error("您尚未登录！")
-      } else {
-        store.state.axios({
-          url: '/go/team/getTeams',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          },
-        }).then(r => {
-          data.value = r.data.data
-        }).catch(() => {
-          message.error("没有获取到小组！")
-        })
+import tabBar from "@/components/common/tabBar";
+import tabBarS from "@/components/common/tabBarS";
+// use
+const message = useMessage()
+const router = useRouter()
+const store = useStore()
+// columns
+const pagination = {
+  pageSize: 10
+}
+const data = ref([])
+const createColumns = ({ lookDetail }) => {
+  return [
+    {
+      width: 100
+    },
+    {
+      title: '小组名称',
+      key: 'TeamName',
+      align: 'left'
+    },
+    {
+      title: '组长',
+      key: 'LeaderName',
+      align: 'center',
+      width: 100
+    },
+    {
+      title: '查看详情',
+      align: 'center',
+      width: 150,
+      key: 'lookDetail',
+      render (row) {
+        return h(
+            NButton,
+            {
+              size: 'small',
+              type: 'info',
+              ghost: true,
+              onClick: () => lookDetail(row)
+            },
+            { default: () => '查看' }
+        )
       }
+    },
+    {
+      width: 50
     }
-
-    return {
-      data, newTeamName, showCreateTeam, getTeams,
-
-      columns: createColumns({
-        lookDetail (rowData) {
-          store.state.tid = rowData.TeamId
-          router.push("/TeamInfo")
-        }
-      }),
-      pagination: {
-        pageSize: 10
+  ]
+}
+const columns = createColumns({
+  lookDetail (rowData) {
+    store.state.tid = rowData.TeamId
+    router.push("/TeamInfo")
+  }
+})
+// modelCreateTeam
+const newTeamName = ref(null)
+const showCreateTeam = ref(false)
+// method
+const getTeams = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  } else {
+    store.state.axios({
+      url: '/go/team/getTeams',
+      method: 'get',
+      params: {
+        userId: store.state.uid
       },
-      createTeam() {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        } else if (newTeamName.value.indexOf(" ") !== -1 || newTeamName.value.indexOf(" ") !== -1) {
-          message.error("小组名不能有空格！")
-        } else {
-          let formData = new FormData()
-          formData.set('teamName', newTeamName.value)
-          formData.set('userId', store.state.uid)
-          store.state.axios({
-            url: '/go/team/createTeam',
-            method: 'post',
-            data: formData,
-          }).then(() => {
-            message.success("创建小组成功")
-            newTeamName.value = null
-            showCreateTeam.value = false
-            getTeams()
-          }).catch(() => {
-            message.error("创建小组出错！")
-          })
-        }
-      },
-
-    }
-  },
-  mounted() {
-    this.getTeams()
+    }).then(r => {
+      data.value = r.data.data
+    }).catch(() => {
+      message.error("没有获取到小组！")
+    })
   }
 }
+const createTeam = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  } else if (newTeamName.value.indexOf(" ") !== -1 || newTeamName.value.indexOf(" ") !== -1) {
+    message.error("小组名不能有空格！")
+  } else {
+    let formData = new FormData()
+    formData.set('teamName', newTeamName.value)
+    formData.set('userId', store.state.uid)
+    store.state.axios({
+      url: '/go/team/createTeam',
+      method: 'post',
+      data: formData,
+    }).then(() => {
+      message.success("创建小组成功")
+      newTeamName.value = null
+      showCreateTeam.value = false
+      getTeams()
+    }).catch(() => {
+      message.error("创建小组出错！")
+    })
+  }
+}
+// life
+onMounted(() => {
+  getTeams()
+})
 </script>
 
 <style scoped>

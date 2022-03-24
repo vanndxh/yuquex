@@ -93,7 +93,7 @@ import {useStore} from "vuex";
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 import catgif from "@/components/common/catGif"
-// reactive state
+// use
 const message = useMessage()
 const notification = useNotification()
 const store = useStore()

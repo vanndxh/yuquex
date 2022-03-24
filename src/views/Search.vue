@@ -44,18 +44,15 @@ import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 import {NButton, useMessage} from "naive-ui";
 import tabBar from "../components/common/tabBar";
-
+// use
 const message = useMessage()
 const store = useStore()
 const router = useRouter()
-
+// state
 const isFollowed = ref(null)
 const searchCheck = ref(null)
 const searchValue = ref(null)
 const searchData = ref([])
-const pagination = {
-  pageSize: 10
-}
 const searchOptions =[
   {
     label: '文章',
@@ -70,7 +67,10 @@ const searchOptions =[
     value: '2'
   },
 ]
-// method
+// columns
+const pagination = {
+  pageSize: 10
+}
 const createColumns1 = ({ lookDetail }) => {
   return [
     {
@@ -247,39 +247,6 @@ const createColumns3 = ({ lookDetail }) => {
     }
   ]
 }
-const getIsFollowed = (followerId, upId) => {
-  store.state.axios({
-    url: '/go/follow/getIsFollowed',
-    method: 'get',
-    params: {
-      userId: followerId,
-      upId: upId,
-    }
-  }).then(r => {
-    isFollowed.value = r.data.data
-  })
-  return isFollowed.value
-}
-const searchInit = () => {
-  searchData.value = store.state.searchData
-}
-const search = () => {
-  store.state.axios({
-    url: '/go/search',
-    method: 'get',
-    params: {
-      searchValue: searchValue.value,
-      handle: searchCheck.value
-    },
-  }).then(r => {
-    router.push('search')
-    searchData.value = r.data.data
-    if (r.data.data.length === 0) {
-      message.error("没有找到相关信息！")
-    }
-  }).catch(() => {})
-}
-// reactive state
 const columns1 = createColumns1({
   lookDetail (rowData) {
     store.state.aid = rowData.ArticleId
@@ -350,6 +317,39 @@ const columns3 = createColumns3({
     router.push("TeamInfo")
   }
 })
+// method
+const getIsFollowed = (followerId, upId) => {
+  store.state.axios({
+    url: '/go/follow/getIsFollowed',
+    method: 'get',
+    params: {
+      userId: followerId,
+      upId: upId,
+    }
+  }).then(r => {
+    isFollowed.value = r.data.data
+  })
+  return isFollowed.value
+}
+const searchInit = () => {
+  searchData.value = store.state.searchData
+}
+const search = () => {
+  store.state.axios({
+    url: '/go/search',
+    method: 'get',
+    params: {
+      searchValue: searchValue.value,
+      handle: searchCheck.value
+    },
+  }).then(r => {
+    router.push('search')
+    searchData.value = r.data.data
+    if (r.data.data.length === 0) {
+      message.error("没有找到相关信息！")
+    }
+  }).catch(() => {})
+}
 // lifecycle
 onMounted(() => {
   searchInit()

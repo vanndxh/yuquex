@@ -113,120 +113,110 @@
 
 </template>
 
-<script>
+<script setup>
 import tabBar from "@/components/common/tabBar";
 import {useStore} from "vuex";
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useMessage} from "naive-ui";
 import { PersonOutline, BookOutline, TimeOutline, RefreshOutline } from "@vicons/ionicons5";
 import { LikeOutlined, StarOutlined } from "@vicons/antd";
-
-export default {
-  components:{
-    tabBar, PersonOutline, BookOutline, LikeOutlined, StarOutlined, TimeOutline, RefreshOutline
-  },
-  setup() {
-    const message = useMessage()
-    const router = useRouter()
-    const store = useStore()
-
-    const followArticleData = ref([])
-    const recommendArticleData = ref([])
-    const recommendArticleDataReal = ref([])
-    const last = ref([])
-
-    return {
-      followArticleData, recommendArticleData, recommendArticleDataReal, last,
-
-      lookDetail(id) {
-        store.state.aid = id
-        router.push('ArticleInfo')
-      },
-      getFollowArticle() {
-        if (store.state.uid <= 0) {
-          message.error("您尚未登录！关注动态无法查看！")
-        } else {
-          store.state.axios({
-            url: '/go/article/getFollowArticles',
-            method: 'get',
-            params: {
-              userId: store.state.uid
-            }
-          }).then(r => {
-            followArticleData.value = r.data.data
-            for (let i in r.data.data) {
-              let now = new Date()
-              let date = new Date(r.data.data[i].Time)
-              r.data.data[i].isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()
-              r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
-            }
-          })
-        }
-      },
-      getHotArticle() {
-        store.state.axios({
-          url: '/go/article/getHotArticles',
-          method: 'get',
-        }).then(r => {
-          recommendArticleData.value = r.data.data
-          for (let i in r.data.data) {
-            let now = new Date()
-            let date = new Date(r.data.data[i].Time)
-            r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
-            r.data.data[i].IsToday = date.getFullYear() == now.toLocaleDateString().split('/')[0] && (date.getMonth()+1) == now.toLocaleDateString().split('/')[1] && date.getDate() == now.toLocaleDateString().split('/')[2]
-          }
-          this.recRandom()
-        })
-      },
-      recRandom() {
-        // 计算三个流量池容量
-        let n = recommendArticleData.value.length
-        let aAmount = parseInt(n/10)
-        let bAmount = parseInt(n/10*3)
-        let cAmount = n-aAmount-bAmount
-        // 随机获取a
-        let a = parseInt(Math.random()*aAmount)
-        while(last.value.indexOf(a) >= 0) {
-          a = parseInt(Math.random()*aAmount)
-        }
-        last.value[0] = a
-        // b
-        let b1 = parseInt(Math.random()*bAmount + aAmount)
-        while(last.value.indexOf(b1) >= 0) {
-          b1 = parseInt(Math.random()*bAmount + aAmount)
-        }
-        let b2 = parseInt(Math.random()*bAmount + aAmount)
-        while(b2 == b1 || last.value.indexOf(b2) >= 0) {
-          b2 = parseInt(Math.random()*bAmount + aAmount)
-        }
-        let b3 = parseInt(Math.random()*bAmount + aAmount)
-        while (b3 == b1 || b3 == b2 || last.value.indexOf(b3) >= 0) {
-          b3 = parseInt(Math.random()*bAmount + aAmount)
-        }
-        last.value[1] = b1
-        last.value[2] = b2
-        last.value[3] = b3
-        // c
-        let c = parseInt(Math.random()*cAmount + aAmount + bAmount)
-        while(last.value.indexOf(c) >= 0) {
-          c = parseInt(Math.random()*cAmount + aAmount + bAmount)
-        }
-        last.value[4] = c
-        // 数据搬运
-        recommendArticleDataReal.value[0] = recommendArticleData.value[a]
-        recommendArticleDataReal.value[1] = recommendArticleData.value[b1]
-        recommendArticleDataReal.value[2] = recommendArticleData.value[b2]
-        recommendArticleDataReal.value[3] = recommendArticleData.value[b3]
-        recommendArticleDataReal.value[4] = recommendArticleData.value[c]
-      },
-    }
-  },
-  mounted() {
-    this.getHotArticle()
-    this.getFollowArticle()
+// use
+const message = useMessage()
+const router = useRouter()
+const store = useStore()
+// state
+const followArticleData = ref([])
+const recommendArticleData = ref([])
+const recommendArticleDataReal = ref([])
+const last = ref([])
+// method
+const lookDetail = (id) => {
+  store.state.aid = id
+  router.push('ArticleInfo')
+}
+const getFollowArticle = () => {
+  if (store.state.uid <= 0) {
+    message.error("您尚未登录！关注动态无法查看！")
+  } else {
+    store.state.axios({
+      url: '/go/article/getFollowArticles',
+      method: 'get',
+      params: {
+        userId: store.state.uid
+      }
+    }).then(r => {
+      followArticleData.value = r.data.data
+      for (let i in r.data.data) {
+        let now = new Date()
+        let date = new Date(r.data.data[i].Time)
+        r.data.data[i].isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()
+        r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
+      }
+    })
   }
 }
+const getHotArticle = () => {
+  store.state.axios({
+    url: '/go/article/getHotArticles',
+    method: 'get',
+  }).then(r => {
+    recommendArticleData.value = r.data.data
+    for (let i in r.data.data) {
+      let now = new Date()
+      let date = new Date(r.data.data[i].Time)
+      r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
+      r.data.data[i].IsToday = date.getFullYear() == now.toLocaleDateString().split('/')[0] && (date.getMonth()+1) == now.toLocaleDateString().split('/')[1] && date.getDate() == now.toLocaleDateString().split('/')[2]
+    }
+    this.recRandom()
+  })
+}
+const recRandom = () => {
+  // 计算三个流量池容量
+  let n = recommendArticleData.value.length
+  let aAmount = parseInt(n/10)
+  let bAmount = parseInt(n/10*3)
+  let cAmount = n-aAmount-bAmount
+  // 随机获取a
+  let a = parseInt(Math.random()*aAmount)
+  while(last.value.indexOf(a) >= 0) {
+    a = parseInt(Math.random()*aAmount)
+  }
+  last.value[0] = a
+  // b
+  let b1 = parseInt(Math.random()*bAmount + aAmount)
+  while(last.value.indexOf(b1) >= 0) {
+    b1 = parseInt(Math.random()*bAmount + aAmount)
+  }
+  let b2 = parseInt(Math.random()*bAmount + aAmount)
+  while(b2 == b1 || last.value.indexOf(b2) >= 0) {
+    b2 = parseInt(Math.random()*bAmount + aAmount)
+  }
+  let b3 = parseInt(Math.random()*bAmount + aAmount)
+  while (b3 == b1 || b3 == b2 || last.value.indexOf(b3) >= 0) {
+    b3 = parseInt(Math.random()*bAmount + aAmount)
+  }
+  last.value[1] = b1
+  last.value[2] = b2
+  last.value[3] = b3
+  // c
+  let c = parseInt(Math.random()*cAmount + aAmount + bAmount)
+  while(last.value.indexOf(c) >= 0) {
+    c = parseInt(Math.random()*cAmount + aAmount + bAmount)
+  }
+  last.value[4] = c
+  // 数据搬运
+  recommendArticleDataReal.value[0] = recommendArticleData.value[a]
+  recommendArticleDataReal.value[1] = recommendArticleData.value[b1]
+  recommendArticleDataReal.value[2] = recommendArticleData.value[b2]
+  recommendArticleDataReal.value[3] = recommendArticleData.value[b3]
+  recommendArticleDataReal.value[4] = recommendArticleData.value[c]
+}
+// life
+onMounted(() => {
+  getHotArticle()
+  getFollowArticle()
+})
 </script>
 
 <style scoped>

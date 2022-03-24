@@ -70,138 +70,123 @@
   </n-layout>
 </template>
 
-<script>
-import tabBar from "@/components/common/tabBar";
-import tabBarS from "@/components/common/tabBarS";
-import { ref } from 'vue'
+<script setup>
+import {onMounted, ref} from 'vue'
 import {useStore} from "vuex";
 import {useMessage} from "naive-ui";
 import {useRouter} from "vue-router";
 import { UploadFilled } from '@element-plus/icons-vue'
-
-export default {
-  components: {
-    tabBar, tabBarS, UploadFilled
+import tabBar from "@/components/common/tabBar";
+import tabBarS from "@/components/common/tabBarS";
+// use
+const router = useRouter()
+const message = useMessage()
+const store = useStore()
+// state
+const parseTextContent = ref("")
+const newArticleName = ref(null)
+const newArticleContent = ref("")
+const toolbarOptions = [
+  // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
+  ['bold', 'italic', 'underline', 'strike'],
+  // 引用  代码块-----['blockquote', 'code-block']
+  ['blockquote', 'code-block'],
+  // 1、2 级标题-----[{ header: 1 }, { header: 2 }]
+  [{ header: 1 }, { header: 2 }],
+  // 有序、无序列表-----[{ list: 'ordered' }, { list: 'bullet' }]
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  // 上标/下标-----[{ script: 'sub' }, { script: 'super' }]
+  [{ script: 'sub' }, { script: 'super' }],
+  // 缩进-----[{ indent: '-1' }, { indent: '+1' }]
+  [{ indent: '-1' }, { indent: '+1' }],
+  // 字体大小-----[{ size: ['small', false, 'large', 'huge'] }]
+  [{ size: ['small', false, 'large', 'huge'] }],
+  // 标题-----[{ header: [1, 2, 3, 4, 5, 6, false] }]
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  // 字体颜色、字体背景颜色-----[{ color: [] }, { background: [] }]
+  [{ color: [] }, { background: [] }],
+  // 对齐方式-----[{ align: [] }]
+  [{ align: [] }],
+  // 清除文本格式-----['clean']
+  ['clean'],
+  // 链接、图片、视频-----['link', 'image', 'video']
+  ['image']
+]
+const editorOption = {
+  modules: {
+    toolbar: toolbarOptions
   },
-  setup() {
-    const router = useRouter()
-    const message = useMessage()
-    const store = useStore()
+  theme: 'snow',
+      placeholder: '请输入正文~'
+}
+// method
+const createArticle = () => {
+  if (store.state.uid === 0){
+    message.error("您尚未登录！")
+  } else if (newArticleName.value === null){
+    message.error("文章名不能为空！")
+  } else if (newArticleName.value.indexOf(" ") !== -1 || newArticleName.value.indexOf("　") !== -1) {
+    message.error("文章名不能含空格！")
+  } else {
+    let formData = new FormData()
+    formData.set('articleName', newArticleName.value)
+    formData.set('articleContent', newArticleContent.value)
+    formData.set('articleAuthor', store.state.uid)
 
-    const parseTextContent = ref("")
-    const newArticleName = ref(null)
-    const newArticleContent = ref("")
-    const articleData = ref({
-      articleName: null,
-      articleContent: null
+    store.state.axios({
+      url: '/go/article/createArticle',
+      method: 'post',
+      data: formData,
+    }).then(r => {
+      newArticleName.value = ""
+      newArticleContent.value = ""
+      message.success("创建文章成功！")
+      store.state.aid = r.data.articleId
+      router.push("/ArticleInfo")
+    }).catch(() => {
+      message.error("新建文章出错！")
     })
-    const fileList = ref([])
-    const toolbarOptions = [
-      // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
-      ['bold', 'italic', 'underline', 'strike'],
-      // 引用  代码块-----['blockquote', 'code-block']
-      ['blockquote', 'code-block'],
-      // 1、2 级标题-----[{ header: 1 }, { header: 2 }]
-      [{ header: 1 }, { header: 2 }],
-      // 有序、无序列表-----[{ list: 'ordered' }, { list: 'bullet' }]
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      // 上标/下标-----[{ script: 'sub' }, { script: 'super' }]
-      [{ script: 'sub' }, { script: 'super' }],
-      // 缩进-----[{ indent: '-1' }, { indent: '+1' }]
-      [{ indent: '-1' }, { indent: '+1' }],
-      // 字体大小-----[{ size: ['small', false, 'large', 'huge'] }]
-      [{ size: ['small', false, 'large', 'huge'] }],
-      // 标题-----[{ header: [1, 2, 3, 4, 5, 6, false] }]
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      // 字体颜色、字体背景颜色-----[{ color: [] }, { background: [] }]
-      [{ color: [] }, { background: [] }],
-      // 对齐方式-----[{ align: [] }]
-      [{ align: [] }],
-      // 清除文本格式-----['clean']
-      ['clean'],
-      // 链接、图片、视频-----['link', 'image', 'video']
-      ['image']
-    ]
-
-    return {
-      articleData, newArticleName, newArticleContent, fileList, parseTextContent,
-
-      editorOption: {
-        modules: {
-          toolbar: toolbarOptions
-        },
-        theme: 'snow',
-        placeholder: '请输入正文~'
-      },
-      createArticle() {
-        if (store.state.uid === 0){
-          message.error("您尚未登录！")
-        } else if (newArticleName.value === null){
-          message.error("文章名不能为空！")
-        } else if (newArticleName.value.indexOf(" ") !== -1 || newArticleName.value.indexOf("　") !== -1) {
-          message.error("文章名不能含空格！")
-        } else {
-          let formData = new FormData()
-          formData.set('articleName', newArticleName.value)
-          formData.set('articleContent', newArticleContent.value)
-          formData.set('articleAuthor', store.state.uid)
-
-          store.state.axios({
-            url: '/go/article/createArticle',
-            method: 'post',
-            data: formData,
-          }).then(r => {
-            newArticleName.value = ""
-            newArticleContent.value = ""
-            message.success("创建文章成功！")
-            store.state.aid = r.data.articleId
-            router.push("/ArticleInfo")
-          }).catch(() => {
-            message.error("新建文章出错！")
-          })
-        }
-      },
-      judgeIsLogged() {
-        if (store.state.uid === 0) {
-          message.error("您尚未登录！")
-        }
-      },
-      checkExt(file) {
-        if (file.name.split('.')[1] !== "txt") {
-          message.error("只能上传txt文件！")
-          return false
-        }
-        return true
-      },
-      parseText(res, file) {
-        if (file.raw) {
-          const reader = new FileReader()
-          reader.readAsText(file.raw);
-          reader.onload = e => {
-            parseTextContent.value = e.target.result.slice(0,2000)
-            message.success("自动解析成功！")
-          }
-        }
-      },
-      parseTextAgain(file) {
-        if (file.raw) {
-          const reader = new FileReader()
-          reader.readAsText(file.raw);
-          reader.onload = e => {
-            parseTextContent.value = e.target.result.slice(0,2000)
-            message.success("自动解析成功！")
-          }
-        }
-      },
-      handleError() {
-        message.error("自动解析失败，请上传正常文件！")
-      },
-    }
-  },
-  mounted() {
-    this.judgeIsLogged()
   }
 }
+const judgeIsLogged = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  }
+}
+const checkExt = (file) => {
+  if (file.name.split('.')[1] !== "txt") {
+    message.error("只能上传txt文件！")
+    return false
+  }
+  return true
+}
+const parseText = (res, file) => {
+  if (file.raw) {
+    const reader = new FileReader()
+    reader.readAsText(file.raw);
+    reader.onload = e => {
+      parseTextContent.value = e.target.result.slice(0,2000)
+      message.success("自动解析成功！")
+    }
+  }
+}
+const parseTextAgain = (file) => {
+  if (file.raw) {
+    const reader = new FileReader()
+    reader.readAsText(file.raw);
+    reader.onload = e => {
+      parseTextContent.value = e.target.result.slice(0,2000)
+      message.success("自动解析成功！")
+    }
+  }
+}
+const handleError = () => {
+  message.error("自动解析失败，请上传正常文件！")
+}
+// lifecycle
+onMounted(() => {
+  judgeIsLogged()
+})
 </script>
 
 <style scoped>

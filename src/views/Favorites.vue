@@ -28,127 +28,118 @@
 <script>
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
-import { h, ref } from "vue";
+import {h, onMounted, ref} from "vue";
 import {NButton, useMessage} from "naive-ui";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
-
-export default {
-  components: {
-    tabBar, tabBarS
-  },
-  setup() {
-    const message = useMessage()
-    const router = useRouter()
-    const store = useStore()
-
-    const data = ref([])
-    const createColumns = ({ lookDetail, removeStar }) => {
-      return [
-        {
-          width: 50
-        },
-        {
-          title: '文章标题',
-          key: 'ArticleName',
-          align: 'left'
-        },
-        {
-          title: '作者',
-          align: 'center',
-          width: 100,
-          key: 'AuthorName'
-        },
-        {
-          title: '查看详情',
-          key: 'lookDetail',
-          align: 'center',
-          width: 150,
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'info',
-                  ghost: true,
-                  onClick: () => lookDetail(row)
-                },
-                { default: () => '查看' }
-            )
-          }
-        },
-        {
-          title: '移除收藏夹',
-          align: 'center',
-          width: 150,
-          key: 'delete',
-          render (row) {
-            return h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'error',
-                  ghost: true,
-                  onClick: () => removeStar(row)
-                },
-                { default: () => '移除' }
-            )
-          }
-        },
-        {
-          width: 100
-        }
-      ]
-    }
-    const getFavorite = () => {
-      if (store.state.uid === 0) {
-        message.error("您尚未登录！")
-      } else {
-        store.state.axios({
-          url: '/go/collection/getFavorite',
-          method: 'get',
-          params: {
-            userId: store.state.uid
-          },
-        }).then(r => {
-          data.value = r.data.data
-        }).catch(() => {
-          message.error("获取收藏夹出错！")
-        })
+// use
+const message = useMessage()
+const router = useRouter()
+const store = useStore()
+// state
+const data = ref([])
+const pagination = {
+  pageSize: 10
+}
+// columns
+const createColumns = ({ lookDetail, removeStar }) => {
+  return [
+    {
+      width: 50
+    },
+    {
+      title: '文章标题',
+      key: 'ArticleName',
+      align: 'left'
+    },
+    {
+      title: '作者',
+      align: 'center',
+      width: 100,
+      key: 'AuthorName'
+    },
+    {
+      title: '查看详情',
+      key: 'lookDetail',
+      align: 'center',
+      width: 150,
+      render (row) {
+        return h(
+            NButton,
+            {
+              size: 'small',
+              type: 'info',
+              ghost: true,
+              onClick: () => lookDetail(row)
+            },
+            { default: () => '查看' }
+        )
       }
+    },
+    {
+      title: '移除收藏夹',
+      align: 'center',
+      width: 150,
+      key: 'delete',
+      render (row) {
+        return h(
+            NButton,
+            {
+              size: 'small',
+              type: 'error',
+              ghost: true,
+              onClick: () => removeStar(row)
+            },
+            { default: () => '移除' }
+        )
+      }
+    },
+    {
+      width: 100
     }
-
-    return {
-      data, getFavorite,
-
-      columns: createColumns({
-        removeStar (rowData) {
-          let formData = new FormData()
-          formData.set('userId', store.state.uid)
-          formData.set('articleId', rowData.ArticleId)
-          store.state.axios({
-            url: '/go/star/cancelStar',
-            method: 'post',
-            data: formData,
-          }).then(() => {
-            message.success("成功取消收藏！")
-            getFavorite()
-          })
-        },
-        lookDetail (rowData) {
-          store.state.aid = rowData.ArticleId
-          router.push("ArticleInfo")
-        }
-      }),
-      pagination: {
-        pageSize: 10
-      },
-    }
+  ]
+}
+const columns = createColumns({
+  removeStar (rowData) {
+    let formData = new FormData()
+    formData.set('userId', store.state.uid)
+    formData.set('articleId', rowData.ArticleId)
+    store.state.axios({
+      url: '/go/star/cancelStar',
+      method: 'post',
+      data: formData,
+    }).then(() => {
+      message.success("成功取消收藏！")
+      getFavorite()
+    })
   },
-  mounted() {
-    this.getFavorite()
+  lookDetail (rowData) {
+    store.state.aid = rowData.ArticleId
+    router.push("ArticleInfo")
+  }
+})
+// get data
+const getFavorite = () => {
+  if (store.state.uid === 0) {
+    message.error("您尚未登录！")
+  } else {
+    store.state.axios({
+      url: '/go/collection/getFavorite',
+      method: 'get',
+      params: {
+        userId: store.state.uid
+      },
+    }).then(r => {
+      data.value = r.data.data
+    }).catch(() => {
+      message.error("获取收藏夹出错！")
+    })
   }
 }
+// life
+onMounted(() => {
+  getFavorite()
+})
 </script>
 
 <style scoped>
