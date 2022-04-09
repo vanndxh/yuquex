@@ -168,7 +168,7 @@ const getHotArticle = () => {
       r.data.data[i].Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + "  " + date.getHours()+ ":" + date.getMinutes();
       r.data.data[i].IsToday = date.getFullYear() == now.toLocaleDateString().split('/')[0] && (date.getMonth()+1) == now.toLocaleDateString().split('/')[1] && date.getDate() == now.toLocaleDateString().split('/')[2]
     }
-    this.recRandom()
+    recRandom()
   })
 }
 const recRandom = () => {

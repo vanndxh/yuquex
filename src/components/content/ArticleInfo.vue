@@ -23,14 +23,14 @@
               <div id="content"></div>
               <n-grid :col="24">
                 <n-gi span="1" offset="6">
-                  <n-space justify="center" vertical>
+                  <n-space justify="center" vertical style="color: #4fbcfa">
                     <h1 style="text-align: center">{{ articleData.LikeAmount }}</h1>
                     <n-icon size="40" v-if="isLiked" @click="clickLike()"><LikeFilled /></n-icon>
                     <n-icon size="40" v-else @click="clickLike()"><LikeOutlined /></n-icon>
                   </n-space>
                 </n-gi>
                 <n-gi span="1" offset="8" >
-                  <n-space justify="center" vertical>
+                  <n-space justify="center" vertical style="color: #4fbcfa">
                     <h1 style="text-align: center">{{ articleData.CollectionAmount }}</h1>
                     <n-icon size="40" v-if="isCollected" @click="clickCollection()"><StarFilled /></n-icon>
                     <n-icon size="40" v-else @click="clickCollection()"><StarOutlined /></n-icon>
@@ -53,7 +53,7 @@
                   <n-card hoverable size="small">
                     <n-space>
                       <h3 style="line-height: 0">{{ item.Username }}</h3>
-                      <div v-if="item.UserAuth">
+                      <div v-if="item.UserAuth && item.UserAuth.length > 0 && item.UserAuth !== 'undefined'">
                         <n-tag type="info" size="small">{{ item.UserAuth }}</n-tag>
                       </div>
                       <div v-if="item.UserVip === 1">
@@ -133,7 +133,7 @@
         aria-modal="true"
     >
       <n-space vertical>
-        <n-select v-model:value="secretValue" :options="secretOptions" :consistent-menu-width="false" style="width: 200px;"
+        <n-select v-model:value="secretValue" :options="secretOptions" :consistent-menu-width="false" style="width: 150px;float: right"
                   placeholder="选择他人是否可见"/>
         <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                  maxlength="20" show-count/>
@@ -286,7 +286,8 @@ const getArticleData = () => {
     url: '/go/article/getArticleInfo',
     method: 'get',
     params: {
-      articleId: store.state.aid
+      articleId: store.state.aid,
+      userId: store.state.uid
     }
   }).then(r => {
     articleData.value = r.data.data

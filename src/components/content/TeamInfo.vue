@@ -32,20 +32,24 @@
         <n-tab-pane name="punchInfo" tab="打卡详情" @click="handlePunch">
           <n-grid :cols="24">
 
-            <n-gi :span="6" :offset="1">
-              <n-space vertical>
-                <n-statistic tabular-nums>
-                  您共在本小组打卡
-                  <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
-                  <template #suffix>
-                    次
-                  </template>
-                </n-statistic>
-                <n-button style="width: 200px" @click="punch">今日打卡</n-button>
-              </n-space>
+            <n-gi :span="10">
+              <n-card title="今日任务">
+                <n-space vertical>
+                  <li>学习一篇他人整理的文章（{{ taskFinished }}/1）</li>
+                  <br>
+                  <div style="justify-content: center;display: flex">
+                    <n-button style="width: 200px" @click="punch" type="success" ghost>打卡</n-button>
+                  </div>
+                </n-space>
+              </n-card>
+              <n-statistic tabular-nums class="animation">
+                您共在本小组打卡
+                <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
+                次
+              </n-statistic>
             </n-gi>
 
-            <n-gi :span="15" :offset="1">
+            <n-gi :span="13" :offset="1">
               <n-data-table :columns="columns" :data="data" :pagination="pagination" size="small"/>
             </n-gi>
 
@@ -153,6 +157,7 @@ const teamData = ref({})
 // 当前用户信息初始化
 const pos = ref(null)
 const count = ref(0)
+const taskFinished = ref(0)
 // 模块信息初始化
 const showManager = ref(false)
 const showUser = ref(false)
@@ -297,6 +302,24 @@ const getTeamArticles = () => {
     }
   }).then(r => {
     data2.value = r.data.data
+  })
+}
+const getUserInfo = () => {
+  store.state.axios({
+    url: '/go/user/getUserInfo',
+    method: 'get',
+    params: {
+      userId: store.state.uid
+    }
+  }).then(r => {
+    // 判断当天任务是否完成
+    let now = new Date()
+    let date = new Date(r.data.data.LatestTaskTime)
+    if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()) {
+      taskFinished.value = 1
+    } else {
+      taskFinished.value = 0
+    }
   })
 }
 const getTeamMembers = () => {
@@ -454,25 +477,32 @@ const handlePunch = () => {
   }
 }
 const punch = () => {
-  let formData = new FormData()
-  formData.set('userId', store.state.uid)
-  formData.set('teamId', store.state.tid)
-  store.state.axios({
-    url: '/go/team/punch',
-    method: 'post',
-    data: formData,
-  }).then(() => {
-    message.success("打卡成功！")
-    getTeamMembers()
-  }).catch(() => {
-    message.error("您今日已经打卡，不能重复打卡！")
-  })
+  if(count.value === -1) {
+    message.info("您不是该组成员，不能打卡！")
+  } else if (!taskFinished.value) {
+    message.error("请先完成每日学习计划！")
+  } else {
+    let formData = new FormData()
+    formData.set('userId', store.state.uid)
+    formData.set('teamId', store.state.tid)
+    store.state.axios({
+      url: '/go/team/punch',
+      method: 'post',
+      data: formData,
+    }).then(() => {
+      message.success("打卡成功！")
+      getTeamMembers()
+    }).catch(() => {
+      message.error("您今日已经打卡，不能重复打卡！")
+    })
+  }
 }
 // lifecycle
 onMounted(() => {
   getTeamInfo()
   getTeamArticles()
   getTeamMembers()
+  getUserInfo()
 })
 </script>
 
@@ -480,5 +510,8 @@ onMounted(() => {
 .teamName {
   text-align: center;
   font-size: 40px;
+}
+.animation {
+  font-size: 12px;
 }
 </style>

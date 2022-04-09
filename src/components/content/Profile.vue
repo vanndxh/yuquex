@@ -23,7 +23,7 @@
               </n-space>
               <h1 class="user">{{ userData.Username }}</h1>
               <n-space justify="center">
-                <div v-if="userData.Authentication">
+                <div v-if="userData.Authentication && userData.Authentication.length > 0 && userData.Authentication !== 'undefined'">
                   <n-tag type="info">{{ userData.Authentication }}</n-tag>
                 </div>
                 <div v-if="isVip">
@@ -49,14 +49,14 @@
               <n-divider />
               <div style="font-size: 14px">
                 <n-statistic tabular-nums>
-                  <n-icon size="20"><BookOutline/></n-icon>共有
+                  <n-icon size="20"><BookOutline/></n-icon><n-divider vertical />共有
                   <n-number-animation ref="numberAnimationInstRef" :from=0 :to= userData.ArticleAmount />
                   <template #suffix>
                     篇文章
                   </template>
                 </n-statistic>
                 <n-statistic tabular-nums>
-                  <n-icon size="20"><LikeOutlined/></n-icon>共收获
+                  <n-icon size="20"><LikeOutlined/></n-icon><n-divider vertical />共收获
                   <n-number-animation ref="numberAnimationInstRef" :from=0 :to=userData.LikeAmount />
                   <template #suffix>
                     个赞
@@ -681,6 +681,7 @@ const renewVip = () => {
     message.success("续费成功！")
     code.value = ""
     showVip.value = false
+    getUserData()
   }).catch(() => {
     message.error("err")
   })

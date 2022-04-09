@@ -83,6 +83,21 @@
               </n-gi>
             </n-grid>
           </n-tab-pane>
+          <n-tab-pane name="violation" tab="违规处理">
+            <br>
+            <n-grid :cols="24">
+              <n-gi :span="18" :offset="3">
+                <n-space vertical>
+                  <p style="line-height: 0">违规用户id</p>
+                  <n-input v-model:value="vioUserId" type="text" style="width: 100%"/>
+                  <p style="line-height: 0">违规内容</p>
+                  <n-input v-model:value="vioContent" type="textarea" style="width: 100%"
+                           :autosize="{minRows: 5,maxRows: 10}"/>
+                  <n-button type="error" ghost @click="handleViolation" style="width: 100px;float: right">违规处理</n-button>
+                </n-space>
+              </n-gi>
+            </n-grid>
+          </n-tab-pane>
         </n-tabs>
       </n-card>
     </n-gi>
@@ -117,6 +132,9 @@ const time = ref()
 // auth界面
 const authId = ref()
 const authContent = ref()
+// violation
+const vioUserId = ref()
+const vioContent = ref()
 // data
 const data1 = ref([])
 const data2 = ref([])
@@ -734,6 +752,20 @@ const sendMessage = () => {
     data: formData
   }).then(() => {
     message.success("发送成功！")
+  })
+}
+const handleViolation = () => {
+  let formData = new FormData()
+  formData.set('vioUserId', vioUserId.value)
+  formData.set('vioContent', vioContent.value)
+  store.state.axios({
+    url: '/go/message/handleViolation',
+    method: 'post',
+    data: formData
+  }).then(() => {
+    message.success("已成功发送违规提示！")
+    vioUserId.value = ""
+    vioContent.value = ""
   })
 }
 // lifecycle

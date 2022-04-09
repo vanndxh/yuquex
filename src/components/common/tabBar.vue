@@ -398,7 +398,7 @@ const addFeedback = () => {
   })
 }
 const submit = () => {
-  if (adminPass.value === "notAdmin") {
+  if (adminPass.value === "adminv") {
     router.push("Manager")
   } else {
     message.error("密码错误~")
