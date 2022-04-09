@@ -21,7 +21,15 @@
                     src="https://ss3.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c83d70cf3bc79f3dbeffa8adb8a1cd11728b2914.jpg"
                 />
               </n-space>
-              <h1 class="user">{{ userData.Username }}</h1>
+              <n-space justify="center">
+                <div style="color: deeppink;line-height: 50px" v-if="userData.Sex">
+                  <n-icon size="20"><FemaleOutline /></n-icon>
+                </div>
+                <div style="color: blue;line-height: 50px" v-if="!userData.Sex">
+                  <n-icon size="20"><MaleOutline /></n-icon>
+                </div>
+                <h1 class="user">{{ userData.Username }}</h1>
+              </n-space>
               <n-space justify="center">
                 <div v-if="userData.Authentication && userData.Authentication.length > 0 && userData.Authentication !== 'undefined'">
                   <n-tag type="info">{{ userData.Authentication }}</n-tag>
@@ -100,6 +108,19 @@
     >
       <n-space vertical>
         用户昵称<n-input v-model:value="newUsername" type="text"/>
+        <n-space>
+          性别
+          <n-radio-group v-model:value="newSex">
+            <n-space>
+              <n-radio value="0">
+                男
+              </n-radio>
+              <n-radio value="1">
+                女
+              </n-radio>
+            </n-space>
+          </n-radio-group>
+        </n-space>
         用户密码<n-input v-model:value="newPassword" type="text"/>
         个人简介<n-input v-model:value="newInfo" type="text"/>
         <n-button type="primary" ghost @click="changeInfo" style="float: right">保存</n-button>
@@ -159,7 +180,7 @@
 </template>
 
 <script setup>
-import {BookOutline} from '@vicons/ionicons5'
+import {BookOutline, FemaleOutline, MaleOutline} from '@vicons/ionicons5'
 import {LikeOutlined, MessageOutlined} from '@vicons/antd'
 import {h, onMounted, ref} from "vue";
 import {NButton, useMessage} from "naive-ui";
@@ -178,16 +199,19 @@ const uidt = store.state.uidTemp
 const pagination = {
   pageSize: 10
 }
-// 模块相关
+// vip
 const code = ref()
 const showVip = ref(false)
+// follow
 const showFollow = ref(false)
 const showFollower = ref(false)
+const upId = ref(null)
+// changeInfo
 const showChangeInfo = ref(false)
 const newUsername = ref(null)
 const newPassword = ref(null)
 const newInfo = ref(null)
-const upId = ref(null)
+const newSex = ref(null)
 // 数据类初始化
 const userData = ref({})
 const data1 = ref([])
@@ -615,13 +639,16 @@ const handleChangeInfo = () => {
   newUsername.value = userData.value.Username
   newPassword.value = userData.value.Password
   newInfo.value = userData.value.UserInfo
+  newSex.value = userData.value.Sex.toString()
   showChangeInfo.value = true
 }
 const changeInfo = () => {
   let formData = new FormData()
+  formData.set("userId", store.state.uid)
   formData.set('username', newUsername.value)
   formData.set('password', newPassword.value)
   formData.set('userInfo', newInfo.value)
+  formData.set("sex", newSex.value)
   store.state.axios({
     url: '/go/user/updateUserInfo',
     method: 'post',
@@ -698,7 +725,7 @@ onMounted(() => {
 
 <style scoped>
 .user{
-  text-align: center;
   font-size: 28px;
+  line-height: 0;
 }
 </style>

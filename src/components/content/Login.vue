@@ -40,6 +40,18 @@
                           @keydown.enter.prevent
                       />
                     </n-form-item-row>
+                    <n-form-item-gi :span="12" label="性别" path="sexSignup" :show-require-mark="true">
+                      <n-radio-group v-model:value="modelSignup.sexValue">
+                        <n-space>
+                          <n-radio value="0">
+                            男
+                          </n-radio>
+                          <n-radio value="1">
+                            女
+                          </n-radio>
+                        </n-space>
+                      </n-radio-group>
+                    </n-form-item-gi>
                     <n-form-item-row label="密码" path="passwordSignup" :show-require-mark="true">
                       <n-input
                           type="password"
@@ -156,9 +168,11 @@ const modelSignup = ref({
   passwordSignup: null,
   repasswordSignup: null,
   isAgree: null,
+  sexValue: "0"
 })
 const tabDef = ref(store.state.choice)
-let tabValue = ref()
+const tabValue = ref()
+// const sexValue = ref("0")
 
 const rulesSignin = {
   useridSignin: [{
@@ -245,7 +259,7 @@ const register = () => {
       formData.set('username', modelSignup.value.usernameSignup)
       formData.set('password', modelSignup.value.passwordSignup)
       formData.set('rePassword', modelSignup.value.repasswordSignup)
-
+      formData.set('sexValue', modelSignup.value.sexValue)
       store.state.axios({
         url: '/go/user/register',
         method: 'post',
@@ -253,7 +267,7 @@ const register = () => {
       }).then(r => {
         if (r.status === 200) {
           store.state.choice = "signin"
-          modelSignin.value.useridSignin = r.data.userId
+          modelSignin.value.useridSignin = r.data.userId.toString()
           modelSignin.value.passwordSignin = r.data.password
           message.success("注册成功！")
           notification.warning({
