@@ -129,12 +129,12 @@ const columns = createColumns({
       positiveText: '确定',
       negativeText: '取消',
       onPositiveClick: () => {
-        let formData = new FormData()
-        formData.set('articleId', rowData.ArticleId)
         store.state.axios({
           url: '/go/article/deleteArticle',
-          method: 'post',
-          data: formData,
+          method: 'delete',
+          params: {
+            articleId: rowData.ArticleId
+          }
         }).then(() => {
           message.success("文章彻底删除!")
           getArticles()
@@ -150,12 +150,12 @@ const clearBin = () => {
   if (store.state.uid === 0) {
     message.error("您尚未登录！")
   } else {
-    let formdata = new FormData
-    formdata.set("userId", store.state.uid)
     store.state.axios({
       url: '/go/article/deleteAllArticle',
       method: 'delete',
-      data: formdata,
+      params: {
+        userId: store.state.uid
+      }
     }).then(() => {
       message.success("清空回收站！")
       getArticles()

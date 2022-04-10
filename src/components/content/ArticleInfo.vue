@@ -133,8 +133,11 @@
         aria-modal="true"
     >
       <n-space vertical>
-        <n-select v-model:value="secretValue" :options="secretOptions" :consistent-menu-width="false" style="width: 150px;float: right"
-                  placeholder="选择他人是否可见"/>
+        <n-space>
+          <p style="line-height: 8px">查看权限</p>
+          <n-select v-model:value="secretValue" :options="secretOptions" :consistent-menu-width="false" style="width: 150px"
+                    placeholder="选择他人是否可见"/>
+        </n-space>
         <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                  maxlength="20" show-count/>
         <div class="editor">

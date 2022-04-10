@@ -392,7 +392,8 @@ const createColumns5 = ({ unFollow }) => {
             NButton,
             {
               size: 'small',
-              type: 'info',
+              type: 'error',
+              ghost: true,
               onClick: () => unFollow(row)
             },
             { default: () => '取消关注' }
@@ -431,6 +432,7 @@ const createColumns6 = ({ follow }) => {
             {
               size: 'small',
               type: 'info',
+              ghost: true,
               onClick: () => follow(row)
             },
             { default: () => '关注' }

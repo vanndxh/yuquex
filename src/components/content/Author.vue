@@ -10,7 +10,7 @@
     <br>
     <n-space justify="center">
       <n-badge value="火">
-        <n-button type="success" @click="clickShowQR" size="large">支持小黑</n-button>
+        <n-button type="success" @click="clickShowQR" size="large" ghost>支持小黑</n-button>
       </n-badge>
     </n-space>
 
