@@ -15,6 +15,12 @@
             <!--文章部分-->
             <n-gi span="14">
               <h1>{{ articleData.ArticleName }}</h1>
+              <n-space v-if="tags.length">
+                <div v-for="item in tags" :key="item">
+                  <n-tag type="success" v-if="item !== ''">{{ item }}</n-tag>
+                </div>
+              </n-space>
+
               <div class="ql-container ql-snow" style="border:none;height: fit-content">
                 <div class="ql-editor" style="height: fit-content">
                   <div v-html="articleData.ArticleContent"></div>
@@ -231,6 +237,8 @@ const articleData = ref({})
 const authorData = ref({})
 const userData = ref({})
 const commentData = ref([])
+// tag
+const tags = ref([])
 // method get
 const getCommentData = () => {
   store.state.axios({
@@ -294,6 +302,7 @@ const getArticleData = () => {
     }
   }).then(r => {
     articleData.value = r.data.data
+    tags.value = r.data.data.Tag.split(",")
     getAuthorData()
     getIsFollowed()
   })

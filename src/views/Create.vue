@@ -15,6 +15,26 @@
             <n-space vertical>
               <n-input v-model:value="newArticleName" type="text" placeholder="标题" size="large"
                        maxlength="15" show-count/>
+              <n-space>
+                <p style="line-height: 0">标签：</p>
+                <n-dynamic-tags v-model:value="tags" :max="3" type="success">
+                  <template #trigger="{ activate, disabled }">
+                    <n-button
+                        size="small"
+                        type="primary"
+                        dashed
+                        :disabled="disabled"
+                        @click="activate()"
+                    >
+                      <template #icon>
+                        <n-icon><Add /></n-icon>
+                      </template>
+                      添加
+                    </n-button>
+                  </template>
+                </n-dynamic-tags>
+              </n-space>
+
               <div class="editor">
                 <Quill-editor
                     id="toolbar"
@@ -33,8 +53,6 @@
           <n-gi span="8" :offset="1">
             <n-card hoverable>
               <h4>你也可以直接</h4>
-<!--              https://www.mocky.io/v2/5e4bafc63100007100d8b70f-->
-<!--              https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/-->
               <el-upload
                   drag
                   with-credentials
@@ -76,6 +94,7 @@ import {useStore} from "vuex";
 import {useMessage} from "naive-ui";
 import {useRouter} from "vue-router";
 import { UploadFilled } from '@element-plus/icons-vue'
+import Add from "@vicons/ionicons5/Add";
 import tabBar from "@/components/common/tabBar";
 import tabBarS from "@/components/common/tabBarS";
 // use
@@ -119,6 +138,8 @@ const editorOption = {
   theme: 'snow',
       placeholder: '请输入正文~'
 }
+// tag
+const tags = ref([])
 // method
 const createArticle = () => {
   if (store.state.uid === 0){
@@ -128,10 +149,16 @@ const createArticle = () => {
   } else if (newArticleName.value.indexOf(" ") !== -1 || newArticleName.value.indexOf("　") !== -1) {
     message.error("文章名不能含空格！")
   } else {
+    let tag = ""
+    tags.value.forEach(i => {
+      tag = tag + i + ","
+    })
+    tag = tag.slice(0, tag.length-1)
     let formData = new FormData()
     formData.set('articleName', newArticleName.value)
     formData.set('articleContent', newArticleContent.value)
     formData.set('articleAuthor', store.state.uid)
+    formData.set('tag', tag)
 
     store.state.axios({
       url: '/go/article/createArticle',
