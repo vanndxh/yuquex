@@ -182,6 +182,7 @@ const getNotice = () => {
     welcome()
   })
 }
+
 // lifecycle
 onMounted(() => {
   getNotice()

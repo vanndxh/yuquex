@@ -258,6 +258,19 @@ const menuOptions = [
             ),
         key: 'update',
       },
+      {
+        label: () =>
+            h(
+                resolveComponent('router-link'),
+                {
+                  to: {
+                    name: 'Cloud',
+                  }
+                },
+                { default: () => '热门词云' }
+            ),
+        key: 'cloud',
+      }
     ]
   },
 ]

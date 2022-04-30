@@ -82,6 +82,11 @@ const routes = [
     name: 'Manager',
     component: () => import('../components/content/Manager')
   },
+  {
+    path: '/Cloud',
+    name: 'Cloud',
+    component: () => import('../components/content/Cloud')
+  },
 ]
 
 const router = createRouter({
